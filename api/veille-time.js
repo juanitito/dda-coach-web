@@ -42,8 +42,9 @@ export default async function handler(req) {
     if (!module_code || !increment) {
       return json({ error: 'Missing fields' }, 400);
     }
-    // Garde-fou : le front utilise VEILLE_STEP=60 (un tick par minute).
-    // On tolère jusqu'à 600s/appel pour absorber le throttling de tab inactif.
+    // Garde-fou : max 600s/appel. Le front sync toutes les 30s avec le vrai
+    // temps écoulé depuis la dernière sync, donc typiquement 30s, exception-
+    // nellement plus en cas de tab suspendu — capé côté front à 600s aussi.
     const inc = Number.parseInt(increment, 10);
     if (!Number.isFinite(inc) || inc <= 0 || inc > 600) {
       return json({ error: 'Invalid increment' }, 400);

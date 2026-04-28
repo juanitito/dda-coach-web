@@ -2258,33 +2258,53 @@ function closeModalDirect() {
 }
 
 // ===== VEILLE TIMER =====
+// Compteur basé sur Date.now() : on mesure le temps réel écoulé depuis
+// la dernière sync. Robuste au throttling de tab inactif et au cas où
+// l'utilisateur lit les articles dans d'autres onglets — la modale reste
+// ouverte en arrière-plan, le compteur continue à comptabiliser le vrai
+// temps écoulé. Sync toutes les 30s + sync finale à la fermeture.
 let _veilleTimer   = null;
-let _veilleSeconds = 0;
-const VEILLE_MAX  = 1800;
-// 60s = 1 tick par minute. La progression côté serveur est synchronisée
-// chaque minute, ce qui rend le feature robuste à la fermeture de modale,
-// au throttling de tab inactif, au reload — au lieu de tout perdre toutes
-// les 10 minutes. Total à valider : 30 ticks = 30 minutes.
-const VEILLE_STEP = 60;
+let _veilleStart   = null;
+let _veilleCode    = null;
+const VEILLE_MAX        = 1800;
+const VEILLE_SYNC_EVERY = 30 * 1000;
 
 function startVeilleTimer(code, mod) {
   stopVeilleTimer();
-  _veilleSeconds = Math.min(mProgress[code]?.seconds_spent || 0, VEILLE_MAX);
-  if (_veilleSeconds >= VEILLE_MAX) return; // déjà validé
-
-  _veilleTimer = setInterval(async () => {
-    _veilleSeconds += VEILLE_STEP;
-    await callVeilleTimeAPI(code, VEILLE_STEP);
-    if (_veilleSeconds >= VEILLE_MAX) {
-      stopVeilleTimer();
-      markDone(code);
-      toast('🏆 Veille lue ! Module validé.');
-    }
-  }, VEILLE_STEP * 1000);
+  const current = mProgress[code]?.seconds_spent || 0;
+  if (current >= VEILLE_MAX) return; // déjà validé
+  _veilleStart = Date.now();
+  _veilleCode  = code;
+  _veilleTimer = setInterval(syncVeilleElapsed, VEILLE_SYNC_EVERY);
 }
 
 function stopVeilleTimer() {
-  if (_veilleTimer) { clearInterval(_veilleTimer); _veilleTimer = null; }
+  if (_veilleTimer) {
+    syncVeilleElapsed(); // sync finale du temps écoulé non encore débité
+    clearInterval(_veilleTimer);
+    _veilleTimer = null;
+  }
+  _veilleStart = null;
+  _veilleCode  = null;
+}
+
+async function syncVeilleElapsed() {
+  if (!_veilleStart || !_veilleCode) return;
+  // Cap à 600s/sync : aligné sur le garde-fou serveur. Si l'onglet a été
+  // suspendu longtemps (sleep, discard...), on crédite max 10 min par
+  // reprise — limite raisonnable contre l'abus.
+  const elapsed = Math.min(600, Math.floor((Date.now() - _veilleStart) / 1000));
+  if (elapsed <= 0) return;
+  _veilleStart = Date.now(); // reset baseline avant l'await pour ne pas double-compter
+  const code = _veilleCode;
+  await callVeilleTimeAPI(code, elapsed);
+  if ((mProgress[code]?.seconds_spent || 0) >= VEILLE_MAX) {
+    if (_veilleTimer) { clearInterval(_veilleTimer); _veilleTimer = null; }
+    _veilleStart = null;
+    _veilleCode  = null;
+    markDone(code);
+    toast('🏆 Veille lue ! Module validé.');
+  }
 }
 
 async function callVeilleTimeAPI(code, increment) {
