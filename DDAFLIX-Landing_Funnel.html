@@ -1307,6 +1307,17 @@ convention que vous avez passée avec elle.
 // ── API SIRENE — Recherche raison sociale ──
 let _sireneTimer = null;
 
+// Échappement HTML pour toute donnée externe (Sirene, BAN) injectée via innerHTML.
+function escapeHtml(s) {
+  if (s == null) return '';
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 async function searchEntreprise(q) {
   clearTimeout(_sireneTimer);
   const sug = document.getElementById('rs-suggestions');
@@ -1327,9 +1338,12 @@ async function searchEntreprise(q) {
         const siege = r.siege || {};
         const parts = [siege.adresse, siege.code_postal, siege.libelle_commune].filter(Boolean);
         const adresse = parts.join(', ');
+        const nom = escapeHtml(r.nom_complet || r.nom_raison_sociale || '-');
+        const siret = escapeHtml(siege.siret || '');
+        const adrEsc = escapeHtml(adresse);
         html += '<div style="padding:10px 14px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.06);font-size:13px;" onmouseover="this.style.background=\'rgba(61,127,255,.1)\'" onmouseout="this.style.background=\'\'" onclick="selectEntreprise(' + i + ')">';
-        html += '<div style="font-weight:600;color:#f0f4ff;">' + (r.nom_complet || r.nom_raison_sociale || '-') + '</div>';
-        html += '<div style="font-size:11px;color:#6b7a99;margin-top:2px;">' + (siege.siret || '') + (adresse ? ' · ' + adresse : '') + '</div>';
+        html += '<div style="font-weight:600;color:#f0f4ff;">' + nom + '</div>';
+        html += '<div style="font-size:11px;color:#6b7a99;margin-top:2px;">' + siret + (adrEsc ? ' · ' + adrEsc : '') + '</div>';
         html += '</div>';
       }
       sug.innerHTML = html;
@@ -1355,7 +1369,10 @@ function selectEntreprise(idx) {
 
   // Confirmation
   const sel = document.getElementById('rs-selected');
-  sel.innerHTML = `✓ <strong>${r.nom_complet || r.nom_raison_sociale}</strong> — SIRET ${formatSiret(siege.siret || '')} · ${siege.libelle_commune || ''}`;
+  const nomEsc = escapeHtml(r.nom_complet || r.nom_raison_sociale || '');
+  const siretEsc = escapeHtml(formatSiret(siege.siret || ''));
+  const villeEsc = escapeHtml(siege.libelle_commune || '');
+  sel.innerHTML = `✓ <strong>${nomEsc}</strong> — SIRET ${siretEsc} · ${villeEsc}`;
   sel.style.display = 'block';
 
   // Cacher suggestions, afficher champs
@@ -1407,7 +1424,7 @@ async function searchAdresse(q) {
           padding:10px 14px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.06);
           font-size:12px;transition:background .15s;
         " onmouseover="this.style.background='rgba(61,127,255,.1)'" onmouseout="this.style.background=''">
-          <div style="color:#f0f4ff;">${f.properties.label}</div>
+          <div style="color:#f0f4ff;">${escapeHtml(f.properties.label)}</div>
         </div>`).join('');
       sug.style.display = 'block';
       window._banResults = features;
