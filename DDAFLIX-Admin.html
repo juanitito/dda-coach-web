@@ -875,7 +875,7 @@ tbody td{padding:12px 20px;font-size:13px;color:var(--text);}
       <button class="ef-btn" onclick="filterModules('elearning',this)">📄 E-learning</button>
       <button class="ef-btn" onclick="filterModules('video',this)">▶ Vidéo</button>
       <button class="ef-btn" onclick="filterModules('veille',this)">📡 Veille</button>
-      <button class="ef-btn" onclick="filterModules('outil',this)">⚙ Outils</button>
+      <button class="ef-btn" onclick="filterModules('outils',this)">⚙ Outils</button>
     </div>
     <div style="display:flex;gap:8px;margin-bottom:16px;align-items:center;">
       <input type="text" id="module-search" placeholder="🔍 Rechercher…" oninput="renderModules(currentModFilter||'all')"
@@ -1471,7 +1471,7 @@ async function loadSupabaseData() {
     // Modules
     const { data: mods } = await sb
       .from('modules')
-      .select('code, section, title, duree_minutes, niveau, published, type, video_url, thumbnail_url')
+      .select('code, section, title, duree_minutes, niveau, published, type, video_url, thumbnail_url, created_at')
       .order('created_at', { ascending: false });
     // Stats progression
     const { data: learningStats } = await sb.from('v_learning_stats').select('*').single();
@@ -1661,7 +1661,7 @@ function renderView(name) {
       } catch { return _SKEY; }
     };
     getToken().then(token => {
-      fetch(`${_SURL}/rest/v1/modules?select=code,section,title,duree_minutes,niveau,published,type,thumbnail_url,video_url&order=sort_order`, {
+      fetch(`${_SURL}/rest/v1/modules?select=code,section,title,duree_minutes,niveau,published,type,thumbnail_url,video_url,created_at&order=sort_order`, {
         headers: { apikey: _SKEY, Authorization: `Bearer ${token}` }
       }).then(r => r.json()).then(data => {
         if (Array.isArray(data)) window._sbMods = data;
@@ -1872,8 +1872,21 @@ function renderPayments() {
 // ══════════════════════════════════════
 // MODULES
 // ══════════════════════════════════════
-const SECTION_LABELS = {tc:'Tronc Commun',reg:'Réglementaire',tp:'Technique Produit',tv:'Techniques de Vente'};
-const SECTION_COLORS = {tc:'#3d7fff',reg:'#e05c8a',tp:'#2dd4bf',tv:'#a78bfa'};
+const SECTION_LABELS = {
+  tc:'Tronc Commun',           reg:'Réglementaire',
+  tp:'Technique Produit',      rc:'Réglementation Complémentaire',
+  pe:'Pratiques & Expertises', aa:'Assurance Avancée',
+  tv:'Techniques de Vente',    dc:'Développement Commercial',
+  mc:'Management Commercial',  cs:'Compétences Soft',
+  bm:'Benchmark',              go:'Gestion & Organisation',
+  veille:'Veille',             outils:'Outils',
+};
+const SECTION_COLORS = {
+  tc:'#3d7fff', reg:'#e05c8a', tp:'#2dd4bf', rc:'#60a5fa',
+  pe:'#38bdf8', aa:'#c084fc',  tv:'#a78bfa', dc:'#34d399',
+  mc:'#fb923c', cs:'#fbbf24',  bm:'#f59e0b', go:'#94a3b8',
+  veille:'#2dd4bf', outils:'#c8a84b',
+};
 let currentModFilter = 'all';
 
 function filterModules(typeFilter, btn) {
@@ -1898,13 +1911,14 @@ function renderModules(sec) {
         completions: 0,
         score:       0,
         thumbnail:   m.thumbnail_url || null,
-        video_url:   m.video_url     || null
+        video_url:   m.video_url     || null,
+        created_at:  m.created_at    || null
       }))
     : DEMO.modules;
 
   let mods = sec === 'all' ? source : source.filter(m => (m.type || 'elearning') === sec);
   if (searchVal) mods = mods.filter(m => m.title.toLowerCase().includes(searchVal) || m.code.toLowerCase().includes(searchVal));
-  if (sortVal === 'recent') mods = [...mods].reverse();
+  if (sortVal === 'recent') mods = [...mods].sort((a,b) => new Date(b.created_at||0) - new Date(a.created_at||0));
   else if (sortVal === 'az') mods = [...mods].sort((a,b) => a.title.localeCompare(b.title, 'fr'));
   document.getElementById('module-grid').innerHTML = mods.map(m => {
     const isVideo = m.type === 'video';
@@ -1924,7 +1938,7 @@ function renderModules(sec) {
         <div class="mac-code">${m.code}</div>
         <div style="display:flex;align-items:center;gap:6px;">
           <span class="mod-type-badge ${isVideo ? 'mtb-video' : 'mtb-elearning'}">${isVideo ? '▶ Vidéo' : '📄 E-learning'}</span>
-          <span style="font-size:10px;color:${SECTION_COLORS[m.section]};font-weight:700;">${SECTION_LABELS[m.section]}</span>
+          <span style="font-size:10px;color:${SECTION_COLORS[m.section]||'var(--muted)'};font-weight:700;">${SECTION_LABELS[m.section]||m.section||'—'}</span>
         </div>
       </div>
       <div class="mac-title">${m.title}</div>
@@ -2377,7 +2391,7 @@ async function saveModal() {
         return;
       }
       // Recharger les modules
-      const { data: mods } = await _sb.from('modules').select('code, section, title, duree_minutes, niveau, published, type, thumbnail_url, video_url').order('sort_order');
+      const { data: mods } = await _sb.from('modules').select('code, section, title, duree_minutes, niveau, published, type, thumbnail_url, video_url, created_at').order('sort_order');
       if (mods) window._sbMods = mods;
       renderModules(currentModFilter || 'all');
       closeModal();
@@ -3035,7 +3049,7 @@ async function saveYoutubeModule() {
 
   // Recharger le cache modules pour l'onglet Modules
   const { data: mods } = await sb.from('modules')
-    .select('code, section, title, duree_minutes, niveau, published, type, video_url, thumbnail_url')
+    .select('code, section, title, duree_minutes, niveau, published, type, video_url, thumbnail_url, created_at')
     .order('created_at', { ascending: false });
   if (mods) window._sbMods = mods;
 
