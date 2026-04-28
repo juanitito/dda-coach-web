@@ -77,16 +77,27 @@ export default async function handler(req) {
       ...(validated && !prev?.quiz_passed ? { completed_at: new Date().toISOString() } : {}),
     };
 
-    await fetch(`${SUPABASE_URL}/rest/v1/progress`, {
-      method: 'POST',
-      headers: {
-        apikey: serviceKey,
-        Authorization: `Bearer ${serviceKey}`,
-        'Content-Type': 'application/json',
-        Prefer: 'resolution=merge-duplicates',
-      },
-      body: JSON.stringify(upsertBody),
-    });
+    // on_conflict=user_id,module_id : la table progress a un UNIQUE
+    // (user_id, module_id). Sans ce paramètre PostgREST utilise la PK (id)
+    // pour le merge, ce qui ne matche jamais → INSERT répété → 409 sur le
+    // UNIQUE → upsert silencieusement échoué.
+    const upsertRes = await fetch(
+      `${SUPABASE_URL}/rest/v1/progress?on_conflict=user_id,module_id`,
+      {
+        method: 'POST',
+        headers: {
+          apikey: serviceKey,
+          Authorization: `Bearer ${serviceKey}`,
+          'Content-Type': 'application/json',
+          Prefer: 'resolution=merge-duplicates,return=minimal',
+        },
+        body: JSON.stringify(upsertBody),
+      }
+    );
+    if (!upsertRes.ok) {
+      const errText = await upsertRes.text();
+      return json({ error: 'Upsert failed', detail: errText }, upsertRes.status);
+    }
 
     return json({ ok: true, seconds_spent: newSecs, validated });
 
