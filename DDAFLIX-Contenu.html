@@ -2289,12 +2289,11 @@ async function callVeilleTimeAPI(code, increment) {
     if (!session) return;
     await fetch('/api/veille-time', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        module_code: code,
-        user_id:     session.user.id,
-        increment
-      })
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${session.access_token}`,
+      },
+      body: JSON.stringify({ module_code: code, increment })
     });
     // Mettre à jour le cache local
     if (!mProgress[code]) mProgress[code] = { seconds_spent: 0 };
