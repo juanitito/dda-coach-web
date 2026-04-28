@@ -1,0 +1,1293 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNyIgZmlsbD0iIzBiMGYxYSIvPgogIDxwYXRoIGQ9Ik04IDZoOGMyLjUgMCA0LjUgMS44IDQuNSA0LjIgMCAxLjQtLjcgMi42LTEuOCAzLjMgMS41LjcgMi41IDIuMSAyLjUgMy44QzIxLjIgMjAgMTkgMjIgMTYuMiAyMkg4VjZ6bTMgM3Y0aDQuNWMxIDAgMS44LS44IDEuOC0ycy0uOC0yLTEuOC0ySDExem0wIDd2NGg1YzEuMSAwIDItLjkgMi0ycy0uOS0yLTItMmgtNXoiIGZpbGw9IiMzZDdmZmYiLz4KICA8Y2lyY2xlIGN4PSIyNSIgY3k9IjI1IiByPSI0LjUiIGZpbGw9IiMyZGQ0YmYiLz4KPC9zdmc+">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Comparateur de garanties — BingeDDA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+/* ── VARIABLES BingeDDA ── */
+:root {
+  --bg:        #080c14;
+  --bg2:       #0b0f1a;
+  --bg3:       #0f1628;
+  --surface:   #141e30;
+  --s2:        #1a2640;
+  --s3:        #1f2e4a;
+  --accent:    #3d7fff;
+  --accent2:   #6b9fff;
+  --teal:      #2dd4bf;
+  --gold:      #e0c472;
+  --red:       #ef4444;
+  --green:     #22c55e;
+  --text:      #c8d4e8;
+  --muted:     #5a6a88;
+  --white:     #f0f4ff;
+  --border:    rgba(61,127,255,0.15);
+  --border2:   rgba(61,127,255,0.25);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+html { font-size:16px; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── TOPBAR ── */
+.topbar {
+  position: fixed; top:0; left:0; right:0; z-index:100;
+  background: rgba(8,12,20,0.92);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 2rem; height: 56px;
+}
+.topbar-logo {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.5rem; letter-spacing: 0.02em;
+  color: var(--white);
+}
+.topbar-logo span { color: var(--accent); }
+.topbar-badge {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 20px;
+  padding: 4px 14px;
+  font-size: 0.7rem; font-weight:600; letter-spacing:0.08em;
+  color: var(--teal); text-transform: uppercase;
+}
+.topbar-back {
+  font-size: 0.82rem; color: var(--muted);
+  cursor: pointer; transition: color 0.2s;
+  display: flex; align-items: center; gap: 6px;
+  background: none; border: none; font-family: inherit;
+}
+.topbar-back:hover { color: var(--white); }
+
+/* ── HERO ── */
+.hero {
+  padding: 96px 2rem 40px;
+  text-align: center;
+  max-width: 760px; margin: 0 auto;
+}
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--surface); border: 1px solid var(--border2);
+  border-radius: 20px; padding: 5px 16px;
+  font-size: 0.7rem; font-weight:600; letter-spacing:0.1em;
+  color: var(--accent); text-transform: uppercase;
+  margin-bottom: 20px;
+}
+.hero h1 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(2.4rem, 6vw, 3.8rem);
+  line-height: 1.05; color: var(--white);
+  letter-spacing: 0.02em;
+  margin-bottom: 14px;
+}
+.hero h1 em { color: var(--accent); font-style: normal; }
+.hero-sub {
+  font-size: 0.95rem; color: var(--muted); line-height: 1.6;
+  max-width: 520px; margin: 0 auto;
+}
+
+/* ── MAIN WRAPPER ── */
+.main {
+  max-width: 1100px; margin: 0 auto;
+  padding: 0 1.5rem 5rem;
+}
+
+/* ── STEP INDICATOR ── */
+.steps {
+  display: flex; align-items: center; justify-content: center;
+  gap: 0; margin: 0 auto 40px;
+  max-width: 500px;
+}
+.step-item {
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  flex: 1;
+}
+.step-dot {
+  width: 32px; height: 32px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.75rem; font-weight: 700;
+  border: 2px solid var(--muted);
+  color: var(--muted); background: transparent;
+  transition: all 0.3s;
+}
+.step-dot.active { border-color: var(--accent); color: var(--accent); background: rgba(61,127,255,0.12); }
+.step-dot.done { border-color: var(--teal); color: var(--bg); background: var(--teal); }
+.step-label { font-size: 0.65rem; color: var(--muted); text-align:center; font-weight:500; letter-spacing:0.05em; text-transform:uppercase; }
+.step-label.active { color: var(--accent); }
+.step-connector { flex: 0 0 40px; height: 1px; background: var(--border); margin-bottom: 22px; transition: background 0.3s; }
+.step-connector.done { background: var(--teal); }
+
+/* ── CARDS ── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 2rem;
+  transition: border-color 0.2s;
+}
+.card:hover { border-color: var(--border2); }
+.card-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.1rem; letter-spacing: 0.05em;
+  color: var(--white); margin-bottom: 1.2rem;
+  display: flex; align-items: center; gap: 10px;
+}
+.card-title-icon {
+  width: 28px; height: 28px; border-radius: 8px;
+  background: rgba(61,127,255,0.15);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.9rem;
+}
+
+/* ── STEP 1 — TYPE CONTRAT ── */
+.contract-types {
+  display: flex; flex-wrap: wrap;
+  gap: 8px;
+}
+.contract-type-btn {
+  background: var(--bg3);
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  padding: 8px 14px;
+  cursor: pointer;
+  transition: all 0.22s;
+  display: flex; flex-direction: row; align-items: center; gap: 7px;
+  font-family: 'DM Sans', sans-serif;
+  text-align: left;
+}
+.contract-type-btn:hover {
+  border-color: var(--accent);
+  background: rgba(61,127,255,0.06);
+  transform: translateY(-1px);
+}
+.contract-type-btn.selected {
+  border-color: var(--accent);
+  background: rgba(61,127,255,0.12);
+  box-shadow: 0 0 0 3px rgba(61,127,255,0.08);
+}
+.contract-icon { font-size: 1.2rem; }
+.contract-name {
+  font-size: 0.82rem; font-weight: 600;
+  color: var(--white); letter-spacing: 0.01em;
+}
+.contract-sub { display: none; }
+
+/* ── STEP 2 — UPLOAD ── */
+.upload-row {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+}
+.upload-zone {
+  border: 2px dashed var(--border2);
+  border-radius: 12px;
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.22s;
+  position: relative;
+  background: var(--bg3);
+}
+.upload-zone:hover {
+  border-color: var(--accent);
+  background: rgba(61,127,255,0.05);
+}
+.upload-zone.drag-over {
+  border-color: var(--teal);
+  background: rgba(45,212,191,0.05);
+}
+.upload-zone.loaded {
+  border-color: var(--teal);
+  border-style: solid;
+  background: rgba(45,212,191,0.04);
+}
+.upload-zone input[type=file] {
+  position: absolute; inset: 0; opacity: 0; cursor: pointer; width:100%;
+}
+.upload-icon { font-size: 2rem; margin-bottom: 10px; }
+.upload-label {
+  font-size: 0.78rem; font-weight:600; color: var(--white); margin-bottom: 5px;
+}
+.upload-sub { font-size: 0.68rem; color: var(--muted); }
+.upload-filename {
+  font-size: 0.75rem; color: var(--teal); margin-top: 8px;
+  font-weight: 600; word-break: break-all;
+}
+.upload-contract-label {
+  font-size: 0.65rem; font-weight:700; letter-spacing:0.1em;
+  text-transform: uppercase; color: var(--accent); margin-bottom: 12px;
+  text-align: left;
+}
+
+/* ── ANALYSE EN COURS ── */
+.analysing {
+  display: none; text-align: center; padding: 3rem 1rem;
+}
+.analysing.show { display: block; }
+.spinner {
+  width: 56px; height: 56px;
+  border: 3px solid var(--border2);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+  margin: 0 auto 1.5rem;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.analysing-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.4rem; color: var(--white); margin-bottom: 8px;
+}
+.analysing-sub { font-size: 0.82rem; color: var(--muted); }
+.analysing-step {
+  font-size: 0.75rem; color: var(--accent); margin-top: 16px;
+  min-height: 20px; font-weight:500;
+}
+
+/* ── RÉSULTATS ── */
+.results-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 24px; flex-wrap: wrap; gap: 12px;
+}
+.results-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.6rem; color: var(--white); letter-spacing: 0.03em;
+}
+.results-meta { font-size: 0.75rem; color: var(--muted); }
+.results-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+/* Synthèse rapide */
+.verdict-banner {
+  background: linear-gradient(135deg, rgba(61,127,255,0.1) 0%, rgba(45,212,191,0.06) 100%);
+  border: 1px solid var(--border2);
+  border-radius: 12px;
+  padding: 1.2rem 1.5rem;
+  margin-bottom: 24px;
+  display: flex; align-items: flex-start; gap: 14px;
+}
+.verdict-icon { font-size: 1.5rem; flex-shrink: 0; margin-top: 2px; }
+.verdict-text { font-size: 0.85rem; line-height: 1.6; color: var(--text); }
+.verdict-text strong { color: var(--white); font-weight:600; }
+
+/* Score cards */
+.score-row {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+  margin-bottom: 24px;
+}
+.score-card {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.2rem 1.5rem;
+  text-align: center;
+}
+.score-contract {
+  font-size: 0.65rem; font-weight:700; letter-spacing:0.1em;
+  text-transform:uppercase; color: var(--muted); margin-bottom:10px;
+}
+.score-label {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 2.4rem; letter-spacing: 0.04em;
+}
+.score-label.best { color: var(--teal); }
+.score-label.lower { color: var(--text); }
+.score-sub { font-size: 0.7rem; color: var(--muted); margin-top:4px; }
+.score-badge {
+  display: inline-block; margin-top: 8px;
+  background: rgba(45,212,191,0.15); color: var(--teal);
+  font-size: 0.65rem; font-weight:700; letter-spacing:0.08em;
+  text-transform:uppercase; border-radius:20px; padding:3px 10px;
+}
+
+/* Tableau comparatif */
+.compare-table-wrap { overflow-x: auto; }
+.compare-table {
+  width: 100%; border-collapse: collapse;
+}
+.compare-table th, .compare-table td {
+  padding: 13px 16px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.82rem;
+}
+.compare-table th {
+  background: var(--bg3);
+  color: var(--muted); font-weight:700; letter-spacing:0.07em;
+  text-transform: uppercase; font-size: 0.65rem;
+  position: sticky; top:0;
+}
+.compare-table th.contract-col {
+  color: var(--white); font-size: 0.78rem; text-transform: none; letter-spacing: 0;
+  background: var(--surface);
+}
+.compare-table td { color: var(--text); vertical-align: middle; }
+.compare-table tr:last-child td { border-bottom: none; }
+.compare-table tr:hover td { background: rgba(61,127,255,0.03); }
+.compare-table .guarantee-name { color: var(--muted); font-size: 0.76rem; }
+.compare-table .val { font-weight: 600; color: var(--white); }
+.compare-table .val.better { color: var(--teal); }
+.compare-table .val.worse { color: var(--muted); }
+.compare-table .val.equal { color: var(--text); }
+.compare-table .na { color: var(--muted); font-style: italic; font-weight:400; font-size:0.74rem; }
+.diff-indicator {
+  display: inline-block; width:6px; height:6px; border-radius:50%;
+  margin-left: 6px; vertical-align: middle;
+}
+.diff-indicator.better { background: var(--teal); }
+.diff-indicator.worse  { background: var(--red); opacity:0.6; }
+.diff-indicator.equal  { display:none; }
+
+/* Section header dans le tableau */
+.compare-table .section-row td {
+  background: var(--bg3);
+  color: var(--accent); font-weight:700; letter-spacing:0.08em;
+  text-transform: uppercase; font-size: 0.65rem;
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--border2);
+}
+.compare-table .section-row:hover td { background: var(--bg3); }
+
+/* ── BOUTONS ── */
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 11px 22px;
+  border-radius: 10px; font-family: 'DM Sans', sans-serif;
+  font-size: 0.82rem; font-weight: 600; cursor: pointer;
+  border: none; transition: all 0.2s;
+  text-decoration: none;
+}
+.btn-primary {
+  background: var(--accent);
+  color: var(--white);
+}
+.btn-primary:hover { background: #5a8fff; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(61,127,255,0.3); }
+.btn-primary:disabled { background: var(--muted); cursor: not-allowed; transform: none; box-shadow: none; opacity:0.6; }
+.btn-ghost {
+  background: transparent;
+  color: var(--text);
+  border: 1px solid var(--border2);
+}
+.btn-ghost:hover { background: var(--s2); color: var(--white); border-color: var(--accent); }
+.btn-teal {
+  background: rgba(45,212,191,0.15);
+  color: var(--teal);
+  border: 1px solid rgba(45,212,191,0.3);
+}
+.btn-teal:hover { background: rgba(45,212,191,0.25); }
+
+/* ── LEGEND ── */
+.legend {
+  display: flex; align-items: center; gap: 18px;
+  flex-wrap: wrap; padding: 10px 0 20px;
+  font-size: 0.72rem; color: var(--muted);
+}
+.legend-item { display: flex; align-items: center; gap: 6px; }
+.legend-dot { width:8px; height:8px; border-radius:50%; }
+
+/* ── VIEWS ── */
+.view { display: none; }
+.view.active { display: block; }
+
+/* ── ANIMATION ── */
+@keyframes fadeUp {
+  from { opacity:0; transform: translateY(16px); }
+  to   { opacity:1; transform: translateY(0); }
+}
+.fade-up { animation: fadeUp 0.4s ease forwards; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 640px) {
+  .upload-row { grid-template-columns: 1fr; }
+  .score-row  { grid-template-columns: 1fr; }
+  .contract-types { grid-template-columns: repeat(2, 1fr); }
+  .topbar { padding: 0 1rem; }
+  .hero { padding: 88px 1rem 32px; }
+}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<nav class="topbar">
+  <div class="topbar-logo"><span>Binge</span>DDA</div>
+  <div class="topbar-badge">⚖ Outil · Comparateur</div>
+  <button class="topbar-back" onclick="window.location.href='/formation?view=catalogue'">← Retour au catalogue</button>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-eyebrow">🔍 Outil professionnel</div>
+  <h1>Comparateur de <em>garanties</em></h1>
+  <p class="hero-sub">Comparez les tableaux de garanties de deux contrats côte-à-côte. Uploadez les pages standardisées et obtenez une analyse structurée en quelques secondes.</p>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- STEPS -->
+  <div class="steps" id="stepsBar">
+    <div class="step-item">
+      <div class="step-dot active" id="dot1">1</div>
+      <div class="step-label active" id="lbl1">Type de contrat</div>
+    </div>
+    <div class="step-connector" id="conn1"></div>
+    <div class="step-item">
+      <div class="step-dot" id="dot2">2</div>
+      <div class="step-label" id="lbl2">Documents</div>
+    </div>
+    <div class="step-connector" id="conn2"></div>
+    <div class="step-item">
+      <div class="step-dot" id="dot3">3</div>
+      <div class="step-label" id="lbl3">Comparaison</div>
+    </div>
+  </div>
+
+  <!-- ═══ STEP 1 : TYPE ═══ -->
+  <div class="view active" id="view1">
+    <div class="card">
+      <div class="card-title">
+        <div class="card-title-icon">📋</div>
+        Sélectionnez le type de contrat à comparer
+      </div>
+      <div class="contract-types" id="contractTypes">
+        <button class="contract-type-btn" data-type="sante" onclick="selectType(this)">
+          <div class="contract-icon">🏥</div>
+          <div class="contract-name">Santé</div>
+          <div class="contract-sub">Complémentaire santé</div>
+        </button>
+        <button class="contract-type-btn" data-type="auto" onclick="selectType(this)">
+          <div class="contract-icon">🚗</div>
+          <div class="contract-name">Auto</div>
+          <div class="contract-sub">Assurance automobile</div>
+        </button>
+        <button class="contract-type-btn" data-type="habitation" onclick="selectType(this)">
+          <div class="contract-icon">🏠</div>
+          <div class="contract-name">Habitation</div>
+          <div class="contract-sub">MRH / Multirisque</div>
+        </button>
+        <button class="contract-type-btn" data-type="rcpro" onclick="selectType(this)">
+          <div class="contract-icon">💼</div>
+          <div class="contract-name">RC Pro</div>
+          <div class="contract-sub">Responsabilité civile</div>
+        </button>
+        <button class="contract-type-btn" data-type="prevoyance" onclick="selectType(this)">
+          <div class="contract-icon">🛡️</div>
+          <div class="contract-name">Prévoyance</div>
+          <div class="contract-sub">Décès / Incapacité</div>
+        </button>
+        <button class="contract-type-btn" data-type="epargne" onclick="selectType(this)">
+          <div class="contract-icon">📈</div>
+          <div class="contract-name">Épargne / Vie</div>
+          <div class="contract-sub">Assurance-vie / UC</div>
+        </button>
+        <button class="contract-type-btn" data-type="emprunteur" onclick="selectType(this)">
+          <div class="contract-icon">🏦</div>
+          <div class="contract-name">Emprunteur</div>
+          <div class="contract-sub">Assurance de prêt</div>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ STEP 2 : UPLOAD ═══ -->
+  <div class="view" id="view2">
+    <div class="card">
+      <div class="card-title">
+        <div class="card-title-icon">📄</div>
+        Uploadez les tableaux de garanties
+      </div>
+      <p style="font-size:0.8rem; color:var(--muted); margin-bottom:1.5rem; line-height:1.6;">
+        Uploadez uniquement les pages du <strong style="color:var(--text)">tableau de garanties</strong> (1 à 3 pages), pas le contrat complet. Ces tableaux sont légalement standardisés — les termes sont identiques d'un assureur à l'autre, ce qui garantit une analyse fiable.
+      </p>
+
+      <div class="upload-row">
+        <!-- Contrat A -->
+        <div>
+          <div class="upload-contract-label">📘 Contrat A</div>
+          <div class="upload-zone" id="dropA" ondrop="handleDrop(event,'A')" ondragover="handleDragOver(event,'A')" ondragleave="handleDragLeave(event,'A')">
+            <input type="file" id="fileA" accept=".pdf,image/*" onchange="handleFile(event,'A')">
+            <div class="upload-icon">📁</div>
+            <div class="upload-label">Déposer ou cliquer</div>
+            <div class="upload-sub">PDF ou image · Tableau de garanties</div>
+            <div class="upload-filename" id="fnameA"></div>
+          </div>
+        </div>
+        <!-- Contrat B -->
+        <div>
+          <div class="upload-contract-label">📙 Contrat B</div>
+          <div class="upload-zone" id="dropB" ondrop="handleDrop(event,'B')" ondragover="handleDragOver(event,'B')" ondragleave="handleDragLeave(event,'B')">
+            <input type="file" id="fileB" accept=".pdf,image/*" onchange="handleFile(event,'B')">
+            <div class="upload-icon">📁</div>
+            <div class="upload-label">Déposer ou cliquer</div>
+            <div class="upload-sub">PDF ou image · Tableau de garanties</div>
+            <div class="upload-filename" id="fnameB"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Nommage facultatif -->
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:16px;">
+        <div>
+          <label style="font-size:0.72rem; color:var(--muted); letter-spacing:0.05em; text-transform:uppercase; font-weight:600; display:block; margin-bottom:6px;">Nom du contrat A (facultatif)</label>
+          <input type="text" id="nameA" placeholder="Ex: MGEN Santé Confort" style="width:100%; background:var(--bg3); border:1px solid var(--border2); border-radius:8px; padding:9px 12px; color:var(--white); font-family:'DM Sans',sans-serif; font-size:0.82rem; outline:none;">
+        </div>
+        <div>
+          <label style="font-size:0.72rem; color:var(--muted); letter-spacing:0.05em; text-transform:uppercase; font-weight:600; display:block; margin-bottom:6px;">Nom du contrat B (facultatif)</label>
+          <input type="text" id="nameB" placeholder="Ex: Harmonie Mutuelle Essentiel" style="width:100%; background:var(--bg3); border:1px solid var(--border2); border-radius:8px; padding:9px 12px; color:var(--white); font-family:'DM Sans',sans-serif; font-size:0.82rem; outline:none;">
+        </div>
+      </div>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:1.8rem;">
+        <button class="btn btn-ghost" onclick="goToStep1()">← Retour</button>
+        <button class="btn btn-primary" id="btnAnalyse" disabled onclick="startAnalysis()">
+          🔍 Lancer l'analyse
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ ANALYSE EN COURS ═══ -->
+  <div class="view" id="viewAnalysing">
+    <div class="card analysing show">
+      <div class="spinner"></div>
+      <div class="analysing-title">Analyse en cours…</div>
+      <div class="analysing-sub">L'IA extrait et structure les garanties des deux contrats</div>
+      <div class="analysing-step" id="analysingStep">Lecture du document…</div>
+    </div>
+  </div>
+
+  <!-- ═══ STEP 3 : RÉSULTATS ═══ -->
+  <div class="view" id="view3">
+    <div class="results-header">
+      <div>
+        <div class="results-title" id="resultsTitle">Comparaison</div>
+        <div class="results-meta" id="resultsMeta"></div>
+      </div>
+      <div class="results-actions">
+        <button class="btn btn-ghost" onclick="resetAll()">↩ Nouvelle comparaison</button>
+        <button class="btn btn-teal" onclick="exportPDF()">📄 Exporter PDF</button>
+      </div>
+    </div>
+
+    <!-- Synthèse -->
+    <div class="verdict-banner" id="verdictBanner">
+      <div class="verdict-icon" id="verdictIcon">⚖️</div>
+      <div class="verdict-text" id="verdictText"></div>
+    </div>
+
+    <!-- Scores -->
+    <div class="score-row" id="scoreRow"></div>
+
+    <!-- Légende -->
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:var(--teal)"></div>Meilleure garantie</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--muted)"></div>Garantie inférieure</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--border2)"></div>Équivalent</div>
+    </div>
+
+    <!-- Tableau -->
+    <div class="compare-table-wrap">
+      <table class="compare-table" id="compareTable">
+        <thead>
+          <tr>
+            <th style="width:35%;">Garantie</th>
+            <th class="contract-col" id="thA">Contrat A</th>
+            <th class="contract-col" id="thB">Contrat B</th>
+          </tr>
+        </thead>
+        <tbody id="compareBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<script>
+// ══════════════════════════════════════
+// STATE
+// ══════════════════════════════════════
+let selectedType = null;
+let fileDataA = null, fileDataB = null;
+let fileTypeA = null, fileTypeB = null;
+let originalFileA = null, originalFileB = null;
+
+// ══════════════════════════════════════
+// GRILLES PAR TYPE DE CONTRAT
+// ══════════════════════════════════════
+const CONTRACT_GRIDS = {
+  sante: {
+    label: 'Santé',
+    sections: [
+      { name: 'Hospitalisation', keys: ['Séjour hospitalier', 'Chambre particulière', 'Forfait hospitalier', 'Frais de transport', 'Médecin anesthésiste dépassement'] },
+      { name: 'Soins courants', keys: ['Médecin généraliste', 'Spécialiste secteur 1', 'Spécialiste secteur 2 (OPTAM)', 'Actes de spécialité', 'Auxiliaires médicaux'] },
+      { name: 'Pharmacie', keys: ['Médicaments remboursables', 'Médicaments non remboursables'] },
+      { name: 'Optique', keys: ['Montures', 'Verres simples', 'Verres complexes', 'Lentilles', 'Chirurgie réfractive'] },
+      { name: 'Dentaire', keys: ['Soins dentaires', 'Prothèses dentaires (panier 100% Santé)', 'Prothèses dentaires (hors panier)', 'Orthodontie'] },
+      { name: 'Audiologie', keys: ["Prothèses auditives (classe I - 100% Santé)", 'Prothèses auditives (classe II)'] },
+      { name: 'Prévention & autres', keys: ['Vaccins', 'Médecines douces', 'Forfait maternité', 'Cures thermales'] },
+    ]
+  },
+  auto: {
+    label: 'Auto',
+    sections: [
+      { name: 'Garanties de base', keys: ['Responsabilité civile', 'Défense et recours', 'Protection du conducteur'] },
+      { name: 'Dommages au véhicule', keys: ['Collision / Tous risques', 'Vol', 'Incendie', 'Bris de glace', 'Événements naturels', 'Actes de vandalisme'] },
+      { name: 'Assistance', keys: ['Assistance panne (km zéro)', 'Véhicule de remplacement', 'Rapatriement'] },
+      { name: 'Options', keys: ['Franchise dommages', 'Valeur à neuf (durée)', 'Équipements / Accessoires'] },
+    ]
+  },
+  habitation: {
+    label: 'Habitation',
+    sections: [
+      { name: 'Garanties essentielles', keys: ['Incendie et explosion', 'Dégâts des eaux', 'Vol et vandalisme', 'Bris de glace', 'Événements climatiques', 'Catastrophes naturelles'] },
+      { name: 'Responsabilité civile', keys: ['RC vie privée', 'RC locative', 'RC voisinage'] },
+      { name: 'Protection juridique', keys: ['Défense pénale', 'Recours suite à sinistre'] },
+      { name: 'Capitaux assurés', keys: ['Mobilier', 'Objets de valeur', 'Matériel informatique', 'Franchise générale'] },
+    ]
+  },
+  rcpro: {
+    label: 'RC Pro',
+    sections: [
+      { name: 'Garanties principales', keys: ['RC professionnelle', 'RC exploitation', 'RC après livraison', 'RC produits', 'Atteintes immatérielles'] },
+      { name: 'Plafonds de garantie', keys: ['Plafond par sinistre', 'Plafond annuel', 'Franchise par sinistre'] },
+      { name: 'Garanties complémentaires', keys: ['Protection juridique', 'Défense pénale', 'Dommages aux biens confiés'] },
+    ]
+  },
+  prevoyance: {
+    label: 'Prévoyance',
+    sections: [
+      { name: 'Décès', keys: ['Capital décès', 'Rente éducation', 'Rente conjoint', 'Double effet', 'PTIA (Perte Totale)'] },
+      { name: 'Incapacité de travail', keys: ['Délai de franchise', 'Indemnités journalières', 'Durée maximum'] },
+      { name: 'Invalidité', keys: ["Invalidité permanente partielle (IPP)", 'Invalidité permanente totale (IPT)', 'Invalidité professionnelle'] },
+    ]
+  },
+  epargne: {
+    label: 'Épargne / Vie',
+    sections: [
+      { name: 'Fonds en euros', keys: ['Taux garanti', 'Participation aux bénéfices', 'Taux minimum garanti'] },
+      { name: 'Unités de compte', keys: ["Nombre d'UC disponibles", 'Arbitrages gratuits / an', 'Frais de gestion UC'] },
+      { name: 'Frais', keys: ["Frais d'entrée", 'Frais de gestion fonds euros', "Frais d'arbitrage (hors quota)"] },
+      { name: 'Options', keys: ['Avances', 'Rachat partiel', 'Profils de gestion pilotée', 'Option rente'] },
+    ]
+  },
+  emprunteur: {
+    label: 'Emprunteur',
+    sections: [
+      { name: 'Tarification', keys: ['Base de calcul cotisation', 'Coût total assurance', 'Cotisation mensuelle moyenne', 'TAEA', 'Taux annuel moyen', 'Frais de dossier'] },
+      { name: 'Caractéristiques du prêt', keys: ['Capital emprunté', 'Durée du prêt', 'Type de prêt', "Taux d'intérêt"] },
+      { name: 'Garanties décès / invalidité', keys: ['Décès', 'PTIA (Perte Totale Irréversible Autonomie)', 'IPT (Invalidité Permanente Totale)', 'IPP (Invalidité Permanente Partielle)'] },
+      { name: 'Garanties incapacité', keys: ['ITT (Incapacité Temporaire Totale)', 'ITP (Incapacité Temporaire Partielle)', 'Franchise ITT/ITP', 'Option Confort / Sans hospitalisation'] },
+      { name: 'Conditions & limites', keys: ['Quotité assurée', "Limite d'âge adhésion", "Limite d'âge garantie", 'Délai de carence'] },
+    ]
+  },
+};
+
+// ══════════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════════
+function showView(id) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function updateSteps(step) {
+  for (let i=1; i<=3; i++) {
+    const dot = document.getElementById('dot'+i);
+    const lbl = document.getElementById('lbl'+i);
+    dot.classList.remove('active','done');
+    lbl.classList.remove('active');
+    if (i < step) { dot.classList.add('done'); dot.textContent = '✓'; }
+    else if (i === step) { dot.classList.add('active'); dot.textContent = i; lbl.classList.add('active'); }
+    else { dot.textContent = i; }
+    if (i < 3) {
+      const conn = document.getElementById('conn'+i);
+      conn.classList.toggle('done', i < step);
+    }
+  }
+}
+
+function selectType(btn) {
+  document.querySelectorAll('.contract-type-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  selectedType = btn.dataset.type;
+  goToStep2();
+}
+
+function goToStep1() {
+  showView('view1');
+  updateSteps(1);
+}
+
+function goToStep2() {
+  showView('view2');
+  updateSteps(2);
+}
+
+function checkBtnAnalyse() {
+  document.getElementById('btnAnalyse').disabled = !(fileDataA && fileDataB);
+}
+
+// ══════════════════════════════════════
+// GESTION FICHIERS
+// ══════════════════════════════════════
+function handleFile(event, side) {
+  const file = event.target.files[0];
+  if (!file) return;
+  processFile(file, side);
+}
+function handleDrop(event, side) {
+  event.preventDefault();
+  const file = event.dataTransfer.files[0];
+  if (!file) return;
+  handleDragLeave(event, side);
+  processFile(file, side);
+}
+function handleDragOver(event, side) {
+  event.preventDefault();
+  document.getElementById('drop'+side).classList.add('drag-over');
+}
+function handleDragLeave(event, side) {
+  document.getElementById('drop'+side).classList.remove('drag-over');
+}
+
+const MAX_PAGES = 10;
+
+async function processFile(file, side) {
+  const zone  = document.getElementById('drop'+side);
+  const fname = document.getElementById('fname'+side);
+
+  const b64 = await new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload  = e => res(e.target.result.split(',')[1]);
+    r.onerror = () => rej(new Error('Lecture impossible'));
+    r.readAsDataURL(file);
+  });
+
+  const mediaType = file.type || 'application/pdf';
+
+  if (mediaType === 'application/pdf') {
+    try {
+      const lib = await loadPdfJs();
+      const arr = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
+      const pdf = await lib.getDocument({ data: arr }).promise;
+      if (pdf.numPages > MAX_PAGES) {
+        zone.classList.remove('loaded');
+        fname.textContent = '';
+        if (side === 'A') { fileDataA = null; fileTypeA = null; }
+        else               { fileDataB = null; fileTypeB = null; }
+        showFileError(side, `PDF de ${pdf.numPages} pages détecté. Merci d'uploader uniquement le tableau de garanties (${MAX_PAGES} pages max).`);
+        checkBtnAnalyse();
+        return;
+      }
+    } catch(e) {
+      console.warn('pdf.js check skipped:', e);
+    }
+  }
+
+  if (side === 'A') { fileDataA = b64; fileTypeA = mediaType; originalFileA = file; }
+  else               { fileDataB = b64; fileTypeB = mediaType; originalFileB = file; }
+  zone.classList.add('loaded');
+  fname.textContent = '✓ ' + file.name;
+  clearFileError(side);
+  checkBtnAnalyse();
+}
+
+let _pdfjsLib = null;
+function loadPdfJs() {
+  if (_pdfjsLib) return Promise.resolve(_pdfjsLib);
+  return new Promise((res, rej) => {
+    const s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+    s.onload = () => {
+      pdfjsLib.GlobalWorkerOptions.workerSrc =
+        'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+      _pdfjsLib = pdfjsLib;
+      res(_pdfjsLib);
+    };
+    s.onerror = rej;
+    document.head.appendChild(s);
+  });
+}
+
+function showFileError(side, msg) {
+  let el = document.getElementById('fileErr'+side);
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'fileErr'+side;
+    el.style.cssText = 'font-size:0.73rem;color:var(--red);margin-top:8px;font-weight:500;line-height:1.5;';
+    document.getElementById('drop'+side).insertAdjacentElement('afterend', el);
+  }
+  el.textContent = '⚠ ' + msg;
+}
+function clearFileError(side) {
+  const el = document.getElementById('fileErr'+side);
+  if (el) el.textContent = '';
+}
+
+// ══════════════════════════════════════
+// ANALYSE IA
+// ══════════════════════════════════════
+const STEPS_MSGS = [
+  'Lecture du document A…',
+  'Lecture du document B…',
+  'Identification des garanties…',
+  'Comparaison en cours…',
+  'Structuration des résultats…',
+];
+
+async function startAnalysis() {
+  showView('viewAnalysing');
+  updateSteps(3);
+
+  // Animation des étapes
+  let si = 0;
+  const stepEl = document.getElementById('analysingStep');
+  const interval = setInterval(() => {
+    stepEl.textContent = STEPS_MSGS[si % STEPS_MSGS.length];
+    si++;
+  }, 1800);
+
+  try {
+    const grid = CONTRACT_GRIDS[selectedType];
+    const nameA = document.getElementById('nameA').value.trim() || 'Contrat A';
+    const nameB = document.getElementById('nameB').value.trim() || 'Contrat B';
+
+    const prompt = buildPrompt(grid, nameA, nameB);
+
+    const contentA = buildContentBlock(fileDataA, fileTypeA);
+    const contentB = buildContentBlock(fileDataB, fileTypeB);
+
+    const response = await fetch('/api/compare', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 4000,
+        messages: [{
+          role: 'user',
+          content: [
+            { type: 'text', text: `DOCUMENT 1 — "${nameA}" :` },
+            contentA,
+            { type: 'text', text: `DOCUMENT 2 — "${nameB}" :` },
+            contentB,
+            { type: 'text', text: prompt }
+          ]
+        }]
+      })
+    });
+
+    clearInterval(interval);
+
+    if (!response.ok) throw new Error('API error ' + response.status);
+    const data = await response.json();
+    const raw = data.content.map(b => b.text || '').join('');
+
+    // Extraction robuste du JSON : on cherche le premier { et le dernier }
+    const firstBrace = raw.indexOf('{');
+    const lastBrace  = raw.lastIndexOf('}');
+    if (firstBrace === -1 || lastBrace === -1) throw new Error('Réponse IA non structurée');
+    const result = JSON.parse(raw.slice(firstBrace, lastBrace + 1));
+
+    renderResults(result, nameA, nameB, grid);
+
+  } catch(err) {
+    clearInterval(interval);
+    stepEl.textContent = 'Erreur : ' + err.message;
+    stepEl.style.color = 'var(--red)';
+    setTimeout(() => { goToStep2(); stepEl.style.color = ''; }, 3000);
+  }
+}
+
+function buildContentBlock(b64, mediaType) {
+  if (mediaType === 'application/pdf') {
+    return { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: b64 } };
+  }
+  return { type: 'image', source: { type: 'base64', media_type: mediaType, data: b64 } };
+}
+
+function buildPrompt(grid, nameA, nameB) {
+  const keysFlat = grid.sections.flatMap(s => s.keys.map(k => `- ${k}`)).join('\n');
+
+  if (grid.label === 'Emprunteur') {
+    return `Tu es un expert en assurance emprunteur français. Les deux documents sont des devis ou tableaux de garanties d'assurance de prêt immobilier.
+
+Le DOCUMENT 1 correspond à "${nameA}" et le DOCUMENT 2 correspond à "${nameB}".
+
+ANALYSE TARIFAIRE PRIORITAIRE :
+La base de calcul de la cotisation est l'élément le plus important à identifier et comparer.
+- "Capital initial" (CI) : cotisation fixe sur toute la durée, calculée sur le capital de départ.
+- "Capital restant dû" (CRD) : cotisation décroissante chaque année. Plus élevée en début mais moins chère au total.
+- Si les deux contrats n'ont pas la même base, le verdict DOIT le signaler.
+
+Pour chaque document, identifie et extrais :
+1. La base de calcul (CI ou CRD) : vérifie si la cotisation mensuelle varie ou reste fixe dans l'échéancier.
+2. Le coût total assurance sur toute la durée.
+3. La cotisation mensuelle : si fixe, indiquer le montant ; si variable, indiquer "Variable — moy. X€/mois".
+4. Le TAEA et le taux annuel moyen.
+5. Toutes les garanties couvertes et leurs conditions.
+
+Champs à extraire :
+${keysFlat}
+
+RÈGLES :
+- Extrais valueA depuis DOCUMENT 1 et valueB depuis DOCUMENT 2, indépendamment.
+- Pour "Base de calcul cotisation" : réponds exactement "Capital initial (CI)" ou "Capital restant dû (CRD)".
+- Pour les montants : indique l'unité (€, %, mois).
+- Pour "better" sur la tarification : le coût total le moins élevé est "better". Pour les garanties : la couverture la plus large est "better".
+- Si une valeur est absente, utilise null.
+
+Le verdict doit mentionner : la base CI/CRD de chaque contrat, le coût total, l'économie en € et en %, et si les bases diffèrent : "Attention : la cotisation mensuelle de ${nameA} (CI fixe) et celle de ${nameB} (CRD variable) ne sont pas directement comparables — seul le coût total fait référence."
+
+Réponds UNIQUEMENT en JSON valide, sans texte ni backtick :
+{
+  "verdict": "Synthèse en 3-4 phrases mentionnant la base CI/CRD, le coût total, et l'économie réalisée.",
+  "scoreA": 7,
+  "scoreB": 5,
+  "scoreMax": 10,
+  "guarantees": [
+    { "name": "Nom du champ", "section": "Nom de la section", "valueA": "valeur ou null", "valueB": "valeur ou null", "better": "A|B|equal" }
+  ]
+}`;
+  }
+
+  return `Tu es un expert en assurance français. Les deux documents ci-dessus sont EXCLUSIVEMENT des tableaux de garanties de contrats de type "${grid.label}". Ignore toute mention d'autres types de contrats ou de branches — concentre-toi uniquement sur les garanties "${grid.label}" listées ci-dessous.
+
+Le DOCUMENT 1 correspond à "${nameA}" et le DOCUMENT 2 correspond à "${nameB}".
+
+Même si les deux documents semblent identiques ou proviennent du même assureur, tu DOIS extraire les valeurs de chaque document séparément.
+
+Champs à extraire :
+${keysFlat}
+
+Si une garantie n'est pas mentionnée, utilise null.
+Compare les deux valeurs : si celle de A est objectivement meilleure, marque "better":"A". Si B est meilleure, marque "better":"B". Si équivalent, marque "better":"equal".
+
+Réponds UNIQUEMENT en JSON valide, sans aucun texte ni backtick :
+{
+  "verdict": "Texte de synthèse de 2-3 phrases en français sur les différences clés entre les deux contrats de type ${grid.label}.",
+  "scoreA": 7,
+  "scoreB": 5,
+  "scoreMax": 10,
+  "guarantees": [
+    { "name": "Nom de la garantie", "section": "Nom de la section", "valueA": "valeur ou null", "valueB": "valeur ou null", "better": "A|B|equal" }
+  ]
+}`;
+}
+
+// ══════════════════════════════════════
+// RENDU DES RÉSULTATS
+// ══════════════════════════════════════
+function renderResults(data, nameA, nameB, grid) {
+  // Titre
+  document.getElementById('resultsTitle').textContent =
+    (document.getElementById('nameA').value || 'Contrat A') + ' vs ' +
+    (document.getElementById('nameB').value || 'Contrat B');
+  document.getElementById('resultsMeta').textContent =
+    grid.label + ' · ' + data.guarantees.length + ' garanties analysées · ' + new Date().toLocaleDateString('fr-FR');
+
+  // Headers tableau
+  document.getElementById('thA').textContent = nameA;
+  document.getElementById('thB').textContent = nameB;
+
+  // Verdict
+  document.getElementById('verdictText').innerHTML = data.verdict;
+
+  // Scores
+  const isBetter = data.scoreA >= data.scoreB;
+  document.getElementById('scoreRow').innerHTML = `
+    <div class="score-card">
+      <div class="score-contract">📘 ${nameA}</div>
+      <div class="score-label ${isBetter ? 'best':'lower'}">${data.scoreA}/${data.scoreMax}</div>
+      <div class="score-sub">Score global</div>
+      ${isBetter ? '<div class="score-badge">✓ Meilleur contrat</div>' : ''}
+    </div>
+    <div class="score-card">
+      <div class="score-contract">📙 ${nameB}</div>
+      <div class="score-label ${!isBetter ? 'best':'lower'}">${data.scoreB}/${data.scoreMax}</div>
+      <div class="score-sub">Score global</div>
+      ${!isBetter ? '<div class="score-badge">✓ Meilleur contrat</div>' : ''}
+    </div>
+  `;
+
+  // Tableau par sections
+  const tbody = document.getElementById('compareBody');
+  tbody.innerHTML = '';
+  const sections = grid.sections.map(s => s.name);
+  let lastSection = null;
+
+  sections.forEach(sectionName => {
+    const rows = data.guarantees.filter(g => g.section === sectionName);
+    if (rows.length === 0) return;
+
+    // Section header
+    if (lastSection !== sectionName) {
+      const tr = document.createElement('tr');
+      tr.className = 'section-row';
+      tr.innerHTML = `<td colspan="3">${sectionName}</td>`;
+      tbody.appendChild(tr);
+      lastSection = sectionName;
+    }
+
+    rows.forEach(g => {
+      const tr = document.createElement('tr');
+      const betterA = g.better === 'A';
+      const betterB = g.better === 'B';
+      const eq = g.better === 'equal';
+      const valA = g.valueA ?? '<span class="na">Non précisé</span>';
+      const valB = g.valueB ?? '<span class="na">Non précisé</span>';
+      const clA = betterA ? 'better' : betterB ? 'worse' : 'equal';
+      const clB = betterB ? 'better' : betterA ? 'worse' : 'equal';
+      const dotA = betterA ? 'better' : betterB ? 'worse' : 'equal';
+      const dotB = betterB ? 'better' : betterA ? 'worse' : 'equal';
+      tr.innerHTML = `
+        <td class="guarantee-name">${g.name}</td>
+        <td><span class="val ${clA}">${valA}</span><span class="diff-indicator ${dotA}"></span></td>
+        <td><span class="val ${clB}">${valB}</span><span class="diff-indicator ${dotB}"></span></td>
+      `;
+      tbody.appendChild(tr);
+    });
+  });
+
+  // Garanties sans section connue
+  const orphans = data.guarantees.filter(g => !sections.includes(g.section));
+  if (orphans.length > 0) {
+    const tr = document.createElement('tr');
+    tr.className = 'section-row';
+    tr.innerHTML = `<td colspan="3">Autres garanties</td>`;
+    tbody.appendChild(tr);
+    orphans.forEach(g => {
+      const tr2 = document.createElement('tr');
+      const betterA = g.better === 'A';
+      const betterB = g.better === 'B';
+      const valA = g.valueA ?? '<span class="na">Non précisé</span>';
+      const valB = g.valueB ?? '<span class="na">Non précisé</span>';
+      tr2.innerHTML = `
+        <td class="guarantee-name">${g.name}</td>
+        <td><span class="val ${betterA?'better':betterB?'worse':'equal'}">${valA}</span></td>
+        <td><span class="val ${betterB?'better':betterA?'worse':'equal'}">${valB}</span></td>
+      `;
+      tbody.appendChild(tr2);
+    });
+  }
+
+  showView('view3');
+}
+
+// ══════════════════════════════════════
+// EXPORT PDF — jsPDF
+// ══════════════════════════════════════
+let _jsPDFLoaded = false;
+function loadJsPDF() {
+  if (_jsPDFLoaded) return Promise.resolve();
+  return new Promise((res, rej) => {
+    const s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+    s.onload = () => { _jsPDFLoaded = true; res(); };
+    s.onerror = rej;
+    document.head.appendChild(s);
+  });
+}
+
+async function exportPDF() {
+  const btn = document.querySelector('.btn-teal');
+  const origText = btn.innerHTML;
+  btn.innerHTML = '⏳ Génération…'; btn.disabled = true;
+
+  try {
+    await loadJsPDF();
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+
+    const nameA = document.getElementById('nameA').value.trim() || 'Contrat A';
+    const nameB = document.getElementById('nameB').value.trim() || 'Contrat B';
+    const grid  = CONTRACT_GRIDS[selectedType];
+    const date  = new Date().toLocaleDateString('fr-FR');
+
+    // ── Palette
+    const C = {
+      bg:      [8,  12, 20],
+      surface: [20, 30, 48],
+      accent:  [61, 127,255],
+      teal:    [45, 212,191],
+      muted:   [90, 106,136],
+      white:   [240,244,255],
+      text:    [200,212,232],
+      red:     [239, 68, 68],
+    };
+
+    const W = 297, H = 210;
+
+    // ── Fond
+    doc.setFillColor(...C.bg);
+    doc.rect(0, 0, W, H, 'F');
+
+    // ── Header band
+    doc.setFillColor(...C.surface);
+    doc.rect(0, 0, W, 20, 'F');
+    doc.setFillColor(...C.accent);
+    doc.rect(0, 0, 2, 20, 'F');
+
+    // ── Logo
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(14); doc.setTextColor(...C.accent);
+    doc.text('Binge', 7, 13);
+    doc.setTextColor(...C.white);
+    doc.text('DDA', 24, 13);
+
+    // ── Titre
+    doc.setFontSize(11); doc.setTextColor(...C.white);
+    doc.text(`Comparaison · ${grid.label}`, 45, 13);
+
+    // ── Noms contrats + date (droite)
+    doc.setFontSize(8); doc.setTextColor(...C.muted);
+    doc.text(`${nameA}  vs  ${nameB}  ·  ${date}`, W - 8, 13, { align: 'right' });
+
+    // ── Verdict
+    const verdictRaw = document.getElementById('verdictText').textContent;
+    doc.setFontSize(8); doc.setTextColor(...C.text);
+    const lines = doc.splitTextToSize(verdictRaw, W - 16);
+    doc.text(lines, 8, 28);
+
+    // ── Scores
+    const scoreCards = document.querySelectorAll('.score-card');
+    let sx = 8;
+    scoreCards.forEach((sc, i) => {
+      const contractName = sc.querySelector('.score-contract')?.textContent || '';
+      const score = sc.querySelector('.score-label')?.textContent || '';
+      const isBest = sc.querySelector('.score-badge');
+      doc.setFillColor(...C.surface);
+      doc.roundedRect(sx, 34, 55, 14, 2, 2, 'F');
+      doc.setFontSize(7); doc.setTextColor(...C.muted);
+      doc.text(contractName, sx+4, 40);
+      doc.setFontSize(13);
+      doc.setTextColor(...(isBest ? C.teal : C.text));
+      doc.text(score, sx+4, 46);
+      sx += 60;
+    });
+
+    // ── Tableau
+    let y = 54;
+    const colW = [90, (W-98)/2, (W-98)/2];
+    const colX = [8, 8+colW[0]+4, 8+colW[0]+4+colW[1]+4];
+
+    // En-tête colonnes
+    doc.setFillColor(...C.surface);
+    doc.rect(8, y-5, W-16, 7, 'F');
+    doc.setFontSize(7); doc.setFont('helvetica','bold');
+    doc.setTextColor(...C.muted);
+    doc.text('GARANTIE', colX[0]+2, y);
+    doc.setTextColor(...C.white);
+    doc.text(nameA.toUpperCase().substring(0,28), colX[1]+2, y);
+    doc.text(nameB.toUpperCase().substring(0,28), colX[2]+2, y);
+    y += 4;
+
+    // Lignes
+    const rows = document.querySelectorAll('#compareBody tr');
+    doc.setFont('helvetica','normal');
+
+    rows.forEach(tr => {
+      if (y > H - 10) {
+        doc.addPage();
+        doc.setFillColor(...C.bg);
+        doc.rect(0, 0, W, H, 'F');
+        y = 15;
+      }
+
+      if (tr.classList.contains('section-row')) {
+        y += 2;
+        doc.setFillColor(...C.surface);
+        doc.rect(8, y-4, W-16, 6, 'F');
+        doc.setFontSize(6.5); doc.setFont('helvetica','bold');
+        doc.setTextColor(...C.accent);
+        doc.text(tr.textContent.trim(), 10, y);
+        doc.setFont('helvetica','normal');
+        y += 5;
+        return;
+      }
+
+      const cells = tr.querySelectorAll('td');
+      if (cells.length < 3) return;
+
+      const gname  = cells[0].textContent.trim();
+      const valA   = cells[1].textContent.trim();
+      const valB   = cells[2].textContent.trim();
+      const hasB_A = cells[1].querySelector('.val.better');
+      const hasB_B = cells[2].querySelector('.val.better');
+
+      doc.setFontSize(7);
+      doc.setTextColor(...C.muted);
+      doc.text(doc.splitTextToSize(gname, colW[0]-4), colX[0]+2, y);
+
+      doc.setTextColor(...(hasB_A ? C.teal : C.text));
+      doc.text(doc.splitTextToSize(valA.replace('Non précisé','—'), colW[1]-4), colX[1]+2, y);
+
+      doc.setTextColor(...(hasB_B ? C.teal : C.text));
+      doc.text(doc.splitTextToSize(valB.replace('Non précisé','—'), colW[2]-4), colX[2]+2, y);
+
+      // Séparateur
+      doc.setDrawColor(...C.surface);
+      doc.line(8, y+2.5, W-8, y+2.5);
+      y += 7;
+    });
+
+    // ── Footer
+    const pages = doc.getNumberOfPages();
+    for (let p = 1; p <= pages; p++) {
+      doc.setPage(p);
+      doc.setFillColor(...C.surface);
+      doc.rect(0, H-8, W, 8, 'F');
+      doc.setFontSize(6.5); doc.setTextColor(...C.muted);
+      doc.text('BingeDDA · Comparateur de garanties · Document généré automatiquement à titre informatif', 8, H-3);
+      doc.text(`Page ${p}/${pages}`, W-8, H-3, { align:'right' });
+    }
+
+    const fname = `comparaison-${selectedType}-${date.replace(/\//g,'-')}.pdf`;
+    doc.save(fname);
+
+  } catch(e) {
+    console.error('Export PDF error:', e);
+    alert('Erreur lors de la génération du PDF. Réessaie.');
+  } finally {
+    btn.innerHTML = origText; btn.disabled = false;
+  }
+}
+
+// ══════════════════════════════════════
+// RESET
+// ══════════════════════════════════════
+function resetAll() {
+  selectedType = null;
+  fileDataA = null; fileDataB = null;
+  fileTypeA = null; fileTypeB = null;
+  document.getElementById('fileA').value = '';
+  document.getElementById('fileB').value = '';
+  document.getElementById('fnameA').textContent = '';
+  document.getElementById('fnameB').textContent = '';
+  document.getElementById('nameA').value = '';
+  document.getElementById('nameB').value = '';
+  document.getElementById('dropA').classList.remove('loaded','drag-over');
+  document.getElementById('dropB').classList.remove('loaded','drag-over');
+  document.querySelectorAll('.contract-type-btn').forEach(b => b.classList.remove('selected'));
+  document.getElementById('btnStep1').disabled = true;
+  document.getElementById('btnAnalyse').disabled = true;
+  goToStep1();
+  updateSteps(1);
+}
+
+// Init
+updateSteps(1);
+</script>
+
+
+</body>
+</html>

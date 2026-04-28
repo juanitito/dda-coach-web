@@ -1,0 +1,2002 @@
+<!DOCTYPE html>
+<html lang="fr"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta charset="UTF-8">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPCEtLSBGb25kIGFycm9uZGkgc29tYnJlIC0tPgogIDxyZWN0IHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgcng9IjciIGZpbGw9IiMwYjBmMWEiLz4KICA8IS0tIExldHRyZSBCIGJvbGQgYmxldWUgLS0+CiAgPHBhdGggZD0iTTggNmg4YzIuNSAwIDQuNSAxLjggNC41IDQuMiAwIDEuNC0uNyAyLjYtMS44IDMuMyAxLjUuNyAyLjUgMi4xIDIuNSAzLjhDMjEuMiAyMCAxOSAyMiAxNi4yIDIySDhWNnptMyAzdjRoNC41YzEgMCAxLjgtLjggMS44LTJzLS44LTItMS44LTJIMTF6bTAgN3Y0aDVjMS4xIDAgMi0uOSAyLTJzLS45LTItMi0yaC01eiIgZmlsbD0iIzNkN2ZmZiIvPgogIDwhLS0gUG9pbnQgdGVhbCBhY2NlbnQgLS0+CiAgPGNpcmNsZSBjeD0iMjUiIGN5PSIyNSIgcj0iNC41IiBmaWxsPSIjMmRkNGJmIi8+Cjwvc3ZnPgo=">
+
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BingeDDA · La formation DDA en illimité · 24,99€ HT/mois</title>
+<link href="DDAFLIX-Landing_Funnel_files/css2.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<style>
+:root {
+  --bg:      #0b0f1a;
+  --bg2:     #0e1420;
+  --bg3:     #131926;
+  --surface: #1a2030;
+  --surface2:#202840;
+  --border:  rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.12);
+  --accent:  #3d7fff;
+  --accent2: #6b9fff;
+  --gold:    #c8a84b;
+  --gold2:   #e0c472;
+  --teal:    #2dd4bf;
+  --text:    #dde3f0;
+  --muted:   #6b7a99;
+  --white:   #fff;
+  --r: 8px;
+  --r2: 14px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+
+/* ── TOPBAR ── */
+.topbar{
+  position:fixed;top:0;left:0;right:0;z-index:300;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 48px;height:66px;
+  background:rgba(11,15,26,0.92);backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--border);
+}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:3px;color:var(--accent);cursor:pointer;}
+.logo span{color:var(--text);}
+.nav-right{display:flex;align-items:center;gap:14px;}
+.btn-login{font-size:13px;font-weight:500;color:var(--muted);background:none;border:none;cursor:pointer;padding:8px 16px;transition:color .2s;}
+.btn-login:hover{color:var(--white);}
+.btn-cta-nav{
+  font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;
+  background:var(--accent);color:#fff;border:none;cursor:pointer;
+  padding:9px 22px;border-radius:var(--r);transition:all .2s;letter-spacing:.2px;
+}
+.btn-cta-nav:hover{background:var(--accent2);transform:translateY(-1px);box-shadow:0 6px 20px rgba(61,127,255,.35);}
+
+/* ── HERO ── */
+.hero{
+  min-height:100vh;display:flex;align-items:center;justify-content:center;
+  position:relative;overflow:hidden;padding:100px 48px 80px;
+}
+.hero-bg{
+  position:absolute;inset:0;pointer-events:none;
+  background:
+    radial-gradient(ellipse at 65% -5%, rgba(61,127,255,.2) 0%,transparent 55%),
+    radial-gradient(ellipse at 5% 100%, rgba(45,212,191,.1) 0%,transparent 45%),
+    radial-gradient(ellipse at 100% 80%, rgba(167,139,250,.06) 0%,transparent 40%);
+}
+.hero-bg::after{
+  content:'';position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(61,127,255,.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(61,127,255,.025) 1px,transparent 1px);
+  background-size:60px 60px;
+}
+.hero-inner{
+  max-width:1200px;width:100%;margin:0 auto;
+  display:grid;grid-template-columns:1fr 420px;gap:80px;align-items:center;
+  position:relative;z-index:2;
+}
+.hero-eyebrow{
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(61,127,255,.1);border:1px solid rgba(61,127,255,.3);
+  border-radius:4px;padding:4px 12px;font-size:11px;font-weight:700;
+  color:var(--accent2);letter-spacing:2px;text-transform:uppercase;margin-bottom:22px;
+}
+.hero-eyebrow::before{content:'◆';font-size:7px;}
+.hero-title{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(56px,7.5vw,96px);line-height:.92;
+  color:var(--white);letter-spacing:1px;margin-bottom:24px;
+}
+.hero-title em{color:var(--accent);font-style:normal;}
+.hero-title .line-serif{font-family:'DM Serif Display',serif;color:var(--gold2);font-size:clamp(40px,5vw,68px);}
+.hero-sub{font-size:16px;color:var(--muted);line-height:1.75;margin-bottom:36px;max-width:500px;}
+.hero-sub strong{color:var(--text);}
+
+.hero-actions{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:40px;}
+.btn-primary{
+  display:inline-flex;align-items:center;gap:10px;
+  background:var(--accent);color:#fff;font-family:'DM Sans',sans-serif;
+  font-size:15px;font-weight:700;padding:15px 34px;border-radius:var(--r);
+  border:none;cursor:pointer;transition:all .25s;letter-spacing:.3px;
+}
+.btn-primary:hover{background:var(--accent2);transform:translateY(-2px);box-shadow:0 10px 32px rgba(61,127,255,.4);}
+.btn-ghost{
+  display:inline-flex;align-items:center;gap:8px;
+  background:transparent;color:var(--muted);font-family:'DM Sans',sans-serif;
+  font-size:14px;font-weight:500;padding:15px 24px;border-radius:var(--r);
+  border:1.5px solid rgba(255,255,255,.1);cursor:pointer;transition:all .2s;
+}
+.btn-ghost:hover{color:var(--text);border-color:rgba(255,255,255,.2);}
+
+.hero-trust{display:flex;align-items:center;gap:20px;flex-wrap:wrap;}
+.trust-item{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);}
+.trust-item span{font-size:14px;}
+
+/* Pricing card hero */
+.hero-card{
+  background:var(--surface);border:1px solid var(--border2);border-radius:var(--r2);
+  overflow:hidden;position:relative;
+}
+.hero-card::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(61,127,255,.06),transparent 60%);
+  pointer-events:none;
+}
+.hc-head{
+  background:linear-gradient(135deg,#071428 0%,#0d2a5c 100%);
+  padding:28px 28px 24px;border-bottom:1px solid var(--border);
+}
+.hc-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  background:rgba(200,168,75,.15);border:1px solid rgba(200,168,75,.4);
+  border-radius:4px;padding:3px 10px;font-size:10px;font-weight:700;
+  color:var(--gold2);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:14px;
+}
+.hc-price-row{display:flex;align-items:flex-end;gap:8px;margin-bottom:6px;}
+.hc-price{font-family:'Bebas Neue',sans-serif;font-size:64px;color:var(--white);line-height:1;}
+.hc-price-detail{padding-bottom:10px;}
+.hc-price-ht{font-size:16px;font-weight:600;color:var(--accent2);}
+.hc-price-mo{font-size:12px;color:var(--muted);margin-top:2px;}
+.hc-commitment{
+  display:inline-flex;align-items:center;gap:6px;
+  background:rgba(45,212,191,.08);border:1px solid rgba(45,212,191,.2);
+  border-radius:4px;padding:4px 10px;font-size:11px;color:var(--teal);font-weight:600;
+}
+.hc-body{padding:24px 28px;}
+.hc-feature{
+  display:flex;align-items:flex-start;gap:12px;
+  padding:10px 0;border-bottom:1px solid var(--border);
+}
+.hc-feature:last-of-type{border-bottom:none;}
+.hc-check{
+  width:20px;height:20px;border-radius:50%;background:rgba(45,212,191,.15);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  font-size:10px;color:var(--teal);margin-top:1px;
+}
+.hc-feat-text{font-size:13px;color:var(--text);line-height:1.4;}
+.hc-feat-sub{font-size:11px;color:var(--muted);margin-top:2px;}
+.hc-cta{
+  width:100%;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:700;
+  background:var(--accent);color:#fff;border:none;cursor:pointer;
+  padding:15px;border-radius:var(--r);margin-top:20px;
+  transition:all .25s;letter-spacing:.3px;
+}
+.hc-cta:hover{background:var(--accent2);transform:translateY(-1px);box-shadow:0 8px 28px rgba(61,127,255,.4);}
+.hc-sepa{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:12px;font-size:11px;color:var(--muted);}
+.hc-sepa span{font-size:14px;}
+
+/* ── LOGOS / PREUVES ── */
+.logos-bar{
+  border-top:1px solid var(--border);border-bottom:1px solid var(--border);
+  padding:28px 48px;
+  background:linear-gradient(90deg,transparent,rgba(61,127,255,.03),transparent);
+}
+.logos-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;gap:40px;flex-wrap:wrap;}
+.logos-label{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);white-space:nowrap;}
+.logos-items{display:flex;align-items:center;gap:40px;flex-wrap:wrap;flex:1;}
+.logo-item{font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:2px;color:rgba(255,255,255,.2);}
+
+/* ── SECTION GÉNÉRIQUE ── */
+.section{padding:96px 48px;}
+.section-inner{max-width:1200px;margin:0 auto;}
+.section-eyebrow{
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(61,127,255,.1);border:1px solid rgba(61,127,255,.25);
+  border-radius:4px;padding:4px 12px;font-size:10px;font-weight:700;
+  color:var(--accent2);letter-spacing:2px;text-transform:uppercase;margin-bottom:16px;
+}
+.section-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,5vw,56px);color:var(--white);letter-spacing:1px;margin-bottom:12px;line-height:1.05;}
+.section-title em{color:var(--accent);font-style:normal;}
+.section-sub{font-size:15px;color:var(--muted);line-height:1.75;max-width:560px;}
+
+/* ── ARGUMENT CARDS ── */
+.args-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:2px;margin-top:56px;border-radius:var(--r2);overflow:hidden;border:1px solid var(--border);}
+.arg-card{
+  background:var(--bg3);padding:36px 32px;position:relative;overflow:hidden;
+  transition:background .2s;
+}
+.arg-card:hover{background:var(--surface);}
+.arg-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  opacity:0;transition:opacity .3s;
+}
+.arg-card:hover::before{opacity:1;}
+.ac-blue::before{background:linear-gradient(90deg,var(--accent),var(--accent2));}
+.ac-teal::before{background:linear-gradient(90deg,var(--teal),#34d399);}
+.ac-gold::before{background:linear-gradient(90deg,var(--gold),var(--gold2));}
+.arg-num{
+  font-family:'Bebas Neue',sans-serif;font-size:48px;line-height:1;
+  margin-bottom:8px;
+}
+.arg-num.blue{color:var(--accent);}
+.arg-num.teal{color:var(--teal);}
+.arg-num.gold{color:var(--gold);}
+.arg-label{font-size:18px;font-weight:600;color:var(--white);margin-bottom:8px;}
+.arg-desc{font-size:13px;color:var(--muted);line-height:1.65;}
+
+/* ── CATALOGUE APERÇU ── */
+.catalogue-preview{
+  background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);
+  padding:96px 48px;
+}
+.preview-grid{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:2px;
+  margin-top:48px;border-radius:var(--r2);overflow:hidden;border:1px solid var(--border);
+}
+.preview-sec{
+  background:var(--bg3);padding:28px 24px;
+  transition:background .2s;cursor:default;
+}
+.preview-sec:hover{background:var(--surface);}
+.ps-dot{width:10px;height:10px;border-radius:50%;margin-bottom:14px;}
+.ps-name{font-size:14px;font-weight:700;color:var(--white);margin-bottom:6px;}
+.ps-count{font-size:12px;color:var(--muted);margin-bottom:16px;}
+.ps-tags{display:flex;flex-direction:column;gap:6px;}
+.ps-tag{
+  background:rgba(255,255,255,.04);border:1px solid var(--border);
+  border-radius:4px;padding:5px 10px;font-size:11px;color:var(--muted);
+}
+
+/* ── CONFORMITÉ ── */
+.conformite{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;margin-top:60px;}
+.conf-visual{
+  background:var(--surface);border:1px solid var(--border2);border-radius:var(--r2);
+  padding:32px;position:relative;overflow:hidden;
+}
+.conf-visual::before{
+  content:'15h';position:absolute;right:-10px;top:50%;transform:translateY(-50%);
+  font-family:'Bebas Neue',sans-serif;font-size:200px;color:rgba(61,127,255,.04);
+  line-height:1;pointer-events:none;
+}
+.conf-progress-label{display:flex;justify-content:space-between;margin-bottom:10px;}
+.conf-progress-text{font-size:13px;font-weight:600;color:var(--text);}
+.conf-progress-pct{font-size:13px;color:var(--accent2);}
+.conf-bar{height:8px;background:rgba(255,255,255,.06);border-radius:4px;margin-bottom:24px;overflow:hidden;}
+.conf-bar-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--accent),var(--teal));}
+.conf-attestation{
+  display:flex;align-items:center;gap:14px;
+  background:rgba(45,212,191,.06);border:1px solid rgba(45,212,191,.2);
+  border-radius:var(--r);padding:16px;
+}
+.conf-att-icon{font-size:28px;flex-shrink:0;}
+.conf-att-title{font-size:13px;font-weight:700;color:var(--teal);margin-bottom:2px;}
+.conf-att-sub{font-size:11px;color:var(--muted);}
+.conf-points{display:flex;flex-direction:column;gap:18px;}
+.conf-point{display:flex;align-items:flex-start;gap:14px;}
+.conf-point-icon{
+  width:36px;height:36px;border-radius:var(--r);flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:16px;
+}
+.cpi-blue{background:rgba(61,127,255,.12);}
+.cpi-teal{background:rgba(45,212,191,.1);}
+.cpi-gold{background:rgba(200,168,75,.1);}
+.cpi-pink{background:rgba(224,92,138,.1);}
+.conf-point-title{font-size:14px;font-weight:600;color:var(--white);margin-bottom:3px;}
+.conf-point-sub{font-size:13px;color:var(--muted);line-height:1.6;}
+
+/* ── TESTIMONIALS ── */
+.testimonials-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:56px;}
+.testi-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r2);padding:28px;position:relative;
+}
+.testi-stars{color:var(--gold);font-size:13px;margin-bottom:14px;letter-spacing:2px;}
+.testi-quote{font-size:14px;line-height:1.7;color:var(--text);margin-bottom:20px;}
+.testi-quote::before{content:'«\00a0';color:var(--accent2);}
+.testi-quote::after{content:'\00a0»';color:var(--accent2);}
+.testi-author{display:flex;align-items:center;gap:12px;}
+.testi-avatar{
+  width:38px;height:38px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Bebas Neue',sans-serif;font-size:16px;color:#fff;flex-shrink:0;
+}
+.testi-name{font-size:13px;font-weight:600;color:var(--white);}
+.testi-role{font-size:11px;color:var(--muted);}
+
+/* ── FAQ ── */
+.faq-list{margin-top:56px;display:flex;flex-direction:column;gap:2px;border-radius:var(--r2);overflow:hidden;border:1px solid var(--border);}
+.faq-item{background:var(--bg3);}
+.faq-q{
+  width:100%;display:flex;align-items:center;justify-content:space-between;
+  padding:20px 28px;background:none;border:none;cursor:pointer;text-align:left;
+  font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;color:var(--text);
+  transition:color .2s;gap:16px;
+}
+.faq-q:hover{color:var(--white);}
+.faq-icon{font-size:16px;color:var(--muted);flex-shrink:0;transition:transform .25s;}
+.faq-a{font-size:13px;color:var(--muted);line-height:1.75;padding:0 28px 20px;display:none;}
+.faq-item.open .faq-a{display:block;}
+.faq-item.open .faq-icon{transform:rotate(45deg);color:var(--accent2);}
+.faq-item.open .faq-q{color:var(--white);}
+
+/* ── CTA BOTTOM ── */
+.cta-bottom{
+  padding:96px 48px;
+  background:linear-gradient(135deg,var(--bg2) 0%,var(--bg3) 100%);
+  border-top:1px solid var(--border);text-align:center;position:relative;overflow:hidden;
+}
+.cta-bottom::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at 50% 0%,rgba(61,127,255,.12) 0%,transparent 60%);
+}
+.cta-bottom-inner{max-width:700px;margin:0 auto;position:relative;z-index:2;}
+.cta-bottom-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(44px,6vw,72px);color:var(--white);letter-spacing:1px;margin-bottom:16px;line-height:.95;}
+.cta-bottom-title em{color:var(--accent);font-style:normal;}
+.cta-bottom-sub{font-size:15px;color:var(--muted);line-height:1.7;margin-bottom:36px;}
+.cta-bottom-price{
+  display:inline-flex;align-items:baseline;gap:6px;
+  margin-bottom:32px;
+}
+.cbp-amount{font-family:'Bebas Neue',sans-serif;font-size:52px;color:var(--white);line-height:1;}
+.cbp-detail{font-size:15px;color:var(--accent2);font-weight:600;}
+
+/* ── FOOTER ── */
+footer{
+  background:var(--bg);border-top:1px solid var(--border);
+  padding:40px 48px;
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:20px;
+}
+.footer-logo{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:var(--accent);}
+.footer-logo span{color:var(--text);}
+.footer-links{display:flex;gap:28px;flex-wrap:wrap;}
+.footer-link{font-size:12px;color:var(--muted);text-decoration:none;transition:color .2s;cursor:pointer;}
+.footer-link:hover{color:var(--text);}
+.footer-legal{font-size:11px;color:rgba(107,122,153,.5);}
+
+/* ── OVERLAY FUNNEL ── */
+.overlay{
+  position:fixed;inset:0;z-index:500;
+  background:rgba(7,10,20,.85);backdrop-filter:blur(8px);
+  display:flex;align-items:center;justify-content:center;
+  padding:20px;opacity:0;pointer-events:none;transition:opacity .3s;
+}
+.overlay.open{opacity:1;pointer-events:all;}
+.modal{
+  background:var(--bg2);border:1px solid var(--border2);
+  border-radius:16px;width:100%;max-width:540px;
+  max-height:92vh;overflow-y:auto;position:relative;
+  animation:slideUp .3s ease;
+}
+@keyframes slideUp{from{transform:translateY(24px);opacity:0}to{transform:none;opacity:1}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.modal-close{
+  position:absolute;top:18px;right:20px;
+  background:rgba(255,255,255,.06);border:none;cursor:pointer;
+  width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:14px;color:var(--muted);transition:all .2s;z-index:10;
+}
+.modal-close:hover{background:rgba(255,255,255,.12);color:var(--white);}
+
+/* ── STEPS INDICATOR ── */
+.steps-bar{padding:28px 36px 0;}
+.steps-row{display:flex;align-items:center;gap:0;}
+.step-node{
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  flex:1;position:relative;
+}
+.step-node::after{
+  content:'';position:absolute;top:14px;left:50%;right:-50%;
+  height:1px;background:var(--border2);z-index:0;
+}
+.step-node:last-child::after{display:none;}
+.step-circle{
+  width:28px;height:28px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;z-index:1;border:2px solid var(--border2);
+  background:var(--bg);color:var(--muted);transition:all .3s;
+}
+.step-circle.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+.step-circle.done{background:rgba(45,212,191,.15);border-color:var(--teal);color:var(--teal);}
+.step-label{font-size:10px;color:var(--muted);text-align:center;white-space:nowrap;}
+.step-node.active .step-label{color:var(--accent2);}
+.step-node.done .step-label{color:var(--teal);}
+
+/* ── FORM VIEWS ── */
+.fview{display:none;}
+.fview.active{display:block;}
+
+.form-head{padding:28px 36px 24px;}
+.form-title{font-family:'Bebas Neue',sans-serif;font-size:30px;color:var(--white);letter-spacing:1px;margin-bottom:6px;}
+.form-sub{font-size:13px;color:var(--muted);line-height:1.6;}
+
+.form-body{padding:0 36px 32px;}
+.form-group{margin-bottom:18px;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.form-label{font-size:12px;font-weight:600;color:var(--text);letter-spacing:.3px;margin-bottom:7px;display:block;}
+.form-label span{color:var(--accent2);}
+.form-input{
+  width:100%;background:var(--surface);border:1.5px solid var(--border2);
+  border-radius:var(--r);padding:11px 14px;
+  font-family:'DM Sans',sans-serif;font-size:14px;color:var(--white);
+  outline:none;transition:border-color .2s;
+}
+.form-input::placeholder{color:var(--muted);}
+.form-input:focus{border-color:var(--accent);}
+.form-input.error{border-color:#e05c8a;}
+.form-select{
+  width:100%;background:var(--surface);border:1.5px solid var(--border2);
+  border-radius:var(--r);padding:11px 36px 11px 14px;
+  font-family:'DM Sans',sans-serif;font-size:14px;color:var(--white);
+  outline:none;cursor:pointer;appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%236b7a99'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 12px center;
+}
+.form-select:focus{border-color:var(--accent);}
+.form-hint{font-size:11px;color:var(--muted);margin-top:5px;}
+
+.form-divider{height:1px;background:var(--border);margin:20px 0;}
+
+/* CGV Checkbox */
+.form-check{display:flex;align-items:flex-start;gap:12px;cursor:pointer;}
+.form-check input[type=checkbox]{
+  width:18px;height:18px;border-radius:4px;
+  border:1.5px solid var(--border2);background:var(--surface);
+  cursor:pointer;accent-color:var(--accent);flex-shrink:0;margin-top:1px;
+}
+.form-check-label{font-size:12px;color:var(--muted);line-height:1.6;}
+.form-check-label a{color:var(--accent2);text-decoration:none;}
+
+.form-btn{
+  width:100%;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:700;
+  background:var(--accent);color:#fff;border:none;cursor:pointer;
+  padding:14px;border-radius:var(--r);margin-top:24px;
+  transition:all .25s;letter-spacing:.3px;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+}
+.form-btn:hover:not(:disabled){background:var(--accent2);transform:translateY(-1px);box-shadow:0 8px 28px rgba(61,127,255,.4);}
+.form-btn:disabled{opacity:.5;cursor:not-allowed;}
+.form-btn-ghost{
+  width:100%;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;
+  background:transparent;color:var(--muted);border:1.5px solid var(--border2);
+  cursor:pointer;padding:11px;border-radius:var(--r);margin-top:10px;transition:all .2s;
+}
+.form-btn-ghost:hover{color:var(--text);border-color:rgba(255,255,255,.2);}
+
+/* Récap commande */
+.order-recap{
+  background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);
+  padding:18px;margin-bottom:20px;
+}
+.or-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.or-row:last-child{margin-bottom:0;}
+.or-label{font-size:13px;color:var(--muted);}
+.or-value{font-size:13px;font-weight:600;color:var(--text);}
+.or-total{border-top:1px solid var(--border);padding-top:10px;margin-top:10px;}
+.or-total .or-label{color:var(--text);font-weight:600;}
+.or-total .or-value{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--accent);}
+
+/* SEPA block */
+.sepa-info{
+  background:rgba(45,212,191,.06);border:1px solid rgba(45,212,191,.2);
+  border-radius:var(--r);padding:18px;margin-bottom:20px;
+}
+.sepa-info-head{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.sepa-logo{
+  background:rgba(45,212,191,.12);border-radius:6px;
+  padding:4px 10px;font-size:10px;font-weight:700;letter-spacing:1px;
+  color:var(--teal);border:1px solid rgba(45,212,191,.25);
+}
+.sepa-info-title{font-size:13px;font-weight:600;color:var(--teal);}
+.sepa-info-body{font-size:12px;color:var(--muted);line-height:1.65;}
+.sepa-info-body strong{color:var(--text);}
+
+.sepa-mandate-box{
+  background:var(--bg3);border:1.5px solid var(--border2);
+  border-radius:var(--r);padding:18px;margin-bottom:16px;
+}
+.smb-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.smb-title{font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);}
+.smb-ref{font-size:10px;color:rgba(107,122,153,.5);font-family:monospace;}
+.smb-field{margin-bottom:12px;}
+.smb-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px;}
+.smb-value{font-size:13px;color:var(--text);}
+.smb-iban{font-family:monospace;letter-spacing:1px;}
+
+/* Success screen */
+.success-view{padding:40px 36px;text-align:center;}
+.success-icon{
+  width:72px;height:72px;border-radius:50%;
+  background:rgba(45,212,191,.12);border:2px solid rgba(45,212,191,.3);
+  display:flex;align-items:center;justify-content:center;
+  font-size:30px;margin:0 auto 24px;
+  animation:popIn .4s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes popIn{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+.success-title{font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--white);letter-spacing:1px;margin-bottom:8px;}
+.success-sub{font-size:14px;color:var(--muted);line-height:1.7;margin-bottom:28px;}
+.success-details{
+  background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);
+  padding:20px;margin-bottom:24px;text-align:left;
+}
+.sd-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);}
+.sd-row:last-child{border-bottom:none;}
+.sd-label{font-size:12px;color:var(--muted);}
+.sd-value{font-size:12px;font-weight:600;color:var(--text);}
+.sd-value.accent{color:var(--teal);}
+
+/* Animations */
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+.a1{animation:fadeUp .6s ease both}
+.a2{animation:fadeUp .6s .1s ease both}
+.a3{animation:fadeUp .6s .2s ease both}
+.a4{animation:fadeUp .6s .3s ease both}
+.a5{animation:fadeUp .6s .4s ease both}
+
+/* Responsive */
+@media(max-width:1024px){
+  .hero-inner{grid-template-columns:1fr;}
+  .hero-card{max-width:440px;}
+  .args-grid{grid-template-columns:1fr;}
+  .preview-grid{grid-template-columns:repeat(2,1fr);}
+  .conformite{grid-template-columns:1fr;}
+  .testimonials-grid{grid-template-columns:1fr;}
+}
+@media(max-width:768px){
+  .topbar{padding:0 20px;}
+  .hero{padding:100px 20px 60px;}
+  .section,.catalogue-preview,.cta-bottom{padding:64px 20px;}
+  .logos-bar{padding:24px 20px;}
+  .preview-grid{grid-template-columns:1fr;}
+  footer{padding:32px 20px;flex-direction:column;align-items:flex-start;}
+  .form-row{grid-template-columns:1fr;}
+  .form-body,.form-head,.steps-bar{padding-left:24px;padding-right:24px;}
+}
+
+::-webkit-scrollbar{width:5px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:rgba(61,127,255,.25);border-radius:3px;}
+</style>
+</head>
+<body>
+
+<!-- ═══ TOPBAR ═══ -->
+<nav class="topbar">
+  <div class="logo">Binge<span>DDA</span></div>
+  <div class="nav-right">
+    <a id="admin-link" href="https://dda-coach.vercel.app/admin" style="display:none;font-size:11px;font-weight:600;color:var(--muted);text-decoration:none;padding:6px 10px;border-radius:5px;background:rgba(255,255,255,.05);border:1px solid var(--border2);transition:all .2s;" onmouseover="this.style.color='var(--white)'" onmouseout="this.style.color='var(--muted)'">⚙ Admin</a>
+    <button class="btn-login" onclick="openFunnel('login')">Se connecter</button>
+    <button class="btn-cta-nav" onclick="openFunnel('register')">▶ &nbsp;S'abonner · 24,99€ HT/mois</button>
+  </div>
+</nav>
+
+<!-- ═══ HERO ═══ -->
+<section class="hero" id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-inner">
+    <div>
+      <div class="hero-eyebrow a1">Formation DDA · Agents généraux · Courtiers · Mandataires</div>
+      <h1 class="hero-title a2">
+        Fini la DDA<br>
+        <em>subie.</em><br>
+        <span class="line-serif">Choisissez. Bingez.</span>
+      </h1>
+      <p class="hero-sub a3">
+        Un catalogue de <strong>200+ modules</strong> à la demande : e-learning, vidéos, webinaires, veille et outils. Des contenus sélectionnés pour leur pertinence métier et mis à jour en continu. Vous choisissez ce qui correspond à votre activité. Le compteur annuel prend en compte votre usage au fil de l'eau.
+      </p>
+      <div class="hero-actions a4">
+        <button class="btn-primary" onclick="openFunnel('register')">▶ &nbsp;S'abonner maintenant</button>
+        <button class="btn-ghost" onclick="document.getElementById('catalogue-section').scrollIntoView({behavior:'smooth'})">Voir le catalogue</button>
+      </div>
+      <div class="hero-trust a5">
+        <div class="trust-item"><span>📺</span> Interface catalogue façon streaming</div>
+        <div class="trust-item"><span>✅</span> Conforme arrêté 26 sept. 2018</div>
+        <div class="trust-item"><span>🔒</span> SEPA · Sans CB</div>
+      </div>
+    </div>
+    <div class="hero-card a3">
+      <div class="hc-head">
+        <div class="hc-badge">▶ &nbsp;Abonnement illimité</div>
+        <div class="hc-price-row">
+          <div class="hc-price">24,99</div>
+          <div class="hc-price-detail">
+            <div class="hc-price-ht">€ HT / mois</div>
+            <div class="hc-price-mo">soit 299,88 € HT/an</div>
+          </div>
+        </div>
+        <div class="hc-commitment">🔄 &nbsp;Prélèvement SEPA · Engagement 12 mois</div>
+      </div>
+      <div class="hc-body">
+        <div class="hc-feature">
+          <div class="hc-check">✓</div>
+          <div>
+            <div class="hc-feat-text">Catalogue illimité : 200+ modules au choix</div>
+            <div class="hc-feat-sub">E-learning, vidéos, webinaires, veille et outils. Vous choisissez.</div>
+          </div>
+        </div>
+        <div class="hc-feature">
+          <div class="hc-check">✓</div>
+          <div>
+            <div class="hc-feat-text">Compteur 15h automatique & certifié</div>
+            <div class="hc-feat-sub">Rappels intelligents, suivi automatique</div>
+          </div>
+        </div>
+        <div class="hc-feature">
+          <div class="hc-check">✓</div>
+          <div>
+            <div class="hc-feat-text">Nouveaux contenus chaque mois</div>
+            <div class="hc-feat-sub">Veille réglementaire mise à jour en continu</div>
+          </div>
+        </div>
+        <div class="hc-feature">
+          <div class="hc-check">✓</div>
+          <div>
+            <div class="hc-feat-text">Attestations PDF certifiées</div>
+            <div class="hc-feat-sub">Horodatées, exportables pour audit ACPR</div>
+          </div>
+        </div>
+        <button class="hc-cta" onclick="openFunnel('register')">▶ &nbsp;S'abonner à BingeDDA</button>
+        <div class="hc-sepa"><span>🏦</span> Paiement par prélèvement SEPA · GoCardless</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ LOGOS BAR ═══ -->
+<div class="logos-bar">
+  <div class="logos-inner">
+    <div class="logos-label">Fait pour</div>
+    <div class="logos-items">
+      <div class="logo-item">AGENTS GÉNÉRAUX</div>
+      <div class="logo-item">COURTIERS IAS</div>
+      <div class="logo-item">MANDATAIRES</div>
+      <div class="logo-item">MUTUELLES</div>
+      <div class="logo-item">BANQUES ASSURANCES</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ ARGUMENTS ═══ -->
+<section class="section">
+  <div class="section-inner">
+    <div class="section-eyebrow">Pourquoi BingeDDA</div>
+    <h2 class="section-title">Vous ne <em>subissez</em> plus.<br>Vous choisissez.</h2>
+    <p class="section-sub">La formation DDA a longtemps été perçue comme une contrainte coûteuse et peu engageante. BingeDDA change la donne : un abonnement, un catalogue vivant, une liberté totale.</p>
+    <div class="args-grid">
+      <div class="arg-card ac-blue">
+        <div class="arg-num blue">250€</div>
+        <div class="arg-label">Le prix que vous payiez avant</div>
+        <div class="arg-desc">Entre 250€ et 800€ HT par an, à l'acte, pour des contenus statiques et ennuyeux imposés par un organisme. Chez BingeDDA : <strong style="color:var(--accent2)">24,99€ HT/mois</strong>, renouvellement glissant sur 12 mois.</div>
+      </div>
+      <div class="arg-card ac-teal">
+        <div class="arg-num teal">200+</div>
+        <div class="arg-label">Modules à votre choix</div>
+        <div class="arg-desc">Interface catalogue façon streaming. Vous naviguez, vous zappez, vous choisissez ce qui correspond à votre activité du moment. E-learning, vidéos courtes, webinaires live, veille et outils opérationnels.</div>
+      </div>
+      <div class="arg-card ac-gold">
+        <div class="arg-num gold">15h</div>
+        <div class="arg-label">Comptées sans y penser</div>
+        <div class="arg-desc">Le compteur tourne en arrière-plan. Des rappels intelligents à J-60, J-30 et J-7. Votre obligation est tracée en temps réel. L'attestation est prête le moment venu.</div>
+      </div>
+      <div class="arg-card ac-blue">
+        <div class="arg-num blue" style="font-size:36px;line-height:1.1;">En continu</div>
+        <div class="arg-label">Contenus mis à jour en permanence</div>
+        <div class="arg-desc">Nouveaux modules chaque mois. Veille réglementaire incluse. Vous êtes toujours à jour, sans effort. Ce n'est pas un catalogue figé, c'est un flux vivant.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ AVANT / APRÈS ═══ -->
+<section class="section" style="background:var(--bg2);border-top:1px solid var(--border);padding-top:72px;padding-bottom:72px;">
+  <div class="section-inner">
+    <div class="section-eyebrow">Le vrai changement</div>
+    <h2 class="section-title">L'ancienne façon.<br><em>La nouvelle.</em></h2>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px;margin-top:48px;border-radius:var(--r2);overflow:hidden;border:1px solid var(--border);">
+
+      <!-- Avant -->
+      <div style="background:var(--bg3);padding:36px 32px;border-right:1px solid var(--border);">
+        <div style="font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.25);margin-bottom:20px;">☠ Avant</div>
+        <div style="display:flex;flex-direction:column;gap:16px;">
+          <div style="display:flex;align-items:flex-start;gap:12px;">
+            <span style="color:#e05c8a;margin-top:1px;flex-shrink:0;">✗</span>
+            <span style="font-size:14px;color:var(--muted);">250€ à 800€ HT par an, payé à l'acte</span>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:12px;">
+            <span style="color:#e05c8a;margin-top:1px;flex-shrink:0;">✗</span>
+            <span style="font-size:14px;color:var(--muted);">Parcours imposé, contenu ennuyeux</span>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:12px;">
+            <span style="color:#e05c8a;margin-top:1px;flex-shrink:0;">✗</span>
+            <span style="font-size:14px;color:var(--muted);">Modules figés, jamais mis à jour</span>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:12px;">
+            <span style="color:#e05c8a;margin-top:1px;flex-shrink:0;">✗</span>
+            <span style="font-size:14px;color:var(--muted);">Formation à consommer en bloc, souvent en fin d'année</span>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:12px;">
+            <span style="color:#e05c8a;margin-top:1px;flex-shrink:0;">✗</span>
+            <span style="font-size:14px;color:var(--muted);">Suivi et attestations à gérer manuellement</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Après -->
+      <div style="background:linear-gradient(135deg,rgba(61,127,255,.07),rgba(45,212,191,.04));padding:36px 32px;position:relative;overflow:hidden;">
+        <div style="font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--teal);margin-bottom:20px;">▶ BingeDDA</div>
+        <div style="display:flex;flex-direction:column;gap:16px;">
+          <div style="display:flex;align-items:flex-start;gap:12px;">
+            <span style="color:var(--teal);margin-top:1px;flex-shrink:0;">✓</span>
+            <span style="font-size:14px;color:var(--text);"><strong style="color:var(--white);">24,99€ HT/mois</strong> : abonnement tout inclus</span>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:12px;">
+            <span style="color:var(--teal);margin-top:1px;flex-shrink:0;">✓</span>
+            <span style="font-size:14px;color:var(--text);">200+ modules à la carte, vous choisissez</span>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:12px;">
+            <span style="color:var(--teal);margin-top:1px;flex-shrink:0;">✓</span>
+            <span style="font-size:14px;color:var(--text);">Catalogue mis à jour en continu</span>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:12px;">
+            <span style="color:var(--teal);margin-top:1px;flex-shrink:0;">✓</span>
+            <span style="font-size:14px;color:var(--text);">15h qui s'accumulent au fil de l'eau, toute l'année</span>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:12px;">
+            <span style="color:var(--teal);margin-top:1px;flex-shrink:0;">✓</span>
+            <span style="font-size:14px;color:var(--text);">Attestations et suivi 100% automatiques</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <div style="text-align:center;margin-top:36px;">
+      <button class="btn-primary" onclick="openFunnel('register')" style="margin:0 auto;">▶ &nbsp;S'abonner à BingeDDA</button>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ CATALOGUE APERÇU ═══ -->
+<section class="catalogue-preview" id="catalogue-section">
+  <div class="section-inner">
+    <div class="section-eyebrow">Le catalogue</div>
+    <h2 class="section-title">Le <em>streaming</em> de la DDA.<br>Vous choisissez ce soir.</h2>
+    <p class="section-sub">200+ modules organisés en grandes familles. Vous naviguez librement, vous cumulez des heures sans vous en rendre compte.</p>
+
+    <!-- Fausse topbar plateforme -->
+    <div style="margin-top:40px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r2) var(--r2) 0 0;padding:18px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+      <div style="display:flex;align-items:center;gap:16px;">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--accent);letter-spacing:2px;">Binge<span style="color:var(--text)">DDA</span></div>
+        <div style="display:flex;gap:8px;">
+          <span style="font-size:12px;color:var(--muted);padding:4px 10px;background:rgba(255,255,255,.05);border-radius:4px;border:1px solid var(--border);">Accueil</span>
+          <span style="font-size:12px;color:var(--accent2);padding:4px 10px;background:rgba(61,127,255,.1);border-radius:4px;border:1px solid rgba(61,127,255,.25);">Catalogue</span>
+          <span style="font-size:12px;color:var(--muted);padding:4px 10px;background:rgba(255,255,255,.05);border-radius:4px;border:1px solid var(--border);">Mes 15h</span>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div style="width:8px;height:8px;border-radius:50%;background:var(--teal);box-shadow:0 0 6px rgba(45,212,191,.6);"></div>
+        <span style="font-size:12px;color:var(--teal);">11h 20min / 15h complétées</span>
+      </div>
+    </div>
+
+    <!-- Catalogue réel depuis Supabase -->
+    <div id="demo-catalogue" style="
+      background:var(--bg2);border:1px solid var(--border2);border-top:none;
+      border-radius:0 0 var(--r2) var(--r2);padding:24px;
+      position:relative;
+    ">
+      <!-- Filtre de sections -->
+      <div id="demo-filters" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;"></div>
+
+      <!-- Grille de modules -->
+      <div id="demo-grid" style="
+        display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;
+      ">
+        <div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted);font-size:13px;">
+          Chargement du catalogue…
+        </div>
+      </div>
+
+      <!-- Dégradé bas — effet "voir plus en s'abonnant" -->
+      <div style="
+        position:absolute;bottom:0;left:0;right:0;height:120px;
+        background:linear-gradient(to bottom, transparent, var(--bg2));
+        border-radius:0 0 var(--r2) var(--r2);pointer-events:none;
+      "></div>
+    </div>
+
+    <!-- CTA -->
+    <div style="text-align:center;margin-top:28px;">
+      <button class="btn-primary" onclick="openFunnel('register')" style="font-size:15px;padding:14px 36px;">
+        S'abonner →
+      </button>
+      <div style="font-size:12px;color:var(--muted);margin-top:10px;">24,99 € HT/mois · Engagement 12 mois</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ CONFORMITÉ ═══ -->
+<section class="section" style="background:var(--bg);">
+  <div class="section-inner">
+    <div class="section-eyebrow">Conformité</div>
+    <h2 class="section-title">L'administratif,<br><em>c'est notre problème.</em></h2>
+    <div class="conformite">
+      <div class="conf-visual">
+        <div class="conf-progress-label">
+          <span class="conf-progress-text">Progression annuelle</span>
+          <span class="conf-progress-pct">11h 20min / 15h</span>
+        </div>
+        <div class="conf-bar"><div class="conf-bar-fill" style="width:75%"></div></div>
+        <div class="conf-attestation">
+          <div class="conf-att-icon">📄</div>
+          <div>
+            <div class="conf-att-title">Attestation DDA disponible</div>
+            <div class="conf-att-sub">TC-03 · Éthique et déontologie · Score 85% · 26 sept. 2025</div>
+          </div>
+        </div>
+      </div>
+      <div class="conf-points">
+        <div class="conf-point">
+          <div class="conf-point-icon cpi-blue">⚖️</div>
+          <div>
+            <div class="conf-point-title">Conforme arrêté du 26 septembre 2018</div>
+            <div class="conf-point-sub">Structure et quiz alignés sur les exigences DDA France. Rien à interpréter de votre côté.</div>
+          </div>
+        </div>
+        <div class="conf-point">
+          <div class="conf-point-icon cpi-teal">📊</div>
+          <div>
+            <div class="conf-point-title">Suivi nominatif, exportable à la demande</div>
+            <div class="conf-point-sub">Historique complet pour vos audits ACPR ou compagnies mandantes. Prêt en un clic.</div>
+          </div>
+        </div>
+        <div class="conf-point">
+          <div class="conf-point-icon cpi-gold">🏆</div>
+          <div>
+            <div class="conf-point-title">Attestations PDF horodatées</div>
+            <div class="conf-point-sub">Nominatives, horodatées, avec code de vérification unique.</div>
+          </div>
+        </div>
+        <div class="conf-point">
+          <div class="conf-point-icon cpi-pink">🔔</div>
+          <div>
+            <div class="conf-point-title">Rappels avant que vous n'y pensiez</div>
+            <div class="conf-point-sub">Alertes automatiques à J-60, J-30 et J-7. Vous n'oubliez plus jamais vos 15h.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ TESTIMONIALS ═══ -->
+<section class="section" style="background:var(--bg2);border-top:1px solid var(--border);">
+  <div class="section-inner">
+    <div class="section-eyebrow">Ils ont switché</div>
+    <h2 class="section-title">Ceux qui ont arrêté<br>de <em>subir</em> leur DDA</h2>
+    <div class="testimonials-grid">
+      <div class="testi-card">
+        <div class="testi-stars">★★★★★</div>
+        <div class="testi-quote">Avant je remettais à décembre, en retard, avec un parcours imposé à boucler rapidement. Maintenant j'ai fait 3 modules un lundi soir parce que le sujet m'intéressait. C'est complètement différent.</div>
+        <div class="testi-author">
+          <div class="testi-avatar" style="background:linear-gradient(135deg,#3d7fff,#6b9fff)">MB</div>
+          <div>
+            <div class="testi-name">Marie B.</div>
+            <div class="testi-role">Courtière IAS — Lyon</div>
+          </div>
+        </div>
+      </div>
+      <div class="testi-card">
+        <div class="testi-stars">★★★★★</div>
+        <div class="testi-quote">J'ai mis mes 8 commerciaux dessus. Tableau de bord clair, attestations automatiques. Et surtout ils choisissent leurs modules, du coup ils le font vraiment, sans que j'aie à les relancer.</div>
+        <div class="testi-author">
+          <div class="testi-avatar" style="background:linear-gradient(135deg,#c8a84b,#e0c472)">TL</div>
+          <div>
+            <div class="testi-name">Thierry L.</div>
+            <div class="testi-role">Directeur d'agence — Bordeaux</div>
+          </div>
+        </div>
+      </div>
+      <div class="testi-card">
+        <div class="testi-stars">★★★★☆</div>
+        <div class="testi-quote">24,99€ par mois contre 400€ à l'acte que je payais avant. Le calcul est vite fait. Et les contenus sont vraiment à jour. J'ai trouvé un module sur la réforme de janvier que mes anciens prestataires n'avaient pas.</div>
+        <div class="testi-author">
+          <div class="testi-avatar" style="background:linear-gradient(135deg,#2dd4bf,#34d399)">SC</div>
+          <div>
+            <div class="testi-name">Sophie C.</div>
+            <div class="testi-role">Agent général — Paris 15e</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FAQ ═══ -->
+<section class="section" style="background:var(--bg);">
+  <div class="section-inner">
+    <div class="section-eyebrow">Questions fréquentes</div>
+    <h2 class="section-title">On répond <em>franchement</em></h2>
+    <div class="faq-list">
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          C'est vraiment moins cher qu'ailleurs ?
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-a">Oui. Les organismes de formation DDA facturent entre <strong>250€ et 800€ HT par an</strong> à l'acte. BingeDDA c'est <strong>24,99€ HT/mois</strong>, soit 299,88€ HT sur 12 mois, avec un catalogue 10x plus riche et des contenus mis à jour en continu. Et vous ne payez pas à l'acte : votre abonnement couvre tout.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          Comment fonctionne le prélèvement SEPA ?
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-a">L'abonnement est facturé <strong>24,99 € HT/mois</strong> par prélèvement SEPA automatique via GoCardless, pour une durée d'engagement de 12 mois. À l'issue, renouvellement tacite mois par mois avec préavis de résiliation de 30 jours. Aucune carte bancaire requise.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          Je dois vraiment choisir mes modules moi-même ?
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-a">Oui, c'est exactement le principe. Fini les parcours imposés. Vous parcourez le catalogue comme sur une plateforme de streaming, vous choisissez ce qui vous intéresse ou ce qui est pertinent pour votre activité du moment. Le compteur annuel prend en compte votre usage au fil de l'eau.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          Les heures démarrent quand exactement ?
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-a">Le compteur DDA démarre le jour de votre inscription et s'applique sur une période glissante de 12 mois civils, conformément à la réglementation. Vous pouvez exporter à tout moment votre relevé avec dates et durées certifiées.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          Et si je rate un quiz ?
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-a">Vous pouvez le relancer autant de fois que nécessaire. L'attestation est générée dès que vous atteignez le score minimum de 70%. Seule la meilleure tentative est retenue.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ CTA BOTTOM ═══ -->
+<section class="cta-bottom">
+  <div class="cta-bottom-inner">
+    <div class="section-eyebrow" style="display:inline-flex">Plus jamais de DDA subie</div>
+    <h2 class="cta-bottom-title">Votre<br><em>BingeDDA</em></h2>
+    <p class="cta-bottom-sub">Un abonnement. Un catalogue illimité. Vos 15h se remplissent au fil de vos envies. Sans carte bancaire,  au-delà de 12 mois.</p>
+    <div class="cta-bottom-price">
+      <div class="cbp-amount">24,99</div>
+      <div class="cbp-detail">€ HT / mois<br><span style="font-size:12px;color:var(--muted);">299,88 € HT sur 12 mois</span></div>
+    </div>
+    <button class="btn-primary" style="font-size:16px;padding:17px 40px;margin:0 auto;" onclick="openFunnel('register')">▶ &nbsp;S'abonner à BingeDDA</button>
+    <div style="display:flex;align-items:center;justify-content:center;gap:24px;margin-top:20px;flex-wrap:wrap;">
+      <div class="trust-item"><span>🏦</span> GoCardless · SEPA</div>
+      <div class="trust-item"><span>🔒</span> Données hébergées en France</div>
+      <div class="trust-item"><span>📄</span> Facture HT/TVA automatique</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FOOTER ═══ -->
+<footer>
+  <div class="footer-logo">Binge<span>DDA</span></div>
+  <div class="footer-links">
+    <span class="footer-link">Mentions légales</span>
+    <span class="footer-link">CGV</span>
+    <span class="footer-link">Politique de confidentialité</span>
+    <span class="footer-link">Contact</span>
+  </div>
+  <div class="footer-legal">© 2025 BingeDDA · Formation DDA en ligne · Tous droits réservés</div>
+</footer>
+
+<!-- ═══════════════════════════════════
+     OVERLAY FUNNEL (Inscription / Login)
+════════════════════════════════════ -->
+<div class="overlay" id="overlay" onclick="handleOverlayClick(event)">
+  <div class="modal" id="modal">
+    <button class="modal-close" onclick="forceCloseOverlay()">✕</button>
+
+    <!-- ══ FUNNEL INSCRIPTION ══ -->
+    <div id="funnel-register">
+
+      <!-- STEPS -->
+      <div class="steps-bar">
+        <div class="steps-row">
+          <div class="step-node active" id="sn-1">
+            <div class="step-circle active" id="sc-1">1</div>
+            <div class="step-label">Compte</div>
+          </div>
+          <div class="step-node" id="sn-2">
+            <div class="step-circle" id="sc-2">2</div>
+            <div class="step-label">Structure</div>
+          </div>
+          <div class="step-node" id="sn-3">
+            <div class="step-circle" id="sc-3">3</div>
+            <div class="step-label">Mandat SEPA</div>
+          </div>
+          <div class="step-node" id="sn-4">
+            <div class="step-circle" id="sc-4">4</div>
+            <div class="step-label">Confirmation</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 1: Compte -->
+      <div class="fview active" id="fv-1">
+        <div class="form-head">
+          <div class="form-title">Créer mon compte</div>
+          <div class="form-sub">Accès complet à la plateforme BingeDDA dès validation du mandat SEPA.</div>
+        </div>
+        <div class="form-body" data-protonpass-form="">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Prénom <span>*</span></label>
+              <input class="form-input" id="f-prenom" type="text" placeholder="Jean" autocomplete="given-name">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Nom <span>*</span></label>
+              <input class="form-input" id="f-nom" type="text" placeholder="Dupont" autocomplete="family-name">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Adresse e-mail professionnelle <span>*</span></label>
+            <input class="form-input" id="f-email" type="email" placeholder="jean.dupont@cabinet.fr" autocomplete="email">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Mot de passe <span>*</span></label>
+            <input class="form-input" id="f-mdp" type="password" placeholder="8 caractères minimum">
+            <div class="form-hint">Minimum 8 caractères, dont 1 majuscule et 1 chiffre.</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Confirmer le mot de passe <span>*</span></label>
+            <input class="form-input" id="f-mdp2" type="password" placeholder="Répétez le mot de passe">
+          </div>
+          <button class="form-btn" id="btn-step1" onclick="validateStep(1) &amp;&amp; registerStep1()">Continuer →</button>
+          <div id="register-error" style="display:none;margin-top:10px;padding:10px 14px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);border-radius:6px;font-size:12px;color:#f87171;"></div>
+          <button class="form-btn-ghost" onclick="switchToLogin()">Déjà un compte ? Se connecter</button>
+        </div>
+      </div>
+
+      <!-- STEP 2: Structure -->
+      <div class="fview" id="fv-2">
+        <div class="form-head">
+          <div class="form-title">Votre structure</div>
+          <div class="form-sub">Ces informations apparaîtront sur vos attestations DDA et factures.</div>
+        </div>
+        <div class="form-body">
+
+          <!-- Recherche raison sociale → SIRET + adresse auto -->
+          <div class="form-group">
+            <label class="form-label">Recherche par raison sociale <span>*</span></label>
+            <div style="position:relative;">
+              <input class="form-input" id="f-rs-search" type="text"
+                placeholder="Tapez le nom de votre société…"
+                autocomplete="off"
+                oninput="searchEntreprise(this.value)">
+              <div id="rs-suggestions" style="
+                display:none;position:absolute;top:100%;left:0;right:0;z-index:9999;
+                background:#1a2030;border:1px solid rgba(61,127,255,.3);border-top:none;
+                border-radius:0 0 8px 8px;max-height:220px;overflow-y:auto;
+              "></div>
+            </div>
+            <div id="rs-selected" style="display:none;margin-top:8px;padding:10px 14px;
+              background:rgba(45,212,191,.06);border:1px solid rgba(45,212,191,.2);
+              border-radius:6px;font-size:12px;color:var(--teal);">
+            </div>
+          </div>
+
+          <!-- Champs pré-remplis (cachés jusqu'à sélection) -->
+          <div id="fields-prefilled" style="display:none;">
+            <div class="form-group">
+              <label class="form-label">Raison sociale</label>
+              <input class="form-input" id="f-rs" type="text" placeholder="Raison sociale">
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">SIRET <span>*</span></label>
+                <input class="form-input" id="f-siret" type="text" placeholder="123 456 789 00012" maxlength="17">
+              </div>
+              <div class="form-group">
+                <label class="form-label">N° ORIAS <span style="color:var(--muted);font-weight:400;">(optionnel)</span></label>
+                <input class="form-input" id="f-orias" type="text" placeholder="07 000 000" maxlength="10">
+                <div style="font-size:11px;color:var(--muted);margin-top:4px;">Renseignable plus tard dans Mon compte. Requis pour l'attestation DDA.</div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Votre métier <span>*</span></label>
+              <select class="form-select" id="f-metier">
+                <option value="" selected="selected">Sélectionner…</option>
+                <option value="courtier">Courtier en assurance (IAS)</option>
+                <option value="agent">Agent général d'assurance</option>
+                <option value="mandataire">Mandataire d'intermédiaire</option>
+                <option value="salarie">Salarié d'une compagnie</option>
+                <option value="mutualiste">Mutualiste</option>
+                <option value="autre">Autre</option>
+              </select>
+            </div>
+
+            <!-- Adresse avec autocomplete BAN -->
+            <div class="form-group">
+              <label class="form-label">Adresse de facturation <span>*</span></label>
+              <div style="position:relative;">
+                <input class="form-input" id="f-adresse" type="text"
+                  placeholder="12 rue de la Paix"
+                  autocomplete="off"
+                  oninput="searchAdresse(this.value)">
+                <div id="adresse-suggestions" style="
+                  display:none;position:absolute;top:100%;left:0;right:0;z-index:100;
+                  background:#1a2030;border:1px solid rgba(61,127,255,.3);border-top:none;
+                  border-radius:0 0 8px 8px;max-height:200px;overflow-y:auto;
+                "></div>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Code postal <span>*</span></label>
+                <input class="form-input" id="f-cp" type="text" placeholder="75001" maxlength="5">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Ville <span>*</span></label>
+                <input class="form-input" id="f-ville" type="text" placeholder="Paris">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Téléphone</label>
+              <input class="form-input" id="f-tel" type="tel" placeholder="06 12 34 56 78">
+            </div>
+          </div>
+
+          <!-- Bouton visible même sans sélection -->
+          <div id="step2-manual-link" style="margin-top:8px;">
+            <span style="font-size:12px;color:var(--muted);cursor:pointer;text-decoration:underline;"
+              onclick="showManualEntry()">Saisie manuelle →</span>
+          </div>
+
+          <button class="form-btn" id="btn-step2" onclick="validateStep(2) && registerStep2()">Continuer →</button>
+          <div id="profile-error" style="display:none;margin-top:10px;padding:10px 14px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);border-radius:6px;font-size:12px;color:#f87171;"></div>
+          <button class="form-btn-ghost" onclick="goStep(1)">← Retour</button>
+        </div>
+      </div>
+
+      <!-- STEP 3: Mandat SEPA -->
+      <div class="fview" id="fv-3">
+        <div class="form-head">
+          <div class="form-title">Mandat de prélèvement SEPA</div>
+          <div class="form-sub">Vos coordonnées bancaires sont transmises de manière sécurisée via GoCardless. DDA.coach ne stocke jamais vos données bancaires.</div>
+        </div>
+        <div class="form-body">
+
+          <!-- Récap commande -->
+          <div class="order-recap">
+            <div class="or-row"><span class="or-label">Abonnement BingeDDA</span><span class="or-value">24,99 € HT/mois</span></div>
+            <div class="or-row"><span class="or-label">Engagement</span><span class="or-value">12 mois</span></div>
+            <div class="or-row"><span class="or-label">TVA (20%)</span><span class="or-value">5,00 € HT</span></div>
+            <div class="or-row or-total"><span class="or-label">Total mensuel HT</span><span class="or-value">24,99 € HT</span></div>
+          </div>
+
+          <!-- Info SEPA -->
+          <div class="sepa-info">
+            <div class="sepa-info-head">
+              <div class="sepa-logo">SEPA</div>
+              <div class="sepa-info-title">Prélèvement SEPA via GoCardless</div>
+            </div>
+            <div class="sepa-info-body">
+              En signant ce mandat, vous autorisez <strong>BingeDDA SAS</strong>
+ (créancier SEPA) à envoyer des instructions à votre banque pour débiter
+ votre compte, et votre banque à débiter votre compte conformément aux 
+instructions de DDA.coach SAS. Vous bénéficiez d'un droit à 
+remboursement par votre banque selon les conditions décrites dans la 
+convention que vous avez passée avec elle.
+            </div>
+          </div>
+
+          <!-- Réassurance SEPA -->
+          <div style="
+            background:rgba(45,212,191,.05);border:1px solid rgba(45,212,191,.15);
+            border-radius:8px;padding:14px 16px;margin-bottom:20px;
+          ">
+            <div style="font-size:12px;font-weight:700;color:var(--teal);margin-bottom:10px;">🔒 Paiement sécurisé par prélèvement SEPA</div>
+            <div style="display:flex;flex-direction:column;gap:7px;">
+              <div style="display:flex;align-items:flex-start;gap:8px;font-size:12px;color:#a0aec0;">
+                <span style="color:var(--teal);flex-shrink:0;">✓</span>
+                <span><strong style="color:#c8d4e8;">Pas de carte bancaire requise</strong> — le prélèvement SEPA débite directement votre compte professionnel</span>
+              </div>
+              <div style="display:flex;align-items:flex-start;gap:8px;font-size:12px;color:#a0aec0;">
+                <span style="color:var(--teal);flex-shrink:0;">✓</span>
+                <span><strong style="color:#c8d4e8;">Résiliable à tout moment</strong> — sans frais ni pénalité, avec préavis de 30 jours</span>
+              </div>
+              <div style="display:flex;align-items:flex-start;gap:8px;font-size:12px;color:#a0aec0;">
+                <span style="color:var(--teal);flex-shrink:0;">✓</span>
+                <span><strong style="color:#c8d4e8;">Protégé par votre banque</strong> — droit au remboursement sous 8 semaines garanti par la réglementation SEPA</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Coordonnées bancaires -->
+          <div class="form-group">
+            <label class="form-label">Titulaire du compte <span>*</span></label>
+            <input class="form-input" id="f-titulaire" type="text" placeholder="Raison sociale ou nom du titulaire">
+          </div>
+          <div class="form-group">
+            <label class="form-label">IBAN <span>*</span></label>
+            <input class="form-input" id="f-iban" type="text" placeholder="FR76 1234 5678 9012 3456 7890 123" maxlength="34" oninput="formatIban(this)">
+            <div class="form-hint">Compte bancaire domicilié dans la zone SEPA (UE + EEE).</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">BIC / SWIFT <span>*</span></label>
+            <input class="form-input" id="f-bic" type="text" placeholder="BNPAFRPPXXX" maxlength="11" style="text-transform:uppercase;" oninput="this.value=this.value.toUpperCase()">
+          </div>
+
+          <div class="form-divider"></div>
+
+          <!-- Aperçu mandat -->
+          <div class="sepa-mandate-box">
+            <div class="smb-head">
+              <div class="smb-title">Aperçu du mandat</div>
+              <div class="smb-ref" id="mandate-ref">REF-XXXXXXXX</div>
+            </div>
+            <div class="smb-field">
+              <div class="smb-label">Créancier</div>
+              <div class="smb-value">BingeDDA SAS · ICS FR12ZZZ000000</div>
+            </div>
+            <div class="smb-field">
+              <div class="smb-label">Débiteur</div>
+              <div class="smb-value" id="mandat-debiteur">—</div>
+            </div>
+            <div class="smb-field">
+              <div class="smb-label">IBAN</div>
+              <div class="smb-value smb-iban" id="mandat-iban">—</div>
+            </div>
+            <div class="smb-field">
+              <div class="smb-label">Montant</div>
+              <div class="smb-value">24,99 € HT · mensuel · à compter du <span id="mandat-date">—</span></div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-check">
+              <input type="checkbox" id="f-cgv">
+              <span class="form-check-label">J'accepte les <a href="#">Conditions Générales de Vente</a> et j'autorise BingeDDA SAS à prélever mensuellement 24,99 € HT (29,99 € TTC) sur le compte ci-dessus pendant 12 mois.</span>
+            </label>
+          </div>
+
+          <button class="form-btn" onclick="registerStep3()" id="btn-sepa">🏦 &nbsp;Signer le mandat et activer mon accès</button>
+          <div id="sepa-error" style="display:none;margin-top:10px;padding:10px 14px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);border-radius:6px;font-size:12px;color:#f87171;"></div>
+          <button class="form-btn-ghost" onclick="goStep(2)">← Retour</button>
+        </div>
+      </div>
+
+      <!-- STEP 4: Confirmation -->
+      <div class="fview" id="fv-4">
+        <div class="success-view">
+          <div class="success-icon">✓</div>
+          <div class="success-title">C'est parti !</div>
+          <div class="success-sub">Votre abonnement BingeDDA est activé. Un e-mail de confirmation avec vos identifiants a été envoyé à <strong id="conf-email">—</strong>.</div>
+          <div class="success-details">
+            <div class="sd-row"><span class="sd-label">Abonnement</span><span class="sd-value">BingeDDA · Accès complet</span></div>
+            <div class="sd-row"><span class="sd-label">Premier prélèvement</span><span class="sd-value" id="conf-date">—</span></div>
+            <div class="sd-row"><span class="sd-label">Montant</span><span class="sd-value">24,99 € HT/mois</span></div>
+            <div class="sd-row"><span class="sd-label">Durée d'engagement</span><span class="sd-value">12 mois</span></div>
+            <div class="sd-row"><span class="sd-label">Statut mandat SEPA</span><span class="sd-value accent">✓ Signé · En cours de validation</span></div>
+          </div>
+          <button class="form-btn" onclick="goToPlatform()" style="max-width:400px;margin:0 auto;">▶ &nbsp;Accéder à ma formation DDA</button>
+          <div style="margin-top:14px;font-size:12px;color:var(--muted);">Votre premier prélèvement sera effectué sous 3 jours ouvrés.</div>
+        </div>
+      </div>
+
+    </div><!-- /funnel-register -->
+
+    <!-- ══ FUNNEL LOGIN ══ -->
+    <div id="funnel-login" style="display:none;">
+      <div class="form-head" style="padding-top:40px;">
+        <div class="form-title">Connexion</div>
+        <div class="form-sub">Accédez à votre espace BingeDDA.</div>
+      </div>
+      <div class="form-body">
+        <div class="form-group">
+          <label class="form-label">Adresse e-mail</label>
+          <input class="form-input" id="l-email" type="email" placeholder="jean.dupont@cabinet.fr" autocomplete="email">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Mot de passe</label>
+          <input class="form-input" id="l-mdp" type="password" placeholder="Votre mot de passe" autocomplete="current-password">
+        </div>
+        <div style="text-align:right;margin-top:-10px;margin-bottom:18px;">
+          <span style="font-size:12px;color:var(--accent2);cursor:pointer;" onclick="resetPassword()">Mot de passe oublié ?</span>
+        </div>
+        <button class="form-btn" id="btn-login" onclick="handleLogin()">Se connecter →</button>
+        <div id="login-error" style="display:none;margin-top:10px;padding:10px 14px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);border-radius:6px;font-size:12px;color:#f87171;"></div>
+        <button class="form-btn-ghost" onclick="switchToRegister()">Pas encore de compte ? S'inscrire</button>
+      </div>
+    </div><!-- /funnel-login -->
+
+  </div><!-- /modal -->
+</div><!-- /overlay -->
+
+<script>
+// ── API SIRENE — Recherche raison sociale ──
+let _sireneTimer = null;
+
+async function searchEntreprise(q) {
+  clearTimeout(_sireneTimer);
+  const sug = document.getElementById('rs-suggestions');
+  if (!sug) return;
+  if (!q || q.length < 2) { sug.style.display = 'none'; return; }
+  _sireneTimer = setTimeout(async () => {
+    try {
+      const url = 'https://recherche-entreprises.api.gouv.fr/search?q=' + encodeURIComponent(q) + '&per_page=6';
+      const res = await fetch(url);
+      if (!res.ok) { sug.style.display = 'none'; return; }
+      const data = await res.json();
+      const results = (data.results || []);
+      if (!results.length) { sug.style.display = 'none'; return; }
+      window._sireneResults = results;
+      let html = '';
+      for (let i = 0; i < results.length; i++) {
+        const r = results[i];
+        const siege = r.siege || {};
+        const parts = [siege.adresse, siege.code_postal, siege.libelle_commune].filter(Boolean);
+        const adresse = parts.join(', ');
+        html += '<div style="padding:10px 14px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.06);font-size:13px;" onmouseover="this.style.background=\'rgba(61,127,255,.1)\'" onmouseout="this.style.background=\'\'" onclick="selectEntreprise(' + i + ')">';
+        html += '<div style="font-weight:600;color:#f0f4ff;">' + (r.nom_complet || r.nom_raison_sociale || '-') + '</div>';
+        html += '<div style="font-size:11px;color:#6b7a99;margin-top:2px;">' + (siege.siret || '') + (adresse ? ' · ' + adresse : '') + '</div>';
+        html += '</div>';
+      }
+      sug.innerHTML = html;
+      sug.style.display = 'block';
+    } catch(e) {
+      console.warn('Sirene:', e);
+      sug.style.display = 'none';
+    }
+  }, 300);
+}
+
+function selectEntreprise(idx) {
+  const r     = (window._sireneResults || [])[idx];
+  if (!r) return;
+  const siege = r.siege || {};
+
+  // Pré-remplir les champs
+  document.getElementById('f-rs').value    = r.nom_complet || r.nom_raison_sociale || '';
+  document.getElementById('f-siret').value = formatSiret(siege.siret || '');
+  document.getElementById('f-adresse').value = siege.adresse || '';
+  document.getElementById('f-cp').value    = siege.code_postal || '';
+  document.getElementById('f-ville').value = siege.libelle_commune || '';
+
+  // Confirmation
+  const sel = document.getElementById('rs-selected');
+  sel.innerHTML = `✓ <strong>${r.nom_complet || r.nom_raison_sociale}</strong> — SIRET ${formatSiret(siege.siret || '')} · ${siege.libelle_commune || ''}`;
+  sel.style.display = 'block';
+
+  // Cacher suggestions, afficher champs
+  document.getElementById('rs-suggestions').style.display = 'none';
+  document.getElementById('rs-search-input-wrap') && null;
+  showManualEntry();
+  document.getElementById('step2-manual-link').style.display = 'none';
+}
+
+function showManualEntry() {
+  document.getElementById('fields-prefilled').style.display = 'block';
+  document.getElementById('step2-manual-link').style.display = 'none';
+}
+
+function formatSiret(s) {
+  const d = s.replace(/\D/g,'');
+  return d.replace(/(\d{3})(\d{3})(\d{3})(\d{0,5})/, '$1 $2 $3 $4').trim();
+}
+
+// Fermer suggestions au clic extérieur
+document.addEventListener('click', e => {
+  if (!e.target.closest('#f-rs-search') && !e.target.closest('#rs-suggestions')) {
+    const sug = document.getElementById('rs-suggestions');
+    if (sug) sug.style.display = 'none';
+  }
+  if (!e.target.closest('#f-adresse') && !e.target.closest('#adresse-suggestions')) {
+    const sug = document.getElementById('adresse-suggestions');
+    if (sug) sug.style.display = 'none';
+  }
+});
+
+// ── API BAN — Autocomplete adresse ──
+let _banTimer = null;
+
+async function searchAdresse(q) {
+  clearTimeout(_banTimer);
+  const sug = document.getElementById('adresse-suggestions');
+  if (!q || q.length < 4) { sug.style.display = 'none'; return; }
+  _banTimer = setTimeout(async () => {
+    try {
+      const cp  = document.getElementById('f-cp').value.trim();
+      const url = `https://api-adresse.data.gouv.fr/search/?q=${encodeURIComponent(q)}${cp ? '&postcode=' + cp : ''}&limit=5&type=housenumber`;
+      const res  = await fetch(url);
+      const data = await res.json();
+      const features = data.features || [];
+      if (!features.length) { sug.style.display = 'none'; return; }
+      sug.innerHTML = features.map((f, i) => `
+        <div onclick="selectAdresse(${i})" style="
+          padding:10px 14px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.06);
+          font-size:12px;transition:background .15s;
+        " onmouseover="this.style.background='rgba(61,127,255,.1)'" onmouseout="this.style.background=''">
+          <div style="color:#f0f4ff;">${f.properties.label}</div>
+        </div>`).join('');
+      sug.style.display = 'block';
+      window._banResults = features;
+    } catch(e) { sug.style.display = 'none'; }
+  }, 300);
+}
+
+function selectAdresse(idx) {
+  const f = (window._banResults || [])[idx];
+  if (!f) return;
+  const p = f.properties;
+  // Remplir rue seulement (sans CP ni ville dans le champ adresse)
+  const rue = [p.housenumber, p.street].filter(Boolean).join(' ');
+  document.getElementById('f-adresse').value = rue || p.name || '';
+  document.getElementById('f-cp').value      = p.postcode || '';
+  document.getElementById('f-ville').value   = p.city || '';
+  document.getElementById('adresse-suggestions').style.display = 'none';
+}
+
+// ── DEMO CATALOGUE — chargement depuis Supabase (anon, public) ──
+const DEMO_SEC_LABELS = {
+  tc:'Tronc Commun', reg:'Réglementaire', tp:'Technique Produit',
+  tv:'Techniques de Vente', rc:'Réglementation Complémentaire',
+  dc:'Développement Commercial', mc:'Management Commercial',
+  pe:'Pratiques & Expertises', bm:'Benchmark',
+  go:'Gestion & Organisation', cs:'Compétences Soft', aa:'Assurance Avancée'
+};
+const DEMO_SEC_COLORS = {
+  tc:'#3d7fff', reg:'#e05c8a', tp:'#2dd4bf', tv:'#a78bfa',
+  rc:'#f59e0b', dc:'#34d399', mc:'#fb923c', pe:'#60a5fa',
+  bm:'#f472b6', go:'#94a3b8', cs:'#a3e635', aa:'#818cf8'
+};
+
+let _demoModules = [];
+let _demoFilter  = 'all';
+
+async function loadDemoCatalogue() {
+  try {
+    // Réutiliser le client sb existant
+    const sbDemo = sb;
+
+    const { data: modules } = await sbDemo
+      .from('modules')
+      .select('code, title, section, duree_minutes, niveau, type, thumbnail_url')
+      .eq('published', true)
+      .order('sort_order')
+      .limit(60);
+
+    if (!modules?.length) return;
+    _demoModules = modules;
+
+    // Construire les filtres par section
+    const sections = [...new Set(modules.map(m => m.section))];
+    const filtersEl = document.getElementById('demo-filters');
+    if (filtersEl) {
+      filtersEl.innerHTML = `
+        <button onclick="filterDemo('all', this)" style="
+          font-size:11px;font-weight:700;padding:5px 12px;border-radius:4px;cursor:pointer;
+          background:var(--accent);color:#fff;border:none;font-family:'DM Sans',sans-serif;
+        ">Tous (${modules.length})</button>
+        ${sections.map(sec => `
+          <button onclick="filterDemo('${sec}', this)" style="
+            font-size:11px;font-weight:600;padding:5px 12px;border-radius:4px;cursor:pointer;
+            background:rgba(255,255,255,.05);color:var(--muted);border:1px solid var(--border2);
+            font-family:'DM Sans',sans-serif;transition:all .2s;
+          ">${DEMO_SEC_LABELS[sec]||sec}</button>
+        `).join('')}
+      `;
+    }
+
+    renderDemoGrid();
+  } catch(e) {
+    console.warn('Demo catalogue error:', e);
+  }
+}
+
+function filterDemo(sec, btn) {
+  _demoFilter = sec;
+  document.querySelectorAll('#demo-filters button').forEach(b => {
+    b.style.background = 'rgba(255,255,255,.05)';
+    b.style.color = 'var(--muted)';
+    b.style.border = '1px solid var(--border2)';
+  });
+  btn.style.background = 'var(--accent)';
+  btn.style.color = '#fff';
+  btn.style.border = 'none';
+  renderDemoGrid();
+}
+
+function renderDemoGrid() {
+  const grid = document.getElementById('demo-grid');
+  if (!grid) return;
+  const mods = _demoFilter === 'all'
+    ? _demoModules
+    : _demoModules.filter(m => m.section === _demoFilter);
+
+  grid.innerHTML = mods.slice(0, 24).map(m => {
+    const color  = DEMO_SEC_COLORS[m.section] || '#3d7fff';
+    const dur    = m.duree_minutes >= 60
+      ? Math.floor(m.duree_minutes/60)+'h'+(m.duree_minutes%60>0?String(m.duree_minutes%60).padStart(2,'0'):'')
+      : m.duree_minutes+'min';
+    const isVideo = m.type === 'video';
+    const thumb   = m.thumbnail_url;
+    return `<div style="
+      background:var(--bg3);border:1px solid var(--border2);border-radius:8px;
+      overflow:hidden;opacity:.95;cursor:default;
+    ">
+      <div style="
+        height:90px;
+        ${thumb ? `background:url('${thumb}') center/cover no-repeat;` : `background:linear-gradient(135deg,${color}22,${color}44);`}
+        position:relative;display:flex;align-items:flex-end;padding:8px;
+      ">
+        <span style="
+          font-size:9px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;
+          padding:2px 7px;border-radius:3px;
+          background:${isVideo ? 'rgba(239,68,68,.8)' : 'rgba(0,0,0,.6)'};
+          color:#fff;
+        ">${isVideo ? '▶ Vidéo' : 'E-learning'}</span>
+      </div>
+      <div style="padding:10px 12px;">
+        <div style="font-size:12px;font-weight:600;color:var(--white);line-height:1.35;
+          display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+          margin-bottom:6px;">${m.title}</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:10px;color:${color};font-weight:600;">${DEMO_SEC_LABELS[m.section]||m.section}</span>
+          <span style="font-size:10px;color:var(--muted);">⏱ ${dur}</span>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// Charger au scroll pour éviter de ralentir le chargement initial
+const _demoObserver = new IntersectionObserver((entries) => {
+  if (entries[0].isIntersecting) {
+    loadDemoCatalogue();
+    _demoObserver.disconnect();
+  }
+}, { threshold: 0.1 });
+
+document.addEventListener('DOMContentLoaded', () => {
+  const section = document.getElementById('catalogue-section');
+  if (section) _demoObserver.observe(section);
+});
+
+// ── FUNNEL STATE ──
+let currentStep = 1;
+
+async function openFunnel(mode) {
+  const overlay = document.getElementById('overlay');
+  if (mode === 'login') {
+    document.getElementById('funnel-register').style.display = 'none';
+    document.getElementById('funnel-login').style.display = 'block';
+  } else {
+    document.getElementById('funnel-register').style.display = 'block';
+    document.getElementById('funnel-login').style.display = 'none';
+
+    // Vérifier si une session existe déjà — reprendre à la bonne étape
+    const { data: { session } } = await sb.auth.getSession();
+    if (session) {
+      window._regUserId = session.user.id;
+      // Vérifier l'état du profil et de l'abonnement
+      const { data: sub } = await sb.from('subscriptions')
+        .select('status').eq('user_id', session.user.id).maybeSingle();
+      const { data: profile } = await sb.from('profiles')
+        .select('metier, adresse').eq('id', session.user.id).single();
+
+      if (sub?.status === 'active') {
+        // Déjà abonné → aller directement à la plateforme
+        window.location.href = '/formation';
+        return;
+      } else if (sub?.status === 'pending') {
+        // Mandat signé, en attente → accès exploration
+        window.location.href = '/formation?mode=exploration';
+        return;
+      } else if (profile?.metier && profile?.adresse) {
+        // Profil complet, pas encore d'abonnement → reprendre étape 3
+        goStep(3, true);
+      } else {
+        // Compte créé mais profil incomplet → reprendre étape 2
+        // Pré-remplir l'email
+        const emailEl = document.getElementById('f-email');
+        if (emailEl) emailEl.value = session.user.email;
+        goStep(2, true);
+      }
+    } else {
+      goStep(1, true);
+    }
+  }
+  overlay.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function forceCloseOverlay() {
+  // Fermeture via la croix — toujours autorisée
+  document.getElementById('overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function closeOverlay() {
+  // Fermeture via clic extérieur — bloquée si funnel inscription ouvert
+  if (document.getElementById('funnel-register')?.style.display !== 'none') {
+    const modal = document.getElementById('modal');
+    if (modal) { modal.style.animation = 'shake .3s ease'; setTimeout(() => modal.style.animation = '', 300); }
+    return;
+  }
+  forceCloseOverlay();
+}
+
+function handleOverlayClick(e) {
+  if (e.target === document.getElementById('overlay')) closeOverlay();
+}
+
+function switchToLogin() {
+  document.getElementById('funnel-register').style.display = 'none';
+  document.getElementById('funnel-login').style.display = 'block';
+}
+
+function switchToRegister() {
+  document.getElementById('funnel-register').style.display = 'block';
+  document.getElementById('funnel-login').style.display = 'none';
+  goStep(1, true);
+}
+
+// ── STEPS ──
+function goStep(n, force) {
+  if (n > currentStep && !force) {
+    if (!validateStep(currentStep)) return;
+  }
+  // Hide all fviews
+  document.querySelectorAll('.fview').forEach(v => v.classList.remove('active'));
+  document.getElementById('fv-' + n).classList.add('active');
+  // Update step indicators
+  for (let i = 1; i <= 4; i++) {
+    const sc = document.getElementById('sc-' + i);
+    const sn = document.getElementById('sn-' + i);
+    sc.classList.remove('active', 'done');
+    sn.classList.remove('active', 'done');
+    if (i < n) { sc.classList.add('done'); sn.classList.add('done'); sc.textContent = '✓'; }
+    else if (i === n) { sc.classList.add('active'); sn.classList.add('active'); sc.textContent = i; }
+    else { sc.textContent = i; }
+  }
+  currentStep = n;
+  // Scroll modal to top
+  document.getElementById('modal').scrollTop = 0;
+  // On step 3: populate mandat preview + generate ref
+  if (n === 3) updateMandatPreview();
+  // On step 4: populate confirmation
+  if (n === 4) populateConfirmation();
+}
+
+function validateStep(n) {
+  if (n === 1) {
+    const prenom = document.getElementById('f-prenom').value.trim();
+    const nom = document.getElementById('f-nom').value.trim();
+    const email = document.getElementById('f-email').value.trim();
+    const mdp = document.getElementById('f-mdp').value;
+    const mdp2 = document.getElementById('f-mdp2').value;
+    if (!prenom || !nom || !email) { alert('Veuillez remplir tous les champs obligatoires.'); return false; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { alert('Adresse e-mail invalide.'); return false; }
+    if (mdp.length < 8) { alert('Le mot de passe doit contenir au moins 8 caractères.'); return false; }
+    if (mdp !== mdp2) { alert('Les mots de passe ne correspondent pas.'); return false; }
+  }
+  if (n === 2) {
+    const rs      = document.getElementById('f-rs').value.trim();
+    const siret   = document.getElementById('f-siret').value.replace(/\s/g,'');
+    const orias   = document.getElementById('f-orias').value.replace(/\s/g,'');
+    const metier  = document.getElementById('f-metier').value;
+    const adresse = document.getElementById('f-adresse').value.trim();
+    const cp      = document.getElementById('f-cp').value.trim();
+    const ville   = document.getElementById('f-ville').value.trim();
+    if (!rs || !metier || !adresse || !cp || !ville) { alert('Veuillez remplir tous les champs obligatoires.'); return false; }
+    if (siret.length > 0 && siret.length !== 14) { alert('Le SIRET doit comporter 14 chiffres.'); return false; }
+  }
+  if (n === 3) {
+    const tit = document.getElementById('f-titulaire').value.trim();
+    const iban = document.getElementById('f-iban').value.replace(/\s/g,'');
+    const bic = document.getElementById('f-bic').value.trim();
+    const cgv = document.getElementById('f-cgv').checked;
+    if (!tit || !iban || !bic) { alert('Veuillez renseigner toutes les coordonnées bancaires.'); return false; }
+    if (!validateIban(iban)) { alert('L\'IBAN saisi semble invalide. Vérifiez le format (ex: FR76…).'); return false; }
+    if (!cgv) { alert('Veuillez accepter les Conditions Générales de Vente pour continuer.'); return false; }
+  }
+  return true;
+}
+
+// ── IBAN ──
+function formatIban(input) {
+  let val = input.value.replace(/[^A-Z0-9a-z]/gi, '').toUpperCase();
+  let formatted = val.replace(/(.{4})/g, '$1 ').trim();
+  input.value = formatted;
+  updateMandatPreview();
+}
+
+function validateIban(iban) {
+  const raw = iban.replace(/\s/g, '');
+  if (raw.length < 14 || raw.length > 34) return false;
+  if (!/^[A-Z]{2}[0-9]{2}[A-Z0-9]+$/.test(raw)) return false;
+  return true;
+}
+
+function updateMandatPreview() {
+  const rs = document.getElementById('f-rs')?.value.trim() || '—';
+  const iban = document.getElementById('f-iban')?.value || '—';
+  document.getElementById('mandat-debiteur').textContent = rs;
+  document.getElementById('mandat-iban').textContent = iban || '—';
+  // Date premier prélèvement: J+3 ouvrés (simplifiée ici: J+5)
+  const d = new Date();
+  d.setDate(d.getDate() + 5);
+  const opts = {day:'2-digit',month:'long',year:'numeric'};
+  document.getElementById('mandat-date').textContent = d.toLocaleDateString('fr-FR', opts);
+  // Référence mandat
+  if (document.getElementById('mandate-ref').textContent === 'REF-XXXXXXXX') {
+    const ref = 'REF-' + Math.random().toString(36).substr(2,8).toUpperCase();
+    document.getElementById('mandate-ref').textContent = ref;
+  }
+}
+
+function populateConfirmation() {
+  const email = document.getElementById('f-email')?.value || '';
+  document.getElementById('conf-email').textContent = email || 'votre adresse e-mail';
+  const d = new Date();
+  d.setDate(d.getDate() + 5);
+  const opts = {day:'2-digit',month:'long',year:'numeric'};
+  document.getElementById('conf-date').textContent = d.toLocaleDateString('fr-FR', opts);
+}
+
+// ── SUPABASE ──
+const SUPABASE_URL  = 'https://vrufldjydjrgcqwhmpnt.supabase.co';
+const SUPABASE_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZydWZsZGp5ZGpyZ2Nxd2htcG50Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5NTA3ODksImV4cCI6MjA5MjUyNjc4OX0.jW1CQ5yzJr4Ccac9-OI2RgVLXqFn-X0MjAxCkc9Xbfc';
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+  auth: {
+    storageKey: 'dda-coach-auth',
+    persistSession: true,
+    autoRefreshToken: true,
+    detectSessionInUrl: true
+  }
+});
+
+// ── HELPERS UI ──
+function setLoading(btnId, loading, defaultText) {
+  const btn = document.getElementById(btnId);
+  if (!btn) return;
+  btn.disabled = loading;
+  btn.textContent = loading ? 'Chargement…' : defaultText;
+}
+function showError(elId, msg) {
+  const el = document.getElementById(elId);
+  if (!el) return;
+  el.textContent = msg;
+  el.style.display = msg ? 'block' : 'none';
+}
+function goToPlatform() {
+  window.location.href = '/formation';
+}
+
+// ── ÉTAPE 1 : INSCRIPTION ──
+// Appelée lors du passage à l'étape 2 (après validation locale)
+async function registerStep1() {
+  const prenom = document.getElementById('f-prenom').value.trim();
+  const nom    = document.getElementById('f-nom').value.trim();
+  const email  = document.getElementById('f-email').value.trim();
+  const mdp    = document.getElementById('f-mdp').value;
+
+  setLoading('btn-step1', true, 'Continuer →');
+  showError('register-error', '');
+
+  try {
+    const { data, error } = await sb.auth.signUp({
+      email,
+      password: mdp,
+      options: { data: { prenom, nom } }
+    });
+
+    if (error) {
+      if (error.message === 'User already registered') {
+        // Login silencieux et reprise à l'étape 2
+        const { data: loginData, error: loginError } = await sb.auth.signInWithPassword({ email, password: mdp });
+        if (loginError) {
+          showError('register-error', 'Un compte existe déjà avec cet email. Mot de passe incorrect — utilisez "Mot de passe oublié" ou connectez-vous.');
+          return;
+        }
+        window._regUserId = loginData.user.id;
+        goStep(2, true);
+        return;
+      }
+      throw error;
+    }
+
+    window._regUserId = data.user?.id;
+    goStep(2, true);
+  } catch (err) {
+    showError('register-error', err.message);
+  } finally {
+    setLoading('btn-step1', false, 'Continuer →');
+  }
+}
+
+// ── ÉTAPE 2 : PROFIL STRUCTURE ──
+async function registerStep2() {
+  const rs      = document.getElementById('f-rs').value.trim();
+  const siret   = document.getElementById('f-siret').value.replace(/\s/g,'');
+  const orias   = document.getElementById('f-orias').value.replace(/\s/g,'');
+  const metier  = document.getElementById('f-metier').value;
+  const adresse = document.getElementById('f-adresse').value.trim();
+  const cp      = document.getElementById('f-cp').value.trim();
+  const ville   = document.getElementById('f-ville').value.trim();
+  const tel     = document.getElementById('f-tel').value.trim();
+  const adresseFull = [adresse, cp, ville].filter(Boolean).join(', ');
+
+  setLoading('btn-step2', true, 'Continuer →');
+  showError('profile-error', '');
+
+  try {
+    // Récupérer la session active pour s'assurer que le JWT est valide
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) throw new Error('Session expirée — veuillez recommencer depuis l\'étape 1.');
+
+    // UPDATE (pas upsert) — le profil existe déjà grâce au trigger handle_new_user
+    const { error } = await sb.from('profiles').update({
+      raison_sociale: rs,
+      siret:          siret || null,
+      orias:          orias || null,
+      metier,
+      adresse:        adresseFull,
+      telephone:      tel || null
+    }).eq('id', session.user.id);
+
+    if (error) throw error;
+    window._regUserId = session.user.id;
+    goStep(3, true);
+  } catch (err) {
+    showError('profile-error', 'Erreur lors de la sauvegarde du profil : ' + err.message);
+  } finally {
+    setLoading('btn-step2', false, 'Continuer →');
+  }
+}
+
+// ── ÉTAPE 3 : MANDAT SEPA → GoCardless ──
+async function registerStep3() {
+  const cgv = document.getElementById('f-cgv').checked;
+  if (!cgv) { showError('sepa-error', 'Veuillez accepter les CGV.'); return; }
+
+  const tit  = document.getElementById('f-titulaire').value.trim();
+  const iban = document.getElementById('f-iban').value.replace(/\s/g,'');
+  const bic  = document.getElementById('f-bic').value.trim();
+  if (!tit || !iban || !bic) { showError('sepa-error', 'Veuillez renseigner toutes les coordonnées bancaires.'); return; }
+  if (!validateIban(iban)) { showError('sepa-error', 'IBAN invalide.'); return; }
+
+  setLoading('btn-sepa', true, '🏦 Signer le mandat et activer mon accès');
+  showError('sepa-error', '');
+
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) throw new Error('Session expirée — veuillez recommencer.');
+
+    const prenom  = document.getElementById('f-prenom').value.trim();
+    const nom     = document.getElementById('f-nom').value.trim();
+    const email   = document.getElementById('f-email').value.trim();
+    const rs      = document.getElementById('f-rs').value.trim();
+    const adresse = document.getElementById('f-adresse').value.trim();
+    const cp      = document.getElementById('f-cp').value.trim();
+    const ville   = document.getElementById('f-ville').value.trim();
+
+    const res = await fetch(SUPABASE_URL + '/functions/v1/create-subscription', {
+      method:  'POST',
+      headers: {
+        'Authorization': 'Bearer ' + session.access_token,
+        'Content-Type':  'application/json'
+      },
+      body: JSON.stringify({ prenom, nom, email, raison_sociale: rs, adresse, cp, ville })
+    });
+
+    const result = await res.json();
+    if (!res.ok) throw new Error(result.error || 'Erreur serveur');
+
+    // Redirection vers la page GoCardless hosted pour signer le mandat
+    window.location.href = result.checkout_url;
+
+  } catch (err) {
+    showError('sepa-error', err.message);
+    setLoading('btn-sepa', false, '🏦 Signer le mandat et activer mon accès');
+  }
+}
+
+// ── LOGIN ──
+async function handleLogin() {
+  const email = document.getElementById('l-email').value.trim();
+  const mdp   = document.getElementById('l-mdp').value;
+
+  if (!email || !mdp) { showError('login-error', 'Veuillez renseigner votre email et mot de passe.'); return; }
+
+  setLoading('btn-login', true, 'Se connecter →');
+  showError('login-error', '');
+
+  try {
+    const { data, error } = await sb.auth.signInWithPassword({ email, password: mdp });
+    if (error) throw error;
+
+    // Vérifier statut abonnement
+    const { data: sub } = await sb.from('subscriptions')
+      .select('status')
+      .eq('user_id', data.user.id)
+      .single();
+
+    if (sub?.status === 'active') {
+      window.location.href = '/formation';
+    } else if (sub?.status === 'pending') {
+      // Accès temporaire 48h en mode exploration
+      window.location.href = '/formation?mode=exploration';
+    } else if (!sub) {
+      // Pas encore d'abonnement — rediriger vers le funnel d'inscription
+      closeOverlay();
+      openFunnel('register');
+    } else {
+      showError('login-error', 'Votre abonnement est ' + sub.status + '. Contactez-nous à hello@dda.coach.');
+    }
+  } catch (err) {
+    showError('login-error', err.message === 'Invalid login credentials'
+      ? 'Email ou mot de passe incorrect.'
+      : err.message);
+  } finally {
+    setLoading('btn-login', false, 'Se connecter →');
+  }
+}
+
+// ── RESET MOT DE PASSE ──
+async function resetPassword() {
+  const email = document.getElementById('l-email')?.value.trim();
+  if (!email) { showError('login-error', 'Entrez votre email ci-dessus puis cliquez sur "Mot de passe oublié".'); return; }
+  const { error } = await sb.auth.resetPasswordForEmail(email, {
+    redirectTo: 'https://dda-coach.vercel.app/formation'
+  });
+  if (error) { showError('login-error', error.message); return; }
+  showError('login-error', '');
+  alert('Email de réinitialisation envoyé à ' + email);
+}
+
+// ── VÉRIFICATION SESSION AU CHARGEMENT ──
+(async () => {
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) return;
+  const { data: sub } = await sb.from('subscriptions')
+    .select('status')
+    .eq('user_id', session.user.id)
+    .maybeSingle();
+  if (sub?.status === 'active') {
+    window.location.href = '/formation';
+  }
+  // Afficher le lien admin si rôle admin
+  const { data: profile } = await sb.from('profiles')
+    .select('role')
+    .eq('id', session.user.id)
+    .single();
+  if (profile?.role === 'admin') {
+    document.getElementById('admin-link').style.display = 'inline-flex';
+  }
+})();
+
+// ── NAVIGATION ──
+function toggleFaq(btn) {
+  const item = btn.closest('.faq-item');
+  const wasOpen = item.classList.contains('open');
+  document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+  if (!wasOpen) item.classList.add('open');
+}
+
+// ── SCROLL TOPBAR ──
+window.addEventListener('scroll', () => {
+  // Light enhancement handled by CSS already
+});
+
+// ── SIRET FORMATTER ──
+document.addEventListener('input', e => {
+  if (e.target.id === 'f-siret') {
+    let v = e.target.value.replace(/\D/g,'').substr(0,14);
+    e.target.value = v.replace(/(\d{3})(\d{3})(\d{3})(\d{0,5})/,'$1 $2 $3 $4').trim();
+  }
+  if (e.target.id === 'f-orias') {
+    let v = e.target.value.replace(/\D/g,'').substr(0,8);
+    e.target.value = v.replace(/(\d{2})(\d{0,6})/,'$1 $2').trim();
+  }
+});
+
+// Keyboard close
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeOverlay();
+});
+</script>
+
+
+<protonpass-root-a38c data-protonpass-role="root" data-protonpass-theme="os"></protonpass-root-a38c></body></html>

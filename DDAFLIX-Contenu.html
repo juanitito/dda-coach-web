@@ -1,0 +1,2467 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPCEtLSBGb25kIGFycm9uZGkgc29tYnJlIC0tPgogIDxyZWN0IHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgcng9IjciIGZpbGw9IiMwYjBmMWEiLz4KICA8IS0tIExldHRyZSBCIGJvbGQgYmxldWUgLS0+CiAgPHBhdGggZD0iTTggNmg4YzIuNSAwIDQuNSAxLjggNC41IDQuMiAwIDEuNC0uNyAyLjYtMS44IDMuMyAxLjUuNyAyLjUgMi4xIDIuNSAzLjhDMjEuMiAyMCAxOSAyMiAxNi4yIDIySDhWNnptMyAzdjRoNC41YzEgMCAxLjgtLjggMS44LTJzLS44LTItMS44LTJIMTF6bTAgN3Y0aDVjMS4xIDAgMi0uOSAyLTJzLS45LTItMi0yaC01eiIgZmlsbD0iIzNkN2ZmZiIvPgogIDwhLS0gUG9pbnQgdGVhbCBhY2NlbnQgLS0+CiAgPGNpcmNsZSBjeD0iMjUiIGN5PSIyNSIgcj0iNC41IiBmaWxsPSIjMmRkNGJmIi8+Cjwvc3ZnPgo=">
+
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BingeDDA · Votre espace formation</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script>
+const SUPABASE_URL = 'https://vrufldjydjrgcqwhmpnt.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZydWZsZGp5ZGpyZ2Nxd2htcG50Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5NTA3ODksImV4cCI6MjA5MjUyNjc4OX0.jW1CQ5yzJr4Ccac9-OI2RgVLXqFn-X0MjAxCkc9Xbfc';
+window._sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+  auth: { storageKey: 'dda-coach-auth', persistSession: true, autoRefreshToken: true }
+});
+</script>
+<style>
+:root {
+  --bg:      #0b0f1a;
+  --bg2:     #0e1420;
+  --bg3:     #131926;
+  --surface: #1a2030;
+  --border:  rgba(255,255,255,0.07);
+  --accent:  #3d7fff;
+  --accent2: #6b9fff;
+  --gold:    #c8a84b;
+  --gold2:   #e0c472;
+  --teal:    #2dd4bf;
+  --text:    #dde3f0;
+  --muted:   #6b7a99;
+  --white:   #fff;
+  --tc:      #3d7fff;
+  --reg:     #e05c8a;
+  --tp:      #2dd4bf;
+  --tv:      #a78bfa;
+  --r: 8px;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; overflow-x:hidden; }
+
+/* ========== TOPBAR ========== */
+.topbar {
+  position:fixed; top:0; left:0; right:0; z-index:200;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:0 48px; height:66px;
+  background:linear-gradient(180deg,rgba(11,15,26,0.95) 0%,rgba(11,15,26,0) 100%);
+  transition:background .3s;
+}
+.topbar.scrolled { background:rgba(11,15,26,0.98); backdrop-filter:blur(12px); border-bottom:1px solid var(--border); }
+.logo { font-family:'Bebas Neue',sans-serif; font-size:26px; letter-spacing:3px; color:var(--accent); cursor:pointer; }
+.logo span { color:var(--text); }
+.nav-links { display:flex; gap:28px; align-items:center; }
+.nav-link { font-size:13px; font-weight:500; color:var(--muted); cursor:pointer; transition:color .2s; }
+.nav-link:hover,.nav-link.active { color:var(--white); }
+.nav-right { display:flex; align-items:center; gap:14px; }
+.timer-badge {
+  display:flex; align-items:center; gap:8px;
+  background:rgba(61,127,255,0.1); border:1px solid rgba(61,127,255,0.3);
+  border-radius:20px; padding:5px 14px; font-size:12px; color:var(--accent2); font-weight:600;
+}
+.timer-dot { width:6px; height:6px; border-radius:50%; background:var(--teal); animation:pulse 1.5s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+/* ========== VIEWS ========== */
+.view { display:none; }
+.view.active { display:block; }
+
+/* ========== ONBOARDING ========== */
+#view-onboarding {
+  min-height:100vh; background:var(--bg); position:relative; overflow:hidden;
+}
+.ob-bg {
+  position:absolute; inset:0; pointer-events:none;
+  background:
+    radial-gradient(ellipse at 70% -10%, rgba(61,127,255,0.15) 0%, transparent 55%),
+    radial-gradient(ellipse at 5% 90%,  rgba(45,212,191,0.08) 0%, transparent 45%);
+}
+/* Subtle grid lines */
+.ob-bg::after {
+  content:''; position:absolute; inset:0;
+  background-image:
+    linear-gradient(rgba(61,127,255,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(61,127,255,0.03) 1px, transparent 1px);
+  background-size:60px 60px;
+}
+.ob-wrap {
+  max-width:700px; margin:0 auto; padding:110px 32px 80px;
+  position:relative; z-index:2;
+}
+.ob-eyebrow {
+  display:inline-flex; align-items:center; gap:8px;
+  background:rgba(61,127,255,0.1); border:1px solid rgba(61,127,255,0.3);
+  border-radius:4px; padding:4px 12px; font-size:11px; font-weight:700;
+  color:var(--accent2); letter-spacing:2px; text-transform:uppercase; margin-bottom:20px;
+}
+.ob-eyebrow::before { content:'◆'; font-size:7px; }
+.ob-title {
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(32px,5vw,52px); line-height:1.1;
+  color:var(--white); margin-bottom:14px; letter-spacing:1px;
+}
+.ob-title em { color:var(--accent); font-style:normal; }
+.ob-title .ob-greeting { font-size:.55em; color:var(--muted); display:block; letter-spacing:2px; margin-bottom:4px; }
+.ob-sub { font-size:14px; color:var(--muted); line-height:1.7; margin-bottom:52px; max-width:480px; }
+
+/* Questions */
+.ob-questions { display:flex; flex-direction:column; gap:40px; }
+.ob-q-label {
+  font-size:11px; font-weight:700; letter-spacing:2px; text-transform:uppercase;
+  color:var(--accent2); margin-bottom:14px; display:flex; align-items:center; gap:10px;
+}
+.ob-q-label::after { content:''; flex:1; height:1px; background:linear-gradient(90deg, rgba(61,127,255,0.2), transparent); }
+.ob-q-label span { color:var(--muted); font-weight:400; font-size:10px; text-transform:none; letter-spacing:0; }
+
+/* Cards métier */
+.q-cards { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+.qc {
+  background:var(--surface); border:1.5px solid var(--border);
+  border-radius:var(--r); padding:16px 12px; cursor:pointer;
+  transition:all .2s; text-align:center; position:relative; overflow:hidden;
+}
+.qc::before { content:''; position:absolute; inset:0; background:linear-gradient(135deg,rgba(61,127,255,0.08),transparent); opacity:0; transition:opacity .2s; }
+.qc:hover { border-color:rgba(61,127,255,0.4); transform:translateY(-2px); }
+.qc:hover::before { opacity:1; }
+.qc.sel { border-color:var(--accent); background:rgba(61,127,255,0.1); }
+.qc.sel::before { opacity:1; }
+.qc-icon { font-size:24px; margin-bottom:8px; }
+.qc-name { font-size:12px; font-weight:600; color:var(--text); }
+.qc-sub { font-size:10px; color:var(--muted); margin-top:3px; line-height:1.3; }
+.qc.sel .qc-name { color:var(--accent2); }
+.qc .check { position:absolute; top:7px; right:7px; width:16px; height:16px; border-radius:50%; background:var(--accent); display:none; align-items:center; justify-content:center; font-size:9px; color:#fff; }
+.qc.sel .check { display:flex; }
+
+/* Tags produits */
+.q-tags { display:flex; flex-wrap:wrap; gap:8px; }
+.qt {
+  padding:7px 14px; border-radius:20px; cursor:pointer; font-size:12px; font-weight:500;
+  border:1.5px solid rgba(255,255,255,0.1); color:var(--muted); transition:all .2s;
+}
+.qt:hover { border-color:rgba(61,127,255,0.4); color:var(--accent2); }
+.qt.sel { background:rgba(61,127,255,0.12); border-color:var(--accent); color:var(--accent2); font-weight:600; }
+
+/* Niveaux */
+.q-levels { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+.ql {
+  background:var(--surface); border:1.5px solid var(--border); border-radius:var(--r);
+  padding:16px 14px; cursor:pointer; transition:all .2s; display:flex; align-items:center; gap:12px;
+}
+.ql:hover { border-color:rgba(61,127,255,0.4); }
+.ql.sel { border-color:var(--accent); background:rgba(61,127,255,0.08); }
+.ql-icon { font-size:20px; flex-shrink:0; }
+.ql-name { font-size:13px; font-weight:600; color:var(--text); }
+.ql-sub { font-size:10px; color:var(--muted); margin-top:2px; }
+.ql.sel .ql-name { color:var(--accent2); }
+
+.ob-cta-row { margin-top:44px; display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+.btn-primary {
+  display:inline-flex; align-items:center; gap:10px;
+  background:var(--accent); color:#fff; font-family:'DM Sans',sans-serif;
+  font-size:14px; font-weight:700; padding:13px 30px; border-radius:var(--r);
+  border:none; cursor:pointer; transition:all .25s; letter-spacing:.3px;
+}
+.btn-primary:hover { background:var(--accent2); transform:translateY(-1px); box-shadow:0 8px 28px rgba(61,127,255,0.35); }
+.btn-ghost {
+  display:inline-flex; align-items:center; gap:8px;
+  background:transparent; color:var(--muted); font-family:'DM Sans',sans-serif;
+  font-size:13px; font-weight:500; padding:13px 22px; border-radius:var(--r);
+  border:1.5px solid rgba(255,255,255,0.1); cursor:pointer; transition:all .2s;
+}
+.btn-ghost:hover { color:var(--text); border-color:rgba(255,255,255,0.2); }
+
+/* ========== CATALOGUE ========== */
+#view-catalogue { padding-top:66px; min-height:100vh; }
+
+.cat-hero {
+  background:linear-gradient(135deg, var(--bg2) 0%, var(--bg3) 100%);
+  padding:44px 48px; border-bottom:1px solid var(--border); position:relative; overflow:hidden;
+}
+.cat-hero::before {
+  content:''; position:absolute; inset:0; pointer-events:none;
+  background:radial-gradient(ellipse at 80% 50%, rgba(61,127,255,0.08) 0%, transparent 60%);
+}
+.cat-hero::after {
+  content:'DDA'; position:absolute; right:-10px; top:50%; transform:translateY(-50%);
+  font-family:'Bebas Neue',sans-serif; font-size:260px; color:rgba(61,127,255,0.03);
+  pointer-events:none; line-height:1;
+}
+.cat-hero-inner { max-width:1300px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; gap:32px; position:relative; z-index:1; }
+.cat-profile-tags { display:flex; gap:7px; flex-wrap:wrap; margin-bottom:14px; }
+.ptag {
+  background:rgba(61,127,255,0.1); border:1px solid rgba(61,127,255,0.25);
+  border-radius:4px; padding:3px 10px; font-size:11px; color:var(--accent2); font-weight:600;
+}
+.cat-hero-title { font-family:'Bebas Neue',sans-serif; font-size:34px; color:var(--white); letter-spacing:1px; }
+.cat-hero-title span { color:var(--accent); }
+.cat-hero-sub { font-size:13px; color:var(--muted); margin-top:5px; }
+.cat-hero-stats { display:flex; gap:28px; flex-shrink:0; }
+.cat-stat { text-align:center; }
+.cat-stat-v { font-family:'Bebas Neue',sans-serif; font-size:32px; color:var(--accent); line-height:1; }
+.cat-stat-l { font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-top:3px; }
+
+/* Filters */
+.filters-bar {
+  position:sticky; top:66px; z-index:100;
+  background:rgba(11,15,26,0.97); backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);
+  padding:10px 48px; display:flex; align-items:center; gap:8px; flex-wrap:nowrap; overflow-x:auto;
+}
+.search-wrap { position:relative; flex:1; min-width:200px; max-width:340px; }
+.search-icon { position:absolute; left:11px; top:50%; transform:translateY(-50%); color:var(--muted); font-size:13px; pointer-events:none; }
+.search-input {
+  width:100%; background:var(--surface); border:1.5px solid var(--border); border-radius:var(--r);
+  padding:9px 12px 9px 34px; font-family:'DM Sans',sans-serif; font-size:13px; color:var(--text);
+  transition:border-color .2s; outline:none;
+}
+.search-input::placeholder { color:var(--muted); }
+.search-input:focus { border-color:var(--accent); }
+.filter-select {
+  background:var(--surface); border:1.5px solid var(--border); border-radius:var(--r);
+  padding:9px 30px 9px 12px; font-family:'DM Sans',sans-serif; font-size:13px; color:var(--text);
+  outline:none; cursor:pointer; transition:border-color .2s; appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%236b7a99'/%3E%3C/svg%3E");
+  background-repeat:no-repeat; background-position:right 10px center;
+}
+.filter-select:focus { border-color:var(--accent); }
+/* Active filter highlight */
+.filter-select.has-value { border-color:rgba(61,127,255,0.4); color:var(--accent2); }
+.filter-count { font-size:12px; color:var(--muted); margin-left:auto; white-space:nowrap; }
+.filter-count span { color:var(--text); font-weight:600; }
+.btn-reset {
+  font-size:12px; color:var(--muted); background:none; border:none; cursor:pointer;
+  padding:4px 8px; border-radius:4px; transition:color .2s; font-family:'DM Sans',sans-serif;
+}
+.btn-reset:hover { color:var(--text); }
+
+/* Grid body */
+.cat-body { max-width:1300px; margin:0 auto; padding:40px 48px 80px; }
+.cat-section { margin-bottom:52px; }
+.cat-section-head { display:flex; align-items:center; gap:14px; margin-bottom:20px; }
+.cat-section-bar { width:4px; height:22px; border-radius:2px; flex-shrink:0; }
+.bar-tc { background:#3d7fff; }
+.bar-reg { background:#e05c8a; }
+.bar-tp { background:#2dd4bf; }
+.bar-bm { background:#f59e0b; }
+.bar-tv { background:#a78bfa; }
+.bar-dc { background:#34d399; }
+.bar-rc { background:#60a5fa; }
+.bar-go { background:#94a3b8; }
+.bar-mc { background:#fb923c; }
+.bar-cs { background:#fbbf24; }
+.bar-aa { background:#c084fc; }
+.bar-pe { background:#38bdf8; }
+
+.cat-section-title { font-family:'Bebas Neue',sans-serif; font-size:20px; color:var(--white); letter-spacing:1px; }
+.cat-section-sub { font-size:12px; color:var(--muted); margin-left:auto; }
+
+/* Cards grid */
+.cards-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:12px; }
+
+/* Module card */
+.mod-card {
+  border-radius:10px; overflow:hidden; cursor:pointer;
+  transition:transform .25s, box-shadow .25s; position:relative;
+  background:var(--bg3); border:1px solid var(--border);
+}
+.mod-card:hover { transform:scale(1.04); box-shadow:0 20px 60px rgba(0,0,0,0.7); z-index:2; border-color:rgba(255,255,255,0.12); }
+.mod-card.done { }
+.mod-card.done:hover { }
+
+/* Thumbnail */
+.mod-card-thumb {
+  height:136px; position:relative; overflow:hidden;
+  display:flex; align-items:flex-end;
+}
+.mod-card-thumb-bg { position:absolute; inset:0; }
+.mod-card-thumb-overlay {
+  position:absolute; inset:0;
+  background:linear-gradient(to top, rgba(11,15,26,0.92) 0%, rgba(11,15,26,0.35) 55%, rgba(11,15,26,0.05) 100%);
+}
+.mod-card-code {
+  position:absolute; top:10px; left:10px;
+  font-family:'Bebas Neue',sans-serif; font-size:12px; letter-spacing:1.5px;
+  color:rgba(255,255,255,0.3);
+}
+.mod-card-badge {
+  position:absolute; top:10px; right:10px;
+  padding:2px 7px; border-radius:3px; font-size:9px; font-weight:700;
+  letter-spacing:.5px; text-transform:uppercase;
+}
+.badge-dda { background:rgba(200,168,75,0.9); color:#000; }
+.mod-card-icon-wrap {
+  position:absolute; bottom:10px; left:10px; z-index:2;
+  width:36px; height:36px; border-radius:8px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:18px;
+}
+
+/* Category color dot */
+.mod-card-cat-dot {
+  position:absolute; bottom:10px; left:10px; z-index:2;
+  width:10px; height:10px; border-radius:50%;
+  box-shadow:0 0 8px rgba(255,255,255,0.3);
+}
+/* Play overlay on hover */
+.mod-card-play {
+  position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+  background:rgba(11,15,26,0.4); opacity:0; transition:opacity .2s; z-index:3;
+}
+.mod-card-play-btn {
+  width:44px; height:44px; border-radius:50%;
+  background:rgba(255,255,255,0.95); display:flex; align-items:center; justify-content:center;
+  font-size:15px; color:#000; padding-left:3px;
+  transform:scale(0.8); transition:transform .2s;
+}
+.mod-card:hover .mod-card-play { opacity:1; }
+.mod-card:hover .mod-card-play-btn { transform:scale(1); }
+
+/* Card body */
+.mod-card-body { padding:12px 14px 14px; }
+.mod-card-title { font-size:13px; font-weight:600; color:var(--text); line-height:1.35; margin-bottom:8px; }
+.mod-card:hover .mod-card-title { color:var(--white); }
+.mod-card-meta { display:flex; align-items:center; gap:8px; }
+.mod-card-dur { font-size:11px; color:var(--muted); }
+.mod-card-type { font-size:11px; margin-left:auto; }
+.mod-card-lvl { font-size:10px; font-weight:600; padding:2px 8px; border-radius:3px; letter-spacing:.3px; }
+.lvl-debutant  { background:rgba(45,212,191,0.12); color:var(--teal); }
+.lvl-confirme  { background:rgba(167,139,250,0.12); color:var(--tv); }
+.lvl-expert    { background:rgba(224,92,138,0.12);  color:var(--reg); }
+
+/* Progress bar */
+.mod-card-progress { height:3px; background:rgba(255,255,255,0.06); margin-top:10px; border-radius:2px; overflow:hidden; }
+.mod-card-progress-fill { height:100%; background:var(--accent); border-radius:2px; transition:width .4s; }
+
+/* Done check */
+.done-tick {
+  position:absolute; bottom:10px; right:10px; z-index:4;
+  width:22px; height:22px; border-radius:50%; background:var(--teal);
+  display:none; align-items:center; justify-content:center; font-size:11px; color:#000; font-weight:700;
+}
+.mod-card.done .done-tick { display:flex; }
+
+/* Empty state */
+.empty-state { text-align:center; padding:80px 20px; color:var(--muted); }
+.empty-state .big { font-size:48px; margin-bottom:14px; }
+.empty-state p { font-size:14px; }
+
+/* ========== MODAL ========== */
+.modal-overlay {
+  position:fixed; inset:0; z-index:500;
+  background:rgba(0,0,0,0.88); backdrop-filter:blur(6px);
+  display:none; align-items:flex-start; justify-content:center;
+  padding:40px 20px; overflow-y:auto;
+}
+.modal-overlay.open { display:flex; }
+@keyframes shake{0%,100%{transform:translateX(0)}15%{transform:translateX(-6px)}30%{transform:translateX(6px)}45%{transform:translateX(-4px)}60%{transform:translateX(4px)}75%{transform:translateX(-2px)}90%{transform:translateX(2px)}}
+.modal.shake{animation:shake 0.4s ease;}
+.modal {
+  background:#131926; border-radius:12px; width:100%; max-width:min(90vw, 1400px);
+  position:relative; overflow:hidden; animation:modalIn .3s ease;
+  border:1px solid rgba(255,255,255,0.06);
+}
+@keyframes modalIn { from{opacity:0;transform:translateY(20px) scale(.97)} to{opacity:1;transform:none} }
+.modal-header {
+  height:200px; position:relative; overflow:hidden;
+  display:flex; align-items:flex-end; padding:24px 32px;
+}
+.modal-header-bg { position:absolute; inset:0; }
+.modal-header-overlay {
+  position:absolute; inset:0;
+  background:linear-gradient(to top, #131926 0%, rgba(19,25,38,0.65) 45%, rgba(19,25,38,0.15) 100%);
+}
+.modal-header-visual { display:none; }
+.modal-header-code { position:absolute; top:18px; left:32px; font-family:'Bebas Neue',sans-serif; font-size:13px; letter-spacing:2px; color:rgba(255,255,255,0.25); }
+.modal-header-badge { position:absolute; top:18px; right:52px; }
+.modal-title { font-family:'DM Serif Display',serif; font-size:24px; color:var(--white); line-height:1.2; position:relative; z-index:2; max-width:620px; }
+.modal-close {
+  position:absolute; top:14px; right:14px; z-index:10;
+  width:30px; height:30px; border-radius:50%; background:rgba(255,255,255,0.1);
+  border:none; color:var(--text); font-size:14px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center; transition:background .2s;
+}
+.modal-close:hover { background:rgba(255,255,255,0.2); }
+.modal-meta {
+  padding:18px 32px; border-bottom:1px solid var(--border);
+  display:flex; align-items:center; gap:14px; flex-wrap:wrap;
+}
+.modal-meta-item { font-size:13px; color:var(--muted); display:flex; align-items:center; gap:5px; }
+.modal-meta-item strong { color:var(--text); font-weight:600; }
+.sep { width:3px; height:3px; border-radius:50%; background:var(--border); }
+.modal-actions { display:flex; gap:8px; margin-left:auto; }
+.btn-play {
+  display:inline-flex; align-items:center; gap:8px;
+  background:var(--accent); color:#fff; font-family:'DM Sans',sans-serif;
+  font-size:13px; font-weight:700; padding:9px 22px; border-radius:var(--r);
+  border:none; cursor:pointer; transition:all .2s;
+}
+.btn-play:hover { background:var(--accent2); }
+.btn-mark {
+  display:inline-flex; align-items:center; gap:7px;
+  background:rgba(255,255,255,0.07); color:var(--text); font-family:'DM Sans',sans-serif;
+  font-size:13px; font-weight:500; padding:9px 16px; border-radius:var(--r);
+  border:1.5px solid rgba(255,255,255,0.12); cursor:pointer; transition:all .2s;
+}
+.btn-mark:hover { background:rgba(255,255,255,0.12); }
+.modal-body { padding:28px 32px 36px; }
+.modal-desc { font-size:14px; color:var(--muted); line-height:1.7; margin-bottom:24px; }
+
+/* Reading content */
+.rc { line-height:1.8; }
+.rc h2 { font-family:'DM Serif Display',serif; font-size:17px; color:var(--accent2); margin:22px 0 10px; padding-bottom:6px; border-bottom:1px solid rgba(61,127,255,0.15); }
+.rc h3 { font-size:13px; font-weight:700; color:var(--text); margin:16px 0 7px; text-transform:uppercase; letter-spacing:.5px; }
+.rc p { font-size:13px; color:rgba(221,227,240,0.8); margin-bottom:10px; }
+.rc ul { padding-left:18px; margin-bottom:10px; }
+.rc li { font-size:13px; color:rgba(221,227,240,0.8); margin-bottom:6px; }
+.rc table { width:100%; border-collapse:collapse; margin:14px 0; font-size:12px; }
+.rc th { background:rgba(61,127,255,0.08); color:var(--accent2); padding:8px 12px; text-align:left; border:1px solid rgba(255,255,255,0.06); }
+.rc td { padding:8px 12px; border:1px solid rgba(255,255,255,0.05); color:rgba(221,227,240,0.8); }
+.rc tr:nth-child(even) td { background:rgba(255,255,255,0.02); }
+.rc .callout { background:rgba(200,168,75,0.07); border-left:3px solid var(--gold); border-radius:0 6px 6px 0; padding:12px 16px; margin:14px 0; }
+.rc .callout strong { color:var(--gold2); }
+.rc .warn { background:rgba(224,92,138,0.07); border-left:3px solid var(--reg); border-radius:0 6px 6px 0; padding:12px 16px; margin:14px 0; }
+.rc .warn strong { color:#f0a0bc; }
+.rc .kp { display:flex; gap:10px; align-items:flex-start; background:rgba(61,127,255,0.07); border-radius:var(--r); padding:12px 14px; margin:12px 0; border:1px solid rgba(61,127,255,0.12); }
+.rc .kp .ki { font-size:16px; flex-shrink:0; }
+.rc .kp .kt { font-size:12px; color:rgba(221,227,240,0.85); }
+.rc .script { background:rgba(45,212,191,0.05); border:1px solid rgba(45,212,191,0.15); border-radius:var(--r); padding:14px 16px; margin:12px 0; font-size:12px; color:rgba(221,227,240,0.85); line-height:1.7; }
+.rc .script strong { color:var(--teal); }
+
+/* Quiz */
+.quiz-wrap { border:1px solid var(--border); border-radius:8px; overflow:hidden; margin-top:24px; }
+.quiz-header { background:rgba(45,212,191,0.06); border-bottom:1px solid rgba(45,212,191,0.1); padding:16px 24px; display:flex; align-items:center; justify-content:space-between; }
+.quiz-header h3 { font-family:'DM Serif Display',serif; font-size:15px; color:var(--text); }
+.quiz-score-circle { width:40px; height:40px; border-radius:50%; border:2px solid var(--gold); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:var(--gold); }
+.quiz-body { padding:24px; }
+.quiz-progress { height:3px; background:rgba(255,255,255,0.06); border-radius:2px; margin-bottom:24px; overflow:hidden; }
+.quiz-progress-fill { height:100%; background:var(--teal); border-radius:2px; transition:width .3s; }
+.quiz-question { margin-bottom:20px; }
+.q-num { font-size:11px; color:var(--accent2); font-weight:600; margin-bottom:6px; letter-spacing:.5px; text-transform:uppercase; }
+.q-text { font-size:15px; font-weight:600; color:var(--text); margin-bottom:14px; line-height:1.5; }
+.q-answers { display:flex; flex-direction:column; gap:8px; }
+.q-ans {
+  display:flex; align-items:center; gap:12px;
+  background:rgba(255,255,255,0.03); border:1.5px solid rgba(255,255,255,0.07);
+  border-radius:8px; padding:11px 14px; cursor:pointer; transition:all .2s;
+}
+.q-ans:hover { border-color:rgba(61,127,255,0.35); background:rgba(61,127,255,0.05); }
+.q-ans.sel { border-color:var(--accent); background:rgba(61,127,255,0.08); }
+.q-ans.correct { border-color:var(--teal); background:rgba(45,212,191,0.08); }
+.q-ans.incorrect { border-color:var(--reg); background:rgba(224,92,138,0.07); }
+.q-radio { width:16px; height:16px; border-radius:50%; border:2px solid rgba(255,255,255,0.15); flex-shrink:0; display:flex; align-items:center; justify-content:center; transition:all .2s; }
+.q-ans.sel .q-radio { border-color:var(--accent); background:var(--accent); }
+.q-ans.sel .q-radio::after { content:''; width:5px; height:5px; border-radius:50%; background:#fff; }
+.q-ans-text { font-size:13px; color:rgba(221,227,240,0.85); }
+.q-expl { background:rgba(45,212,191,0.06); border:1px solid rgba(45,212,191,0.15); border-radius:6px; padding:10px 14px; margin-top:8px; display:none; font-size:12px; color:rgba(221,227,240,0.8); line-height:1.6; }
+.q-expl.show { display:block; }
+.q-expl strong { color:var(--teal); }
+.quiz-results { text-align:center; padding:32px 24px; display:none; }
+.quiz-results.show { display:block; }
+.quiz-score-big { font-family:'Bebas Neue',sans-serif; font-size:72px; color:var(--accent); line-height:1; margin-bottom:8px; }
+.quiz-result-label { font-size:16px; color:var(--text); margin-bottom:6px; }
+.quiz-result-sub { font-size:13px; color:var(--muted); margin-bottom:24px; }
+
+/* ========== TIMER ========== */
+/* ── MON COMPTE ── */
+.account-section{background:var(--surface);border:1px solid var(--border2);border-radius:var(--r);padding:20px 24px;margin-bottom:16px;}
+.account-section-title{font-size:13px;font-weight:700;color:var(--white);margin-bottom:18px;padding-bottom:12px;border-bottom:1px solid var(--border);}
+.account-label{font-size:12px;font-weight:500;color:var(--muted);display:block;margin-bottom:6px;}
+.account-btn{background:var(--accent);color:#fff;border:none;border-radius:var(--r);padding:10px 20px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;margin-top:8px;}
+.account-btn:hover{background:#2d6ae0;}
+
+.dda-timer {
+  position:fixed; bottom:24px; left:24px; z-index:200;
+  background:#131926; border:1px solid rgba(61,127,255,0.25);
+  border-radius:12px; padding:14px 18px; min-width:188px;
+  box-shadow:0 8px 32px rgba(0,0,0,0.5); display:none;
+}
+.dda-timer.visible { display:block; }
+.timer-row { display:flex; align-items:center; gap:9px; margin-bottom:7px; }
+.timer-pulse { width:7px; height:7px; border-radius:50%; background:var(--teal); animation:pulse 1.5s infinite; flex-shrink:0; }
+.timer-pulse.off { background:var(--muted); animation:none; }
+.timer-lbl { font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:1px; flex:1; }
+.timer-val { font-family:'Bebas Neue',sans-serif; font-size:20px; color:var(--accent2); }
+.timer-track { height:3px; background:rgba(255,255,255,0.06); border-radius:2px; overflow:hidden; margin-bottom:5px; }
+.timer-fill { height:100%; background:linear-gradient(90deg,var(--accent),var(--teal)); transition:width .5s; border-radius:2px; }
+.timer-meta { display:flex; justify-content:space-between; font-size:10px; color:var(--muted); }
+.timer-meta .tv { color:var(--accent2); }
+
+/* Toast */
+.toast {
+  position:fixed; bottom:24px; right:24px; z-index:9999;
+  background:#1a2030; border:1px solid rgba(61,127,255,0.3);
+  border-radius:8px; padding:12px 18px;
+  display:flex; align-items:center; gap:10px;
+  transform:translateY(80px); opacity:0; transition:all .3s;
+  max-width:320px; font-size:13px; color:var(--text);
+}
+.toast.show { transform:translateY(0); opacity:1; }
+
+/* Responsive */
+@media(max-width:900px) {
+  .topbar,.filters-bar { padding-left:20px; padding-right:20px; }
+  .cat-hero { padding:32px 20px; }
+  .cat-body { padding:24px 20px 60px; }
+  .cards-grid { grid-template-columns:repeat(2,1fr); gap:8px; }
+  .q-cards { grid-template-columns:repeat(2,1fr); }
+  .q-levels { grid-template-columns:1fr; }
+  .ob-wrap { padding:90px 20px 40px; }
+  .cat-hero-inner { flex-direction:column; gap:20px; }
+  .modal { border-radius:0; }
+  .modal-body { padding:20px; }
+  .modal-meta { padding:14px 20px; }
+  .modal-header { padding:20px; }
+  .modal-header-code { left:20px; }
+}
+@media(max-width:480px) {
+  .cards-grid { grid-template-columns:1fr; }
+  .q-cards { grid-template-columns:1fr; }
+  .ob-title { font-size:36px; }
+}
+::-webkit-scrollbar { width:5px; }
+::-webkit-scrollbar-track { background:var(--bg); }
+::-webkit-scrollbar-thumb { background:rgba(61,127,255,0.25); border-radius:3px; }
+@keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:none} }
+.a1{animation:fadeUp .5s ease both}
+.a2{animation:fadeUp .5s .1s ease both}
+.a3{animation:fadeUp .5s .2s ease both}
+.a4{animation:fadeUp .5s .3s ease both}
+.a5{animation:fadeUp .5s .4s ease both}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<nav class="topbar" id="topbar">
+  <div class="logo" onclick="goView('onboarding')">Binge<span>DDA</span></div>
+  <div class="nav-links" id="nav-cat" style="display:none">
+    <div class="nav-link active">Catalogue</div>
+    <div class="nav-link" onclick="goView('onboarding')">Mon profil</div>
+  </div>
+  <div class="nav-right">
+    <div class="timer-badge" id="topTimerBadge" style="display:none">
+      <div class="timer-dot"></div>
+      <span id="topTimerVal">0h 00min</span>
+    </div>
+    <div id="user-info" style="display:flex;align-items:center;gap:10px;margin-left:8px;">
+      <span id="user-name" style="font-size:12px;color:var(--muted);display:none;"></span>
+      <button id="btn-account" onclick="goView('account')" style="
+        font-size:11px;font-weight:600;color:var(--muted);
+        background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);
+        border-radius:6px;padding:5px 12px;cursor:pointer;
+        font-family:'DM Sans',sans-serif;transition:all .2s;display:none;
+      " onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted)'">
+        👤 Mon compte
+      </button>
+      <a id="admin-link-contenu" href="/admin" style="display:none;font-size:11px;font-weight:600;color:var(--muted);text-decoration:none;padding:5px 10px;border-radius:5px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);transition:all .2s;" onmouseover="this.style.color='var(--white)'" onmouseout="this.style.color='var(--muted)'">⚙ Admin</a>
+      <button id="btn-logout" onclick="handleLogout()" style="
+        font-size:11px;font-weight:600;color:var(--muted);
+        background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);
+        border-radius:6px;padding:5px 12px;cursor:pointer;
+        font-family:'DM Sans',sans-serif;transition:all .2s;display:none;
+      " onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted)'">
+        Déconnexion
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- ===== ONBOARDING ===== -->
+<div class="view active" id="view-onboarding">
+  <div class="ob-bg"></div>
+  <div class="ob-wrap">
+    <div class="ob-eyebrow a1">Directive Distribution Assurance · 15h / an</div>
+    <h1 class="ob-title a2" id="ob-title">Votre<br>espace<br><em>DDA</em></h1>
+    <p class="ob-sub a3" id="ob-sub">3 questions pour personnaliser votre catalogue de formation. Vous pourrez explorer librement tous les modules ensuite.</p>
+
+    <div class="ob-questions">
+      <!-- Q1 -->
+      <div class="ob-q a3">
+        <div class="ob-q-label">01 — Votre métier <span>(sélection unique)</span></div>
+        <div class="q-cards">
+          <div class="qc" data-g="type" data-v="courtier"      onclick="selOb(this)"><div class="check">✓</div><div class="qc-icon">⚖️</div><div class="qc-name">Courtier</div><div class="qc-sub">Indépendant multi-compagnies</div></div>
+          <div class="qc" data-g="type" data-v="commercial"    onclick="selOb(this)"><div class="check">✓</div><div class="qc-icon">🚀</div><div class="qc-name">Commercial</div><div class="qc-sub">Chargé de clientèle</div></div>
+          <div class="qc" data-g="type" data-v="manager"       onclick="selOb(this)"><div class="check">✓</div><div class="qc-icon">🎯</div><div class="qc-name">Manager</div><div class="qc-sub">Responsable d'équipe</div></div>
+          <div class="qc" data-g="type" data-v="gestionnaire"  onclick="selOb(this)"><div class="check">✓</div><div class="qc-icon">📂</div><div class="qc-name">Gestionnaire</div><div class="qc-sub">Contrats & sinistres</div></div>
+          <div class="qc" data-g="type" data-v="assistant"     onclick="selOb(this)"><div class="check">✓</div><div class="qc-icon">🗂️</div><div class="qc-name">Assistant</div><div class="qc-sub">Support administratif</div></div>
+          <div class="qc" data-g="type" data-v="teleconseiller" onclick="selOb(this)"><div class="check">✓</div><div class="qc-icon">🎧</div><div class="qc-name">Téléconseiller</div><div class="qc-sub">Relation client à distance</div></div>
+        </div>
+      </div>
+      <!-- Q2 -->
+      <div class="ob-q a4">
+        <div class="ob-q-label">02 — Produits distribués <span>(choix multiples)</span></div>
+        <div class="q-tags">
+          <div class="qt" data-v="sante"      onclick="selTag(this)">🏥 Santé individuelle</div>
+          <div class="qt" data-v="prevoyance" onclick="selTag(this)">🛡️ Prévoyance</div>
+          <div class="qt" data-v="collectif"  onclick="selTag(this)">🏢 Collectif entreprise</div>
+          <div class="qt" data-v="vie"        onclick="selTag(this)">💎 Assurance Vie</div>
+          <div class="qt" data-v="auto"       onclick="selTag(this)">🚗 Automobile</div>
+          <div class="qt" data-v="hab"        onclick="selTag(this)">🏠 Habitation / MRH</div>
+          <div class="qt" data-v="ent"        onclick="selTag(this)">🏭 Risques d'Entreprise</div>
+          <div class="qt" data-v="rc"         onclick="selTag(this)">⚖️ Responsabilité Civile</div>
+          <div class="qt" data-v="pat"        onclick="selTag(this)">📊 Patrimoine / CGP</div>
+          <div class="qt" data-v="cred"       onclick="selTag(this)">💳 Crédit / IOBSP</div>
+        </div>
+      </div>
+      <!-- Q3 -->
+      <div class="ob-q a5">
+        <div class="ob-q-label">03 — Niveau d'expérience <span>(sélection unique)</span></div>
+        <div class="q-levels">
+          <div class="ql" data-g="niveau" data-v="debutant" onclick="selOb(this)"><div class="ql-icon">🌱</div><div><div class="ql-name">Débutant</div><div class="ql-sub">Moins de 2 ans · Niveau 3 DDA</div></div></div>
+          <div class="ql" data-g="niveau" data-v="confirme" onclick="selOb(this)"><div class="ql-icon">📊</div><div><div class="ql-name">Confirmé</div><div class="ql-sub">2 à 5 ans · Niveaux 1 & 2 DDA</div></div></div>
+          <div class="ql" data-g="niveau" data-v="expert"   onclick="selOb(this)"><div class="ql-icon">🎯</div><div><div class="ql-name">Expert</div><div class="ql-sub">5 ans et plus · Tous niveaux</div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ob-cta-row a5">
+      <button class="btn-primary" onclick="launchCatalogue()">▶ &nbsp;Accéder à ma formation</button>
+      <button class="btn-ghost"   onclick="launchAll()">Explorer tout le catalogue</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== CATALOGUE ===== -->
+<div class="view" id="view-catalogue">
+  <div class="cat-hero">
+    <div class="cat-hero-inner">
+      <div>
+        <div class="cat-profile-tags" id="profile-tags"></div>
+        <div class="cat-hero-title">Mon catalogue <span>DDA</span></div>
+        <div class="cat-hero-sub">Formation continue · Conforme arrêté du 26 septembre 2018</div>
+      </div>
+      <div class="cat-hero-stats">
+        <div class="cat-stat"><div class="cat-stat-v">15h</div><div class="cat-stat-l">Obligation / an</div></div>
+        <div class="cat-stat"><div class="cat-stat-v" id="hero-count">0</div><div class="cat-stat-l">Modules</div></div>
+        <div class="cat-stat"><div class="cat-stat-v" id="hero-done">0</div><div class="cat-stat-l">Complétés</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-bar">
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input class="search-input" id="searchInput" type="text" placeholder="Rechercher un module..." oninput="applyFilters()">
+    </div>
+    <select class="filter-select" id="filterType" onchange="onFilterChange()">
+      <option value="">Métier</option>
+      <option value="courtier">Courtier indépendant</option>
+      <option value="commercial">Commercial</option>
+      <option value="manager">Manager commercial</option>
+      <option value="gestionnaire">Gestionnaire contrats</option>
+      <option value="assistant">Assistant administratif</option>
+      <option value="teleconseiller">Téléconseiller</option>
+    </select>
+    <select class="filter-select" id="filterSec" onchange="onFilterChange()">
+      <option value="">Catégorie</option>
+      <option value="tc">Tronc Commun DDA</option>
+      <option value="reg">Réglementaire S/P</option>
+      <option value="tp">Technique Produit</option>
+      <option value="bm">Benchmark Marché</option>
+      <option value="tv">Techniques de Vente</option>
+      <option value="dc">Développement Commercial</option>
+      <option value="rc">Relation Client à Distance</option>
+      <option value="go">Gestion Opérationnelle</option>
+      <option value="mc">Management Commercial</option>
+      <option value="cs">Commercial Salarié</option>
+      <option value="aa">Assistant Administratif</option>
+      <option value="pe">Prévoyance Emprunteur</option>
+    </select>
+    <select class="filter-select" id="filterProd" onchange="onFilterChange()">
+      <option value="">Produit</option>
+      <option value="sante">Santé individuelle</option>
+      <option value="prevoyance">Prévoyance</option>
+      <option value="collectif">Collectif entreprise</option>
+      <option value="vie">Assurance Vie</option>
+      <option value="auto">Automobile</option>
+      <option value="hab">Habitation / MRH</option>
+      <option value="ent">Risques d'Entreprise</option>
+      <option value="rc">Responsabilité Civile</option>
+      <option value="pat">Patrimoine / CGP</option>
+      <option value="cred">Crédit / IOBSP</option>
+    </select>
+    <select class="filter-select" id="filterLvl" onchange="onFilterChange()">
+      <option value="">Niveau</option>
+      <option value="debutant">Débutant</option>
+      <option value="confirme">Confirmé</option>
+      <option value="expert">Expert</option>
+    </select>
+    <select class="filter-select" id="filterModType" onchange="onFilterChange()">
+      <option value="">Type</option>
+      <option value="elearning">📄 E-learning</option>
+      <option value="video">▶ Vidéo</option>
+      <option value="outil">🔧 Outils</option>
+      <option value="veille">📡 Veille</option>
+    </select>
+    <select class="filter-select" id="filterSort" onchange="onFilterChange()">
+      <option value="">Tri</option>
+      <option value="recent">Plus récents d'abord</option>
+      <option value="ancien">Plus anciens d'abord</option>
+      <option value="title">Titre A→Z</option>
+    </select>
+    <button class="btn-reset" onclick="resetFilters()" id="btnReset" style="display:none">✕ Réinitialiser</button>
+    <div class="filter-count" id="filterCount"><span>0</span> modules</div>
+  </div>
+
+  <div class="cat-body" id="cat-body"></div>
+</div>
+
+<!-- ===== BANDEAU ORIAS ===== -->
+<div id="orias-banner" style="display:none;
+  background:linear-gradient(90deg,#1a1000,#2a1800);
+  border-bottom:1px solid rgba(251,191,36,.2);
+  padding:10px 24px;align-items:center;justify-content:space-between;
+  font-family:'DM Sans',sans-serif;gap:16px;flex-wrap:wrap;position:sticky;top:56px;z-index:99;">
+  <div style="display:flex;align-items:center;gap:10px;">
+    <span style="font-size:15px;">⚠️</span>
+    <span style="font-size:13px;color:#fde68a;">
+      <strong style="color:#fbbf24;">N° ORIAS manquant</strong> —
+      Votre attestation DDA ne pourra pas être délivrée sans votre numéro ORIAS.
+      <button onclick="goView('account')" style="
+        background:none;border:none;color:#fbbf24;font-weight:700;cursor:pointer;
+        font-family:'DM Sans',sans-serif;font-size:13px;text-decoration:underline;padding:0;margin-left:4px;">
+        Le renseigner maintenant →
+      </button>
+    </span>
+  </div>
+  <button onclick="document.getElementById('orias-banner').style.display='none'" style="
+    background:none;border:none;color:#92400e;cursor:pointer;font-size:16px;padding:0;">✕</button>
+</div>
+
+<!-- ===== VUE MON COMPTE ===== -->
+<div class="view" id="view-account">
+  <div style="max-width:600px;margin:0 auto;padding:100px 16px 32px;">
+
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:28px;">
+      <button onclick="goView('catalogue')" style="
+        background:rgba(61,127,255,.12);border:1px solid rgba(61,127,255,.25);
+        border-radius:6px;padding:8px 16px;cursor:pointer;font-size:13px;
+        font-weight:600;color:var(--accent2);font-family:'DM Sans',sans-serif;
+      ">← Retour</button>
+      <h2 style="font-size:20px;font-weight:700;color:var(--white);margin:0;">Mon compte</h2>
+    </div>
+
+    <!-- Section Informations personnelles -->
+    <div class="account-section">
+      <div class="account-section-title">👤 Informations personnelles</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="account-label">Prénom</label>
+          <input class="form-input" id="ac-prenom" type="text" placeholder="Jean">
+        </div>
+        <div class="form-group">
+          <label class="account-label">Nom</label>
+          <input class="form-input" id="ac-nom" type="text" placeholder="Dupont">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="account-label">Téléphone</label>
+        <input class="form-input" id="ac-tel" type="tel" placeholder="06 12 34 56 78">
+      </div>
+      <div class="form-group">
+        <label class="account-label">Email de contact</label>
+        <input class="form-input" id="ac-email" type="email" placeholder="jean@cabinet.fr">
+        <div style="font-size:11px;color:var(--muted);margin-top:4px;">Un email de confirmation sera envoyé aux deux adresses.</div>
+      </div>
+      <div class="form-group">
+        <label class="account-label">Nouveau mot de passe</label>
+        <input class="form-input" id="ac-mdp" type="password" placeholder="Laisser vide pour ne pas modifier">
+      </div>
+      <div class="form-group">
+        <label class="account-label">Confirmer le mot de passe</label>
+        <input class="form-input" id="ac-mdp2" type="password" placeholder="Confirmer le nouveau mot de passe">
+      </div>
+      <button class="account-btn" onclick="savePersonalInfo()">Enregistrer les modifications</button>
+      <div id="ac-personal-msg" style="display:none;margin-top:8px;font-size:12px;"></div>
+    </div>
+
+    <!-- Section Informations professionnelles -->
+    <div class="account-section">
+      <div class="account-section-title">🏢 Informations professionnelles</div>
+      <div class="form-group">
+        <label class="account-label">Raison sociale</label>
+        <input class="form-input" id="ac-rs" type="text" placeholder="Cabinet Dupont Assurances">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="account-label">SIRET</label>
+          <input class="form-input" id="ac-siret" type="text" placeholder="123 456 789 00012" maxlength="17">
+        </div>
+        <div class="form-group">
+          <label class="account-label">N° ORIAS</label>
+          <input class="form-input" id="ac-orias" type="text" placeholder="07 000 000" maxlength="10"
+            style="border-color: var(--orias-border, var(--border2));">
+          <div id="ac-orias-hint" style="font-size:11px;margin-top:4px;"></div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="account-label">Métier</label>
+        <select class="form-input" id="ac-metier">
+          <option value="">Sélectionner…</option>
+          <option value="courtier">Courtier en assurance (IAS)</option>
+          <option value="agent">Agent général d'assurance</option>
+          <option value="mandataire">Mandataire d'intermédiaire</option>
+          <option value="salarie">Salarié d'une compagnie</option>
+          <option value="mutualiste">Mutualiste</option>
+          <option value="autre">Autre</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="account-label">Adresse de facturation</label>
+        <input class="form-input" id="ac-adresse" type="text" placeholder="12 rue de la Paix">
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 2fr;gap:12px;">
+        <div class="form-group">
+          <label class="account-label">Code postal</label>
+          <input class="form-input" id="ac-cp" type="text" placeholder="75001" maxlength="5">
+        </div>
+        <div class="form-group">
+          <label class="account-label">Ville</label>
+          <input class="form-input" id="ac-ville" type="text" placeholder="Paris">
+        </div>
+      </div>
+      <button class="account-btn" onclick="saveProfessionalInfo()">Enregistrer les modifications</button>
+      <div id="ac-pro-msg" style="display:none;margin-top:8px;font-size:12px;"></div>
+    </div>
+
+    <!-- Section Abonnement -->
+    <div class="account-section">
+      <div class="account-section-title">💳 Abonnement</div>
+      <div id="ac-sub-content" style="font-size:13px;color:var(--muted);">Chargement…</div>
+    </div>
+
+    <!-- Section Préférences -->
+    <div class="account-section">
+      <div class="account-section-title">🔔 Préférences email</div>
+      <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:16px;">
+        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
+          <input type="checkbox" id="ac-notif-modules" style="accent-color:var(--accent);width:16px;height:16px;">
+          <div>
+            <div style="font-size:13px;color:var(--white);font-weight:500;">Nouveaux modules</div>
+            <div style="font-size:11px;color:var(--muted);">Être notifié quand un nouveau module est publié</div>
+          </div>
+        </label>
+        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
+          <input type="checkbox" id="ac-notif-rappels" style="accent-color:var(--accent);width:16px;height:16px;">
+          <div>
+            <div style="font-size:13px;color:var(--white);font-weight:500;">Rappels DDA</div>
+            <div style="font-size:11px;color:var(--muted);">Rappels mensuels de progression vers les 15h annuelles</div>
+          </div>
+        </label>
+        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
+          <input type="checkbox" id="ac-notif-facturation" style="accent-color:var(--accent);width:16px;height:16px;">
+          <div>
+            <div style="font-size:13px;color:var(--white);font-weight:500;">Facturation</div>
+            <div style="font-size:11px;color:var(--muted);">Confirmation de prélèvement mensuel</div>
+          </div>
+        </label>
+      </div>
+      <button class="account-btn" onclick="savePreferences()">Enregistrer les préférences</button>
+      <div id="ac-pref-msg" style="display:none;margin-top:8px;font-size:12px;"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ===== MODAL ===== -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal" id="modalContent">
+    <button class="modal-close" onclick="closeModalDirect()">✕</button>
+    <div class="modal-header" id="modalHeader">
+      <div class="modal-header-bg"    id="modalHeaderBg"></div>
+      <div class="modal-header-visual" id="modalHeaderVisual"></div>
+      <div class="modal-header-overlay"></div>
+      <div class="modal-header-code"  id="modalCode"></div>
+      <div class="modal-header-badge" id="modalBadge"></div>
+      <div class="modal-title"        id="modalTitle"></div>
+    </div>
+    <div class="modal-meta"  id="modalMeta"></div>
+    <div class="modal-body"  id="modalBody"></div>
+  </div>
+</div>
+
+<!-- DDA Timer -->
+<div class="dda-timer" id="ddaTimer">
+  <div class="timer-row">
+    <div class="timer-pulse" id="timerPulse"></div>
+    <div class="timer-lbl">Temps DDA 2025</div>
+    <div class="timer-val" id="timerVal">0:00:00</div>
+  </div>
+  <div class="timer-track"><div class="timer-fill" id="timerFill" style="width:0%"></div></div>
+  <div class="timer-meta">
+    <span>Objectif : <span class="tv">15h 00min</span></span>
+    <span id="timerRemain">15h restantes</span>
+  </div>
+  <div style="margin-top:10px;text-align:center;">
+    <button id="btn-attestation" onclick="downloadAttestation()" style="
+      background:rgba(61,127,255,.12);border:1px solid rgba(61,127,255,.25);
+      border-radius:5px;padding:5px 14px;cursor:pointer;font-size:11px;
+      font-weight:600;color:var(--accent2);font-family:'DM Sans',sans-serif;
+      transition:all .2s;display:none;
+    ">⬇ Télécharger mon attestation</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"><span id="toastTxt"></span></div>
+
+<script>
+// ===== SUPABASE AUTH =====
+async function handleLogout() {
+  if (window._sb) await window._sb.auth.signOut();
+  window.location.href = '/';
+}
+
+// ===== STATE =====
+let P = { type:null, prods:[], niveau:null };
+let mDone = {};   // sera chargé depuis Supabase
+let mProgress = {}; // { code: { seconds_spent, quiz_passed } }
+let qSt   = {};
+
+// ===== SUPABASE DATA LOADING =====
+// MODS sera peuplé depuis Supabase — initialisé vide
+let MODS = {};
+let _progressLoaded = false;
+
+async function loadFromSupabase() {
+  const sb = window._sb;
+  if (!sb || !window._user) return;
+
+  try {
+    // 1. Charger les modules depuis Supabase
+    const { data: modules, error: modError } = await sb
+      .from('modules')
+      .select('code, section, title, description, duree_minutes, niveau, dda_certifiant, produits, thumbnail_url, type, content_html, quiz_data, video_url, sort_order, published, veille_modules_meta(semaine, items_count)')
+      .eq('published', true)
+      .order('sort_order');
+
+    if (!modError && modules) {
+      // Convertir au format attendu par le shell
+      modules.forEach(m => {
+        // Durée : convertir minutes en string "Xmin"
+        const durStr = m.duree_minutes ? `${m.duree_minutes}min` : '30min';
+        MODS[m.code] = {
+          sec:       m.section,
+          title:     m.title,
+          dur:       durStr,
+          dda:       m.dda_certifiant,
+          lvl:       m.niveau || 'debutant',
+          types:     m.produits || [],
+          desc:      m.description || '',
+          content:   m.content_html || null,
+          quiz_data: m.quiz_data    || null,
+          video_url:  m.video_url    || null,
+          sort_order: m.sort_order   || 0,
+          type:       m.type         || 'elearning',
+          thumb:     m.thumbnail_url || null,
+          semaine:    m.veille_modules_meta?.semaine    || null,
+          items_count:m.veille_modules_meta?.items_count || 0
+        };
+      });
+      console.log(`✓ ${modules.length} modules chargés depuis Supabase`);
+    }
+
+    // 2. Charger la progression de l'utilisateur
+    const userId = window._user.id;
+    const { data: progress, error: progError } = await sb
+      .from('progress')
+      .select('module_id, seconds_spent, quiz_passed, quiz_best_score, completed_at')
+      .eq('user_id', userId);
+
+    if (!progError && progress) {
+      // Reconstruire mDone à partir des données Supabase
+      // On a besoin du mapping module_id -> code
+      const { data: modIds } = await sb
+        .from('modules')
+        .select('id, code');
+      
+      const idToCode = {};
+      if (modIds) modIds.forEach(m => { idToCode[m.id] = m.code; });
+
+      // Total secondes pour le timer
+      let totalSeconds = 0;
+      progress.forEach(p => {
+        const code = idToCode[p.module_id];
+        if (!code) return;
+        totalSeconds += p.seconds_spent || 0;
+        if (p.quiz_passed) mDone[code] = true;
+        mProgress[code] = { seconds_spent: p.seconds_spent || 0, quiz_passed: !!p.quiz_passed };
+      });
+
+      // Lire dda_minutes_total depuis profiles (source de vérité unique)
+      const { data: profileTimer } = await sb
+        .from('profiles')
+        .select('dda_minutes_total')
+        .eq('id', window._user.id)
+        .single();
+
+      const savedMinutes = profileTimer?.dda_minutes_total;
+
+      // Fallback migration one-shot : si dda_minutes_total est NULL (colonne
+      // vient d'être créée), recalculer depuis les modules et initialiser.
+      // Si la valeur est 0 ou plus (même fixée manuellement), on la respecte.
+      let validatedMinutes = savedMinutes ?? 0;
+      if (savedMinutes === null || savedMinutes === undefined) {
+        const validatedIds = progress.filter(p => p.quiz_passed).map(p => p.module_id);
+        if (validatedIds.length > 0) {
+          const { data: validatedMods } = await sb
+            .from('modules')
+            .select('id, duree_minutes, type')
+            .in('id', validatedIds);
+          let recalc = 0;
+          (validatedMods || []).forEach(m => {
+            if (m.type === 'outil') return;
+            recalc += m.duree_minutes || 0;
+          });
+          if (recalc > 0) {
+            validatedMinutes = recalc;
+            // Écrire dans profiles pour les prochaines sessions
+            await sb.from('profiles')
+              .update({ dda_minutes_total: recalc })
+              .eq('id', window._user.id);
+          }
+        }
+      }
+
+      timerTotal = validatedMinutes * 60;
+      localStorage.setItem('ddaTimer3', timerTotal);
+      localStorage.setItem('ddaDone', JSON.stringify(mDone));
+      _progressLoaded = true;
+      console.log(`✓ Progression chargée: ${Object.keys(mDone).length} modules complétés, ${Math.round(validatedMinutes)}min validées`);
+    }
+
+  } catch (err) {
+    console.warn('Erreur chargement Supabase:', err);
+    // Afficher un message d'erreur propre
+    const body = document.getElementById('cat-body');
+    if (body) body.innerHTML = `
+      <div style="text-align:center;padding:80px 20px;max-width:480px;margin:0 auto;">
+        <div style="font-size:48px;margin-bottom:16px;">⚠️</div>
+        <div style="font-size:16px;font-weight:600;color:var(--white);margin-bottom:8px;">Connexion temporairement indisponible</div>
+        <div style="font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:24px;">
+          Impossible de charger le catalogue depuis nos serveurs. Vérifiez votre connexion internet et réessayez.
+        </div>
+        <button onclick="loadFromSupabase()" style="
+          background:var(--accent);color:#fff;border:none;border-radius:8px;
+          padding:12px 28px;font-size:14px;font-weight:700;cursor:pointer;
+          font-family:'DM Sans',sans-serif;
+        ">↺ Réessayer</button>
+      </div>`;
+  }
+
+  // Déclencher le rendu initial après chargement
+  // Si pas de profil → reset filtres pour afficher tous les modules
+  if (!window._user?.metier) {
+    P = { type: null, prods: [], niveau: null };
+    const filterIds = ['filterType','filterSec','filterProd','filterLvl','filterModType'];
+    filterIds.forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
+  }
+  renderCatalogue();
+  timerRender();
+  if (timerTotal > 0) {
+    document.getElementById('ddaTimer')?.classList.add('visible');
+    const badge = document.getElementById('topTimerBadge');
+    if (badge) badge.style.display = 'flex';
+  }
+
+  // Si profil déjà connu depuis Supabase → aller directement au catalogue
+  const urlParams  = new URLSearchParams(window.location.search);
+  const forceView  = urlParams.get('view');
+  const lastView   = forceView || localStorage.getItem('dda-last-view');
+  const lastType   = localStorage.getItem('dda-last-type');
+  const hasProfile = window._user?.metier && lastType;
+
+  if (forceView === 'catalogue' || (lastView && lastView !== 'onboarding' && hasProfile)) {
+    if (forceView) window.history.replaceState({}, '', '/formation');
+    applyProfileToFilters();
+    buildHero();
+    goView('catalogue');
+  }
+}
+
+// ===== SUPABASE PROGRESS SAVE =====
+async function saveProgressToSupabase(code, secondsToAdd, quizPassed, quizScore) {
+  const sb = window._sb;
+  if (!sb || !window._user) {
+    // Fallback localStorage
+    localStorage.setItem('ddaDone', JSON.stringify(mDone));
+    return;
+  }
+
+  try {
+    // Récupérer l'ID du module
+    const { data: mod } = await sb
+      .from('modules')
+      .select('id')
+      .eq('code', code)
+      .single();
+
+    if (!mod) return;
+
+    const userId = window._user.id;
+
+    // Upsert progression
+    // seconds_spent = duree_minutes du module (pas le temps réel)
+    const { data: modData } = await sb.from('modules').select('duree_minutes').eq('code', code).single();
+    const modSeconds = (modData?.duree_minutes || 0) * 60;
+
+    // Vérifier si ce module était déjà validé (pour ne pas double-compter)
+    const { data: existingProg } = await sb.from('progress')
+      .select('quiz_passed')
+      .eq('user_id', userId)
+      .eq('module_id', mod.id)
+      .maybeSingle();
+    const wasAlreadyPassed = existingProg?.quiz_passed === true;
+
+    const { error } = await sb.from('progress').upsert({
+      user_id:         userId,
+      module_id:       mod.id,
+      seconds_spent:   modSeconds,
+      quiz_passed:     quizPassed || false,
+      quiz_best_score: quizScore || 0,
+      completed_at:    quizPassed ? new Date().toISOString() : null,
+      started_at:      new Date().toISOString()
+    }, { onConflict: 'user_id,module_id', ignoreDuplicates: false });
+
+    if (error) console.warn('Erreur save progress:', error);
+
+    // Incrémenter dda_minutes_total dans profiles si nouveau quiz réussi
+    // (pas outil, pas déjà validé)
+    const isOutil = (MODS[code]?.type || 'elearning') === 'outil';
+    if (quizPassed && !wasAlreadyPassed && !isOutil) {
+      const minsToAdd = modData?.duree_minutes || 0;
+      if (minsToAdd > 0) {
+        const { data: profile } = await sb.from('profiles')
+          .select('dda_minutes_total')
+          .eq('id', userId)
+          .single();
+        const currentTotal = profile?.dda_minutes_total || 0;
+        await sb.from('profiles')
+          .update({ dda_minutes_total: currentTotal + minsToAdd })
+          .eq('id', userId);
+      }
+    }
+  } catch (err) {
+    console.warn('Erreur Supabase save progress:', err);
+    // Fallback localStorage
+    localStorage.setItem('ddaDone', JSON.stringify(mDone));
+  }
+}
+
+// scheduleTimerSave supprimé — le timer est crédité uniquement à la validation du quiz
+
+// ===== THUMB CONFIG =====
+const THUMB = {
+  tc:  { accent:'#3d7fff' },
+  reg: { accent:'#e05c8a' },
+  tp:  { accent:'#2dd4bf' },
+  bm:  { accent:'#f59e0b' },
+  tv:  { accent:'#a78bfa' },
+  dc:  { accent:'#34d399' },
+  rc:  { accent:'#60a5fa' },
+  go:  { accent:'#94a3b8' },
+  mc:  { accent:'#fb923c' },
+  cs:  { accent:'#fbbf24' },
+  aa:  { accent:'#c084fc' },
+  pe:  { accent:'#38bdf8' },
+  veille: { accent:'#2dd4bf' },
+  outils: { accent:'#c8a84b' },
+};
+
+// Stock photos Unsplash — URLs fixes (w=600&q=80 pour perf)
+const MOD_PHOTO = {
+'TC-01':'https://images.unsplash.com/photo-1589829085413-56de8ae18c73?w=600&q=75',
+'TC-02':'https://images.unsplash.com/photo-1589330694653-ded6df03f754?w=600&q=75',
+'TC-03':'https://images.unsplash.com/photo-1507925921958-8a62f3d1a50d?w=600&q=75',
+'TC-04':'https://images.unsplash.com/photo-1631511258193-252ab3da6b8b?w=600&q=75',
+'TC-05':'https://images.unsplash.com/photo-1521791136064-7986c2920216?w=600&q=75',
+'TC-06':'https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=600&q=75',
+'TC-07':'https://images.unsplash.com/photo-1510511459019-5dda7724fd87?w=600&q=75',
+'TC-08':'https://images.unsplash.com/photo-1501167786227-4cba60f6d58f?w=600&q=75',
+'TC-09':'https://images.unsplash.com/photo-1605791238890-3a4a9dc5d54a?w=600&q=75',
+'TC-10':'https://images.unsplash.com/photo-1521791055366-0d553872952f?w=600&q=75',
+'REG-SP-01':'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=600&q=75',
+'REG-SP-02':'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=600&q=75',
+'REG-SP-03':'https://images.unsplash.com/photo-1504813184591-01572f98c85f?w=600&q=75',
+'REG-SP-04':'https://images.unsplash.com/photo-1559757175-0eb30cd8c063?w=600&q=75',
+'REG-SP-05':'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=600&q=75',
+'REG-SP-06':'https://images.unsplash.com/photo-1498837167922-ddd27525d352?w=600&q=75',
+'REG-SP-07':'https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?w=600&q=75',
+'REG-SP-08':'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=600&q=75',
+'REG-SP-09':'https://images.unsplash.com/photo-1434494878577-86c23bcb06b9?w=600&q=75',
+'TP-SP-01':'https://images.unsplash.com/photo-1543286386-2e659306cd6c?w=600&q=75',
+'TP-SP-02':'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&q=75',
+'TP-SP-03':'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&q=75',
+'TP-SP-04':'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&q=75',
+'TP-SP-05':'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=600&q=75',
+'TP-SP-06':'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=600&q=75',
+'TP-SP-07':'https://images.unsplash.com/photo-1518186285589-2f7649de83e0?w=600&q=75',
+'TP-SP-08':'https://images.unsplash.com/photo-1611532736597-de2d4265fba3?w=600&q=75',
+'TP-SP-09':'https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=600&q=75',
+'TP-SP-10':'https://images.unsplash.com/photo-1557804506-669a67965ba0?w=600&q=75',
+'TP-SP-11':'https://images.unsplash.com/photo-1559028012-481c04fa702d?w=600&q=75',
+'TP-SP-12':'https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=600&q=75',
+'BM-SP-01':'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&q=75',
+'BM-SP-02':'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&q=75',
+'BM-SP-03':'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=600&q=75',
+'BM-SP-04':'https://images.unsplash.com/photo-1543286386-2e659306cd6c?w=600&q=75',
+'TV-SP-01':'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=600&q=75',
+'TV-SP-02':'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=600&q=75',
+'TV-SP-03':'https://images.unsplash.com/photo-1432888498266-38ffec3eaf0a?w=600&q=75',
+'TV-SP-04':'https://images.unsplash.com/photo-1515187029135-18ee286d815b?w=600&q=75',
+'TV-SP-05':'https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=600&q=75',
+'TV-SP-06':'https://images.unsplash.com/photo-1552664730-d307ca884978?w=600&q=75',
+'TV-SP-07':'https://images.unsplash.com/photo-1553877522-43269d4ea984?w=600&q=75',
+'TV-SP-08':'https://images.unsplash.com/photo-1521791055366-0d553872952f?w=600&q=75',
+'TV-SP-09':'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=600&q=75',
+'TV-SP-10':'https://images.unsplash.com/photo-1611532736597-de2d4265fba3?w=600&q=75',
+'DC-SP-01':'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&q=75',
+'DC-SP-02':'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=600&q=75',
+'DC-SP-03':'https://images.unsplash.com/photo-1521791055366-0d553872952f?w=600&q=75',
+'DC-SP-04':'https://images.unsplash.com/photo-1432888498266-38ffec3eaf0a?w=600&q=75',
+'DC-SP-05':'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&q=75',
+'DC-SP-06':'https://images.unsplash.com/photo-1553877522-43269d4ea984?w=600&q=75',
+'RC-01':'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=600&q=75',
+'RC-02':'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=600&q=75',
+'RC-03':'https://images.unsplash.com/photo-1603791440384-56cd371ee9a7?w=600&q=75',
+'RC-04':'https://images.unsplash.com/photo-1521791136064-7986c2920216?w=600&q=75',
+'RC-05':'https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=600&q=75',
+'RC-06':'https://images.unsplash.com/photo-1432888498266-38ffec3eaf0a?w=600&q=75',
+'RC-07':'https://images.unsplash.com/photo-1611532736597-de2d4265fba3?w=600&q=75',
+'RC-08':'https://images.unsplash.com/photo-1510511459019-5dda7724fd87?w=600&q=75',
+'RC-09':'https://images.unsplash.com/photo-1577563908411-5077b6dc7624?w=600&q=75',
+'RC-10':'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=600&q=75',
+'RC-11':'https://images.unsplash.com/photo-1605791238890-3a4a9dc5d54a?w=600&q=75',
+'GO-01':'https://images.unsplash.com/photo-1631511258193-252ab3da6b8b?w=600&q=75',
+'GO-02':'https://images.unsplash.com/photo-1589330694653-ded6df03f754?w=600&q=75',
+'GO-03':'https://images.unsplash.com/photo-1521791136064-7986c2920216?w=600&q=75',
+'GO-04':'https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=600&q=75',
+'GO-05':'https://images.unsplash.com/photo-1507925921958-8a62f3d1a50d?w=600&q=75',
+'GO-06':'https://images.unsplash.com/photo-1589829085413-56de8ae18c73?w=600&q=75',
+'GO-07':'https://images.unsplash.com/photo-1510511459019-5dda7724fd87?w=600&q=75',
+'MC-01':'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&q=75',
+'MC-02':'https://images.unsplash.com/photo-1552664730-d307ca884978?w=600&q=75',
+'MC-03':'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&q=75',
+'MC-04':'https://images.unsplash.com/photo-1553877522-43269d4ea984?w=600&q=75',
+'MC-05':'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=600&q=75',
+'MC-06':'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=600&q=75',
+'MC-07':'https://images.unsplash.com/photo-1521791055366-0d553872952f?w=600&q=75',
+'MC-08':'https://images.unsplash.com/photo-1515187029135-18ee286d815b?w=600&q=75',
+'CS-01':'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=600&q=75',
+'CS-02':'https://images.unsplash.com/photo-1611532736597-de2d4265fba3?w=600&q=75',
+'CS-03':'https://images.unsplash.com/photo-1432888498266-38ffec3eaf0a?w=600&q=75',
+'CS-04':'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&q=75',
+'CS-05':'https://images.unsplash.com/photo-1552664730-d307ca884978?w=600&q=75',
+'AA-01':'https://images.unsplash.com/photo-1631511258193-252ab3da6b8b?w=600&q=75',
+'AA-02':'https://images.unsplash.com/photo-1521791136064-7986c2920216?w=600&q=75',
+'AA-03':'https://images.unsplash.com/photo-1507925921958-8a62f3d1a50d?w=600&q=75',
+'AA-04':'https://images.unsplash.com/photo-1589330694653-ded6df03f754?w=600&q=75',
+'PE-01':'https://images.unsplash.com/photo-1501167786227-4cba60f6d58f?w=600&q=75',
+'PE-02':'https://images.unsplash.com/photo-1631511258193-252ab3da6b8b?w=600&q=75',
+'PE-03':'https://images.unsplash.com/photo-1521791136064-7986c2920216?w=600&q=75',
+'PE-04':'https://images.unsplash.com/photo-1589829085413-56de8ae18c73?w=600&q=75',
+'PE-05':'https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=600&q=75',
+'PE-06':'https://images.unsplash.com/photo-1589330694653-ded6df03f754?w=600&q=75',
+'PE-07':'https://images.unsplash.com/photo-1507925921958-8a62f3d1a50d?w=600&q=75',
+'PE-08':'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&q=75',
+'PE-09':'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=600&q=75',
+};
+const SEC_INFO = {
+'tc':{label:'Tronc Commun DDA',icon:'⚖️',color:'#3d7fff',bar:'bar-tc'},
+'reg':{label:'Réglementaire Santé & Prévoyance',icon:'📋',color:'#e05c8a',bar:'bar-reg'},
+'tp':{label:'Technique Produit',icon:'🔧',color:'#2dd4bf',bar:'bar-tp'},
+'bm':{label:'Benchmark Marché',icon:'📊',color:'#f59e0b',bar:'bar-bm'},
+'tv':{label:'Techniques de Vente',icon:'🚀',color:'#a78bfa',bar:'bar-tv'},
+'dc':{label:'Développement Commercial',icon:'💼',color:'#34d399',bar:'bar-dc'},
+'rc':{label:'Relation Client à Distance',icon:'🎧',color:'#60a5fa',bar:'bar-rc'},
+'go':{label:'Gestion Opérationnelle',icon:'⚙️',color:'#94a3b8',bar:'bar-go'},
+'mc':{label:'Management Commercial',icon:'👥',color:'#fb923c',bar:'bar-mc'},
+'cs':{label:'Commercial Salarié',icon:'🏆',color:'#fbbf24',bar:'bar-cs'},
+'aa':{label:'Assistant Administratif',icon:'🗂️',color:'#c084fc',bar:'bar-aa'},
+'pe':{label:'Prévoyance Emprunteur',icon:'🏦',color:'#38bdf8',bar:'bar-pe'},
+'veille':{label:'Veille Hebdomadaire',icon:'📡',color:'#2dd4bf',bar:'bar-tp'},
+'outils':{label:'Outils',icon:'⚙️',color:'#c8a84b',bar:'bar-go'},
+};
+const LVL_LBL  = { debutant:'Débutant', confirme:'Confirmé', expert:'Expert' };
+const TYPE_LBL = { courtier:'Courtier', commercial:'Commercial', manager:'Manager', gestionnaire:'Gestionnaire', assistant:'Assistant', teleconseiller:'Téléconseiller' };
+const PROD_LBL = { sante:'Santé individuelle', prevoyance:'Prévoyance', collectif:'Collectif entreprise', vie:'Assurance Vie', auto:'Automobile', hab:'Habitation/MRH', ent:"Risques d'entreprise", rc:'Responsabilité Civile', pat:'Patrimoine/CGP', cred:'Crédit/IOBSP' };
+
+// ===== CATALOG =====
+
+// ===== TYPE DE MODULE =====
+const MOD_TYPE = {};
+Object.keys(MODS).forEach(code => { MOD_TYPE[code] = MOD_TYPE[code] || 'elearning'; });
+
+// ===== MODULE METADATA : types & produits pour filtrage =====
+// types = quels profils concernés, prods = quels produits concernés
+const MOD_META = {
+'TC-01':{types:["courtier", "commercial", "manager", "gestionnaire", "assistant", "teleconseiller"],prods:["sante", "prevoyance", "collectif", "vie", "auto", "hab", "ent", "rc", "pat", "cred"]},
+'TC-02':{types:["courtier", "commercial", "manager", "gestionnaire", "assistant", "teleconseiller"],prods:["sante", "prevoyance", "collectif", "vie", "auto", "hab", "ent", "rc", "pat", "cred"]},
+'TC-03':{types:["courtier"],prods:["sante", "prevoyance", "collectif", "vie", "auto", "hab", "ent", "rc", "pat", "cred"]},
+'TC-04':{types:["courtier", "commercial", "manager", "gestionnaire", "assistant", "teleconseiller"],prods:["sante", "prevoyance", "collectif", "vie", "auto", "hab", "ent", "rc", "pat", "cred"]},
+'TC-05':{types:["courtier"],prods:["sante", "prevoyance", "collectif", "vie", "auto", "hab", "ent", "rc", "pat", "cred"]},
+'TC-06':{types:["courtier", "commercial", "manager", "gestionnaire", "assistant", "teleconseiller"],prods:["sante", "prevoyance", "collectif", "vie", "auto", "hab", "ent", "rc", "pat", "cred"]},
+'TC-07':{types:["courtier", "gestionnaire"],prods:["sante", "prevoyance", "collectif", "vie", "auto", "hab", "ent", "rc", "pat", "cred"]},
+'TC-08':{types:["courtier", "commercial", "manager", "gestionnaire", "assistant", "teleconseiller"],prods:["sante", "prevoyance", "collectif", "vie", "auto", "hab", "ent", "rc", "pat", "cred"]},
+'TC-09':{types:["courtier"],prods:["sante", "prevoyance", "collectif", "vie", "auto", "hab", "ent", "rc", "pat", "cred"]},
+'TC-10':{types:["courtier", "commercial", "manager", "gestionnaire", "assistant", "teleconseiller"],prods:["sante", "prevoyance", "collectif", "vie", "auto", "hab", "ent", "rc", "pat", "cred"]},
+'REG-SP-01':{types:["courtier", "commercial", "manager", "gestionnaire", "assistant", "teleconseiller"],prods:["sante", "prevoyance", "collectif"]},
+'REG-SP-02':{types:["courtier"],prods:["sante", "prevoyance", "collectif"]},
+'REG-SP-03':{types:["courtier"],prods:["sante", "prevoyance", "collectif"]},
+'REG-SP-04':{types:["courtier", "commercial", "manager", "gestionnaire", "assistant", "teleconseiller"],prods:["sante", "prevoyance", "collectif"]},
+'REG-SP-05':{types:["courtier"],prods:["sante", "prevoyance", "collectif"]},
+'REG-SP-06':{types:["courtier", "commercial", "manager", "gestionnaire", "assistant", "teleconseiller"],prods:["sante", "prevoyance", "collectif"]},
+'REG-SP-07':{types:["courtier"],prods:["sante", "prevoyance", "collectif"]},
+'REG-SP-08':{types:["courtier"],prods:["sante", "prevoyance", "collectif"]},
+'REG-SP-09':{types:["courtier"],prods:["sante", "prevoyance", "collectif"]},
+'TP-SP-01':{types:["courtier", "commercial", "manager", "gestionnaire", "assistant", "teleconseiller"],prods:["sante", "prevoyance", "collectif"]},
+'TP-SP-02':{types:["courtier"],prods:["sante", "prevoyance", "collectif"]},
+'TP-SP-03':{types:["courtier"],prods:["sante", "prevoyance", "collectif"]},
+'TP-SP-04':{types:["courtier", "commercial", "manager", "gestionnaire", "assistant", "teleconseiller"],prods:["sante", "prevoyance", "collectif"]},
+'TP-SP-05':{types:["courtier"],prods:["sante", "prevoyance", "collectif"]},
+'TP-SP-06':{types:["courtier"],prods:["sante", "prevoyance", "collectif"]},
+'TP-SP-07':{types:["courtier", "commercial", "manager", "gestionnaire", "assistant", "teleconseiller"],prods:["sante", "prevoyance", "collectif"]},
+'TP-SP-08':{types:["courtier"],prods:["sante", "prevoyance", "collectif"]},
+'TP-SP-09':{types:["courtier"],prods:["sante", "prevoyance", "collectif"]},
+'TP-SP-10':{types:["courtier", "commercial", "manager", "gestionnaire", "assistant", "teleconseiller"],prods:["sante", "prevoyance", "collectif"]},
+'TP-SP-11':{types:["courtier"],prods:["sante", "prevoyance", "collectif"]},
+'TP-SP-12':{types:["courtier"],prods:["sante", "prevoyance", "collectif"]},
+'BM-SP-01':{types:["courtier"],prods:["sante", "prevoyance", "collectif"]},
+'BM-SP-02':{types:["courtier"],prods:["sante", "prevoyance", "collectif"]},
+'BM-SP-03':{types:["courtier"],prods:["sante", "prevoyance", "collectif"]},
+'BM-SP-04':{types:["courtier"],prods:["sante", "prevoyance", "collectif"]},
+'TV-SP-01':{types:["courtier", "commercial", "manager", "gestionnaire", "assistant", "teleconseiller"],prods:["sante", "prevoyance", "collectif"]},
+'TV-SP-02':{types:["courtier"],prods:["sante", "prevoyance", "collectif"]},
+'TV-SP-03':{types:["courtier", "commercial", "manager", "gestionnaire", "assistant", "teleconseiller"],prods:["sante", "prevoyance", "collectif"]},
+'TV-SP-04':{types:["courtier"],prods:["sante", "prevoyance", "collectif"]},
+'TV-SP-05':{types:["courtier", "commercial", "manager", "gestionnaire", "assistant", "teleconseiller"],prods:["sante", "prevoyance", "collectif"]},
+'TV-SP-06':{types:["courtier"],prods:["sante", "prevoyance", "collectif"]},
+'TV-SP-07':{types:["courtier"],prods:["sante", "prevoyance", "collectif"]},
+'TV-SP-08':{types:["courtier"],prods:["sante", "prevoyance", "collectif"]},
+'TV-SP-09':{types:["courtier"],prods:["sante", "prevoyance", "collectif"]},
+'TV-SP-10':{types:["courtier"],prods:["sante", "prevoyance", "collectif"]},
+'DC-SP-01':{types:["courtier"],prods:["sante", "prevoyance", "collectif", "vie", "auto", "hab", "ent", "rc", "pat", "cred"]},
+'DC-SP-02':{types:["courtier"],prods:["sante", "prevoyance", "collectif", "vie", "auto", "hab", "ent", "rc", "pat", "cred"]},
+'DC-SP-03':{types:["courtier"],prods:["sante", "prevoyance", "collectif", "vie", "auto", "hab", "ent", "rc", "pat", "cred"]},
+'DC-SP-04':{types:["courtier"],prods:["sante", "prevoyance", "collectif", "vie", "auto", "hab", "ent", "rc", "pat", "cred"]},
+'DC-SP-05':{types:["courtier"],prods:["sante", "prevoyance", "collectif", "vie", "auto", "hab", "ent", "rc", "pat", "cred"]},
+'DC-SP-06':{types:["courtier"],prods:["sante", "prevoyance", "collectif", "vie", "auto", "hab", "ent", "rc", "pat", "cred"]},
+'RC-01':{types:["teleconseiller"],prods:["sante", "prevoyance", "collectif"]},
+'RC-02':{types:["teleconseiller"],prods:["sante", "prevoyance", "collectif"]},
+'RC-03':{types:["teleconseiller"],prods:["sante", "prevoyance", "collectif"]},
+'RC-04':{types:["teleconseiller"],prods:["sante", "prevoyance", "collectif"]},
+'RC-05':{types:["teleconseiller"],prods:["sante", "prevoyance", "collectif"]},
+'RC-06':{types:["teleconseiller"],prods:["sante", "prevoyance", "collectif"]},
+'RC-07':{types:["teleconseiller"],prods:["sante", "prevoyance", "collectif"]},
+'RC-08':{types:["teleconseiller"],prods:["sante", "prevoyance", "collectif"]},
+'RC-09':{types:["teleconseiller"],prods:["sante", "prevoyance", "collectif"]},
+'RC-10':{types:["teleconseiller"],prods:["sante", "prevoyance", "collectif"]},
+'RC-11':{types:["teleconseiller"],prods:["sante", "prevoyance", "collectif"]},
+'GO-01':{types:["gestionnaire"],prods:["sante", "prevoyance", "collectif"]},
+'GO-02':{types:["gestionnaire"],prods:["sante", "prevoyance", "collectif"]},
+'GO-03':{types:["gestionnaire"],prods:["sante", "prevoyance", "collectif"]},
+'GO-04':{types:["gestionnaire"],prods:["sante", "prevoyance", "collectif"]},
+'GO-05':{types:["gestionnaire"],prods:["sante", "prevoyance", "collectif"]},
+'GO-06':{types:["gestionnaire"],prods:["sante", "prevoyance", "collectif"]},
+'GO-07':{types:["gestionnaire"],prods:["sante", "prevoyance", "collectif"]},
+'MC-01':{types:["manager"],prods:["sante", "prevoyance", "collectif"]},
+'MC-02':{types:["manager"],prods:["sante", "prevoyance", "collectif"]},
+'MC-03':{types:["manager"],prods:["sante", "prevoyance", "collectif"]},
+'MC-04':{types:["manager"],prods:["sante", "prevoyance", "collectif"]},
+'MC-05':{types:["manager"],prods:["sante", "prevoyance", "collectif"]},
+'MC-06':{types:["manager"],prods:["sante", "prevoyance", "collectif"]},
+'MC-07':{types:["manager"],prods:["sante", "prevoyance", "collectif"]},
+'MC-08':{types:["manager"],prods:["sante", "prevoyance", "collectif"]},
+'CS-01':{types:["commercial"],prods:["sante", "prevoyance", "collectif"]},
+'CS-02':{types:["commercial"],prods:["sante", "prevoyance", "collectif"]},
+'CS-03':{types:["commercial"],prods:["sante", "prevoyance", "collectif"]},
+'CS-04':{types:["commercial"],prods:["sante", "prevoyance", "collectif"]},
+'CS-05':{types:["commercial"],prods:["sante", "prevoyance", "collectif"]},
+'AA-01':{types:["assistant"],prods:["sante", "prevoyance", "collectif"]},
+'AA-02':{types:["assistant"],prods:["sante", "prevoyance", "collectif"]},
+'AA-03':{types:["assistant"],prods:["sante", "prevoyance", "collectif"]},
+'AA-04':{types:["assistant"],prods:["sante", "prevoyance", "collectif"]},
+'PE-01':{types:["courtier", "commercial"],prods:["cred"]},
+'PE-02':{types:["courtier", "commercial"],prods:["cred"]},
+'PE-03':{types:["courtier", "commercial", "manager", "gestionnaire", "assistant", "teleconseiller"],prods:["cred"]},
+'PE-04':{types:["courtier", "commercial"],prods:["cred"]},
+'PE-05':{types:["courtier"],prods:["cred"]},
+'PE-06':{types:["courtier", "commercial"],prods:["cred"]},
+'PE-07':{types:["courtier"],prods:["cred"]},
+'PE-08':{types:["courtier"],prods:["cred"]},
+'PE-09':{types:["courtier"],prods:["cred"]},
+};
+
+// QUIZZES — données chargées depuis Supabase (quiz_data) au runtime
+const QUIZZES = {}; // fallback vide — Supabase est autoritaire
+
+// ===== TIMER =====
+const DDA_GOAL = 15 * 3600;
+let timerTotal    = parseInt(localStorage.getItem('ddaTimer3') || '0'); // init localStorage, écrasé par Supabase au chargement
+let timerActive   = null;
+let timerInterval = null;
+
+function timerStart(code) {
+  timerStop();
+  timerActive = { code, start: Date.now() };
+  const timer = document.getElementById('ddaTimer');
+  const badge = document.getElementById('topTimerBadge');
+  const pulse = document.getElementById('timerPulse');
+  if (timer) timer.classList.add('visible');
+  if (pulse) pulse.classList.remove('off');
+  if (badge) badge.style.display = 'flex';
+  timerInterval = setInterval(timerTick, 1000);
+}
+function timerStop() {
+  timerActive = null;
+  clearInterval(timerInterval);
+  const p = document.getElementById('timerPulse');
+  if (p) p.classList.add('off');
+}
+function timerTick() {
+  timerRender(timerActive ? Math.floor((Date.now() - timerActive.start) / 1000) : 0);
+}
+function timerRender(live = 0) {
+  const total = timerTotal + live;
+  const h = Math.floor(total / 3600), m = Math.floor((total % 3600) / 60), s = total % 60;
+  const rem = Math.max(0, DDA_GOAL - total);
+  const rh = Math.floor(rem / 3600), rm = Math.floor((rem % 3600) / 60);
+  const pct = Math.min(100, Math.round(total / DDA_GOAL * 100));
+  const el = id => document.getElementById(id);
+  if (el('timerVal'))    el('timerVal').textContent    = `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  if (el('timerFill'))   el('timerFill').style.width   = pct + '%';
+  if (el('timerRemain')) el('timerRemain').textContent = rem > 0 ? `${rh}h ${String(rm).padStart(2,'0')}min restantes` : '🎉 Objectif atteint !';
+  if (el('topTimerVal')) el('topTimerVal').textContent = `${h}h ${String(m).padStart(2,'0')}min`;
+  // Afficher le badge dès qu'il y a du temps enregistré
+  if (total > 0) {
+    const badge = document.getElementById('topTimerBadge');
+    if (badge) badge.style.display = 'flex';
+  }
+  // Afficher le bouton attestation dès qu'un module est validé
+  const btnAttestation = el('btn-attestation');
+  if (btnAttestation && Object.keys(mDone).length > 0) {
+    btnAttestation.style.display = 'block';
+    const isOfficial = total >= 15 * 3600;
+    btnAttestation.textContent = isOfficial ? '⬇ Télécharger mon certificat DDA' : '⬇ Télécharger mon attestation';
+    if (isOfficial) {
+      btnAttestation.style.background = 'rgba(45,212,191,.12)';
+      btnAttestation.style.borderColor = 'rgba(45,212,191,.3)';
+      btnAttestation.style.color = 'var(--teal)';
+    }
+  }
+}
+window.addEventListener('load', () => {
+  timerRender();
+  if (timerTotal > 0) {
+    document.getElementById('ddaTimer').classList.add('visible');
+    document.getElementById('topTimerBadge').style.display = 'flex';
+  }
+});
+document.addEventListener('visibilitychange', () => { if (document.hidden) timerStop(); });
+
+// ===== ONBOARDING =====
+function selOb(el) {
+  const g = el.dataset.g;
+  document.querySelectorAll(`[data-g="${g}"]`).forEach(c => c.classList.remove('sel'));
+  el.classList.add('sel');
+  if (g === 'type')   P.type   = el.dataset.v;
+  if (g === 'niveau') P.niveau = el.dataset.v;
+}
+function selTag(el) {
+  el.classList.toggle('sel');
+  const v = el.dataset.v, i = P.prods.indexOf(v);
+  i === -1 ? P.prods.push(v) : P.prods.splice(i, 1);
+}
+
+// ===== NAVIGATION =====
+function goView(id) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-' + id).classList.add('active');
+  document.getElementById('nav-cat').style.display = id === 'catalogue' ? 'flex' : 'none';
+  const timer = document.getElementById('ddaTimer');
+  const badge = document.getElementById('topTimerBadge');
+  if (id === 'onboarding') {
+    if (timer) timer.classList.remove('visible');
+    if (badge) badge.style.display = 'none';
+  } else {
+    if (timerTotal > 0) {
+      if (timer) timer.classList.add('visible');
+      if (badge) badge.style.display = 'flex';
+    }
+  }
+  if (id === 'account') loadAccountData();
+  localStorage.setItem('dda-last-view', id);
+  window.scrollTo(0, 0);
+}
+function launchCatalogue() {
+  // Sauvegarder le profil pour la prochaine visite
+  localStorage.setItem('dda-last-type',   P.type   || '');
+  localStorage.setItem('dda-last-prods',  JSON.stringify(P.prods));
+  localStorage.setItem('dda-last-niveau', P.niveau || '');
+  applyProfileToFilters();
+  buildHero();
+  renderCatalogue();
+  goView('catalogue');
+}
+function launchAll() {
+  P = { type: null, prods: [], niveau: null };
+  resetFilters();
+  buildHero();
+  renderCatalogue();
+  goView('catalogue');
+}
+
+// ===== PRÉ-SÉLECTION DES FILTRES DEPUIS LE PROFIL =====
+function applyProfileToFilters() {
+  if (P.type)   document.getElementById('filterType').value = P.type;
+  document.getElementById('filterSec').value = '';  // reset section filter on profile load
+  if (P.niveau) document.getElementById('filterLvl').value  = P.niveau;
+  // Produit : pré-sélectionner le premier produit choisi s'il existe
+  if (P.prods.length > 0) { const fp = document.getElementById('filterProd'); if(fp) fp.value = P.prods[0]; }
+  updateFilterHighlight();
+}
+
+function onFilterChange() {
+  updateFilterHighlight();
+  applyFilters();
+}
+
+function updateFilterHighlight() {
+  ['filterType','filterSec','filterProd','filterLvl','filterModType','filterSort'].forEach(id => {
+    const el = document.getElementById(id);
+    el.classList.toggle('has-value', el.value !== '');
+  });
+  const anyActive = ['filterType','filterSec','filterProd','filterLvl','filterModType','filterSort'].some(id => document.getElementById(id)?.value !== '')
+    || document.getElementById('searchInput').value !== '';
+  document.getElementById('btnReset').style.display = anyActive ? 'inline-block' : 'none';
+}
+
+function resetFilters() {
+  document.getElementById('searchInput').value = '';
+  document.getElementById('filterType').value  = '';
+  document.getElementById('filterSec').value    = '';
+  document.getElementById('filterProd').value  = '';
+  document.getElementById('filterLvl').value      = '';
+  document.getElementById('filterModType').value  = '';
+  updateFilterHighlight();
+  renderCatalogue();
+}
+
+function buildHero() {
+  const tags = document.getElementById('profile-tags');
+  tags.innerHTML = '';
+  if (P.type)   tags.innerHTML += `<div class="ptag">👤 ${TYPE_LBL[P.type]}</div>`;
+  if (P.niveau) tags.innerHTML += `<div class="ptag">📊 ${LVL_LBL[P.niveau]}</div>`;
+  P.prods.slice(0,3).forEach(p => tags.innerHTML += `<div class="ptag">${PROD_LBL[p] || p}</div>`);
+  if (!P.type && !P.niveau && P.prods.length === 0)
+    tags.innerHTML = `<div class="ptag">🌐 Catalogue complet</div>`;
+}
+
+// ===== RENDER =====
+function applyFilters() {
+  updateFilterHighlight();
+  renderCatalogue();
+}
+
+function getModTypeIcon(code) {
+  const type = MODS[code]?.type || MOD_TYPE[code] || 'elearning';
+  const labels = { elearning:'E-learning', video:'Video', outil:'Outil', veille:'Veille' };
+  return labels[type] || 'E-learning';
+}
+
+function renderCatalogue() {
+  const search         = document.getElementById('searchInput').value.toLowerCase();
+  const filterType     = document.getElementById('filterType').value;
+  const filterSec      = document.getElementById('filterSec').value;
+  const filterProd     = document.getElementById('filterProd').value;
+  const filterLvl      = document.getElementById('filterLvl').value;
+  const filterModType  = document.getElementById('filterModType').value;
+  const filterSort     = document.getElementById('filterSort')?.value || '';
+
+  const sections = { tc:[], reg:[], tp:[], bm:[], tv:[], dc:[], rc:[], go:[], mc:[], cs:[], aa:[], pe:[], veille:[], outils:[] };
+  let total = 0, doneCount = 0;
+
+  Object.entries(MODS).forEach(([code, mod]) => {
+    const meta  = MOD_META[code] || {};
+    const types = mod.types?.length ? mod.types : (meta.types || []);
+    const prods = mod.prods?.length ? mod.prods : (meta.prods || []);
+    const isUniversal = mod.type === 'outil' || mod.type === 'veille';
+    // Vidéos sans types/prods définis → visibles pour tous les métiers/produits
+    const hasNoTypes = !types.length;
+    const hasNoProds = !prods.length;
+    if (filterSec     && mod.sec !== filterSec && !isUniversal) return;
+    if (filterType    && !hasNoTypes && !types.includes(filterType) && !isUniversal) return;
+    if (filterProd    && !hasNoProds && !prods.includes(filterProd) && !isUniversal) return;
+    if (filterLvl     && mod.lvl !== filterLvl && !isUniversal) return;
+    if (filterModType && (mod.type || 'elearning') !== filterModType) return;
+    if (search && !mod.title.toLowerCase().includes(search) && !(mod.desc||'').toLowerCase().includes(search)) return;
+    sections[mod.sec].push({ code, ...mod });
+    total++;
+    if (mDone[code]) doneCount++;
+  });
+
+  // Appliquer le tri dans chaque section
+  if (filterSort) {
+    Object.keys(sections).forEach(sec => {
+      if (filterSort === 'title')  sections[sec].sort((a,b) => a.title.localeCompare(b.title, 'fr'));
+      if (filterSort === 'recent') sections[sec].sort((a,b) => (b.sort_order||0) - (a.sort_order||0));
+      if (filterSort === 'ancien') sections[sec].sort((a,b) => (a.sort_order||0) - (b.sort_order||0));
+    });
+  }
+
+  document.getElementById('filterCount').innerHTML = `<span>${total}</span> module${total > 1 ? 's' : ''}`;
+  document.getElementById('hero-count').textContent = total;
+  document.getElementById('hero-done').textContent  = doneCount;
+
+  const body = document.getElementById('cat-body');
+  body.innerHTML = '';
+  let anyVisible = false;
+
+  Object.entries(sections).forEach(([sec, mods]) => {
+    if (!mods.length) return;
+    anyVisible = true;
+    const info = SEC_INFO[sec];
+    const secEl = document.createElement('div');
+    secEl.className = 'cat-section';
+    secEl.innerHTML = `
+      <div class="cat-section-head">
+        <div class="cat-section-bar ${info.bar}"></div>
+        <div class="cat-section-title">${info.icon} ${info.label}</div>
+        <div class="cat-section-sub">${mods.length} module${mods.length > 1 ? 's' : ''}</div>
+      </div>
+      <div class="cards-grid" id="grid-${sec}"></div>`;
+    body.appendChild(secEl);
+    const grid = document.getElementById('grid-' + sec);
+    mods.forEach(mod => buildCard(grid, mod, sec));
+  });
+
+
+
+  if (!anyVisible) {
+    body.innerHTML = `<div class="empty-state"><div class="big">🔍</div><p>Aucun module ne correspond à vos critères.<br>Utilisez le bouton "Réinitialiser" pour tout voir.</p></div>`;
+  }
+}
+
+function buildCard(grid, mod, sec) {
+  const { code } = mod;
+  const th     = THUMB[sec];
+  const photo  = mod.thumb || MOD_PHOTO[code] || null;
+  const done   = !!mDone[code];
+  const isVideo = mod.type === 'video';
+  const card   = document.createElement('div');
+  card.className = 'mod-card' + (done ? ' done' : '');
+  const thumbBg = photo
+    ? `background:url('${photo}') center/cover no-repeat; background-color:#0b0f1a;`
+    : `background:linear-gradient(135deg,#071428 0%,#0d2a5c 100%);`;
+  card.innerHTML = `
+    <div class="mod-card-thumb">
+      <div class="mod-card-thumb-bg" style="${thumbBg}"></div>
+      <div class="mod-card-thumb-overlay"></div>
+      <div class="mod-card-code">${code}</div>
+      <div class="mod-card-badges"></div>
+      <div class="mod-card-cat-dot" style="background:${th.accent}"></div>
+    </div>
+    <div class="mod-card-play"><div class="mod-card-play-btn" style="${mod.type !== 'video' ? 'border-radius:8px;padding-left:0;font-size:20px;' : ''}">${mod.type === 'video' ? '▶' : '📄'}</div></div>
+    <div class="done-tick">✓</div>
+    <div class="mod-card-body">
+      <div class="mod-card-title">${mod.title}</div>
+      <div class="mod-card-meta">
+        <span class="mod-card-dur">⏱ ${mod.dur}</span>
+        <span class="mod-card-lvl lvl-${mod.lvl}">${LVL_LBL[mod.lvl]}</span>
+        <span class="mod-card-type" style="
+          font-size:9px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;
+          padding:2px 7px;border-radius:3px;
+          background:${(MODS[code]?.type||'elearning')==='video' ? 'rgba(239,68,68,.15)' : 'rgba(61,127,255,.12)'};
+          color:${(MODS[code]?.type||'elearning')==='video' ? '#f87171' : 'var(--accent2)'};
+          border:1px solid ${(MODS[code]?.type||'elearning')==='video' ? 'rgba(239,68,68,.2)' : 'rgba(61,127,255,.2)'};
+        ">${getModTypeIcon(code)}</span>
+      </div>
+      ${done ? '<div class="mod-card-progress"><div class="mod-card-progress-fill" style="width:100%"></div></div>' : ''}
+    </div>`;
+  // Variante outil
+  if (mod.type === 'outil') {
+    const thumbUrl = mod.thumb || (code === 'OUTIL-COMPARATEUR' ? 'https://images.unsplash.com/photo-1589330694653-ded6df03f754?w=600&q=75' : 'https://images.unsplash.com/photo-1631511258193-252ab3da6b8b?w=600&q=75');
+    card.innerHTML = `
+      <div class="mod-card-thumb">
+        <div class="mod-card-thumb-bg" style="background:url('${thumbUrl}') center/cover no-repeat;background-color:#0b0f1a;"></div>
+        <div class="mod-card-overlay"></div>
+        <div class="mod-card-play"><div class="mod-card-play-btn" style="border-radius:8px;padding-left:0;font-size:18px;">⚙</div></div>
+        <div class="mod-card-badges"></div>
+      </div>
+      <div class="mod-card-body">
+        <div class="mod-card-title">${mod.title}</div>
+        <div class="mod-card-meta">
+          <span class="mod-card-type" style="font-size:9px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;padding:2px 7px;border-radius:3px;background:rgba(200,168,75,.12);color:#c8a84b;border:1px solid rgba(200,168,75,.2);">⚙ Outil</span>
+          <span class="mod-card-dur" style="font-size:10px;color:var(--muted);">Accès libre</span>
+        </div>
+      </div>`;
+    card.addEventListener('click', () => openModal(code));
+    grid.appendChild(card);
+    return;
+  }
+
+  // Variante veille
+  if (mod.type === 'veille') {
+    const prog = mProgress[code];
+    const spent = Math.min(prog?.seconds_spent || 0, 1800);
+    const pct   = Math.round(spent / 1800 * 100);
+    const progressBar = pct > 0
+      ? `<div class="mod-card-progress"><div class="mod-card-progress-fill" style="width:${pct}%"></div></div>`
+      : '';
+    const veilleThumb = mod.thumb
+      ? `background:url('${mod.thumb}') center/cover no-repeat;background-color:#0b0f1a;`
+      : `background:url('https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=600&q=75') center/cover no-repeat;background-color:#0b0f1a;`;
+    const weekLabel = mod.semaine
+      ? `S${mod.semaine.split('-W')[1]} · ${mod.semaine.split('-W')[0]}`
+      : '';
+    card.innerHTML = `
+      <div class="mod-card-thumb">
+        <div class="mod-card-thumb-bg" style="${veilleThumb}"></div>
+        <div class="mod-card-thumb-overlay"></div>
+        <div class="mod-card-badges">
+          <span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:3px;background:rgba(45,212,191,.15);color:#2dd4bf;border:1px solid rgba(45,212,191,.25);">📡 Veille</span>
+          ${weekLabel ? `<span style="font-size:9px;padding:2px 7px;border-radius:3px;background:rgba(255,255,255,.06);color:var(--muted);margin-left:4px;">${weekLabel}</span>` : ''}
+        </div>
+        <div class="done-tick" style="${done ? '' : 'display:none'}">✓</div>
+      </div>
+      <div class="mod-card-body">
+        <div class="mod-card-title">${mod.title}</div>
+        <div class="mod-card-meta">
+          <span class="mod-card-dur">⏱ ${mod.dur}</span>
+          <span style="font-size:10px;color:var(--muted);">📰 ${mod.items_count || 0} article${(mod.items_count||0) > 1 ? 's' : ''}</span>
+        </div>
+        ${progressBar}
+      </div>`;
+    card.addEventListener('click', () => openModal(code));
+    grid.appendChild(card);
+    return;
+  }
+
+  card.addEventListener('click', () => openModal(code));
+  grid.appendChild(card);
+}
+
+// ===== MON COMPTE =====
+async function loadAccountData() {
+  const sb   = window._sb;
+  const user  = window._user;
+  if (!sb || !user) return;
+
+  // Pré-remplir infos personnelles
+  document.getElementById('ac-prenom').value = user.prenom || '';
+  document.getElementById('ac-nom').value    = user.nom    || '';
+  document.getElementById('ac-tel').value    = user.telephone || '';
+  document.getElementById('ac-email').value  = user.email  || '';
+
+  // Pré-remplir infos pro
+  document.getElementById('ac-rs').value     = user.raison_sociale || '';
+  document.getElementById('ac-siret').value  = user.siret  || '';
+  document.getElementById('ac-orias').value  = user.orias  || '';
+  document.getElementById('ac-metier').value = user.metier || '';
+
+  // Adresse
+  const adresseParts = (user.adresse || '').split(',').map(s => s.trim());
+  document.getElementById('ac-adresse').value = adresseParts[0] || '';
+  document.getElementById('ac-cp').value      = adresseParts[1] || '';
+  document.getElementById('ac-ville').value   = adresseParts[2] || '';
+
+  // Indicateur ORIAS
+  const oriasHint = document.getElementById('ac-orias-hint');
+  if (!user.orias) {
+    document.getElementById('ac-orias').style.borderColor = 'rgba(251,191,36,.5)';
+    oriasHint.style.color = '#fbbf24';
+    oriasHint.textContent = '⚠ Requis pour votre attestation DDA';
+  } else {
+    oriasHint.style.color = 'var(--teal)';
+    oriasHint.textContent = '✓ Renseigné';
+  }
+
+  // Préférences
+  const { data: prefs } = await sb.from('profiles').select('notif_nouveaux_modules, notif_rappels_dda, notif_facturation').eq('id', user.id).single();
+  if (prefs) {
+    document.getElementById('ac-notif-modules').checked   = prefs.notif_nouveaux_modules ?? true;
+    document.getElementById('ac-notif-rappels').checked   = prefs.notif_rappels_dda      ?? true;
+    document.getElementById('ac-notif-facturation').checked = prefs.notif_facturation    ?? true;
+  }
+
+  // Abonnement
+  const { data: sub } = await sb.from('subscriptions')
+    .select('status, started_at, current_period_end, gc_customer_id')
+    .eq('user_id', user.id).single();
+  const subEl = document.getElementById('ac-sub-content');
+  if (sub) {
+    const statusLabel = { active:'Actif', pending:'En attente de validation', cancelled:'Résilié', past_due:'Prélèvement échoué' };
+    const statusColor = { active:'var(--green)', pending:'#fbbf24', cancelled:'var(--muted)', past_due:'var(--red)' };
+    const nextDate = sub.current_period_end ? new Date(sub.current_period_end).toLocaleDateString('fr-FR') : '—';
+    subEl.innerHTML = `
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span style="color:var(--muted);font-size:12px;">Statut</span>
+          <span style="font-weight:600;color:${statusColor[sub.status]||'var(--muted)'};">● ${statusLabel[sub.status]||sub.status}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span style="color:var(--muted);font-size:12px;">Montant</span>
+          <span style="font-weight:600;color:var(--white);">24,99 € HT / mois</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span style="color:var(--muted);font-size:12px;">Prochain prélèvement</span>
+          <span style="font-weight:600;color:var(--white);">${nextDate}</span>
+        </div>
+        ${sub.gc_customer_id ? `
+        <div style="margin-top:8px;padding-top:12px;border-top:1px solid var(--border);">
+          <div style="font-size:11px;color:var(--muted);">Pour modifier vos coordonnées bancaires, contactez-nous à <a href="mailto:hello@bingedda.fr" style="color:var(--accent2);">hello@bingedda.fr</a></div>
+        </div>` : ''}
+      </div>`;
+  } else {
+    subEl.textContent = 'Aucun abonnement actif.';
+  }
+}
+
+async function savePersonalInfo() {
+  const sb   = window._sb;
+  const user = window._user;
+  if (!sb || !user) return;
+
+  const prenom = document.getElementById('ac-prenom').value.trim();
+  const nom    = document.getElementById('ac-nom').value.trim();
+  const tel    = document.getElementById('ac-tel').value.trim();
+  const email  = document.getElementById('ac-email').value.trim();
+  const mdp    = document.getElementById('ac-mdp').value;
+  const mdp2   = document.getElementById('ac-mdp2').value;
+  const msgEl  = document.getElementById('ac-personal-msg');
+
+  if (mdp && mdp !== mdp2) {
+    msgEl.textContent = '⚠ Les mots de passe ne correspondent pas.';
+    msgEl.style.color = '#f87171'; msgEl.style.display = 'block'; return;
+  }
+  if (mdp && mdp.length < 8) {
+    msgEl.textContent = '⚠ Mot de passe trop court (8 caractères minimum).';
+    msgEl.style.color = '#f87171'; msgEl.style.display = 'block'; return;
+  }
+
+  try {
+    // Mettre à jour le profil
+    const { error } = await sb.from('profiles').update({ prenom, nom, telephone: tel || null }).eq('id', user.id);
+    if (error) throw error;
+
+    // Mettre à jour l'email si changé
+    if (email && email !== user.email) {
+      const { error: emailError } = await sb.auth.updateUser({ email });
+      if (emailError) throw emailError;
+      msgEl.textContent = '✓ Profil mis à jour. Un email de confirmation a été envoyé à votre nouvelle adresse.';
+    } else {
+      msgEl.textContent = '✓ Informations personnelles mises à jour.';
+    }
+
+    // Mettre à jour le mot de passe si saisi
+    if (mdp) {
+      const { error: mdpError } = await sb.auth.updateUser({ password: mdp });
+      if (mdpError) throw mdpError;
+      document.getElementById('ac-mdp').value  = '';
+      document.getElementById('ac-mdp2').value = '';
+    }
+
+    // Mettre à jour le cache local
+    window._user = { ...window._user, prenom, nom, telephone: tel };
+    const nameEl = document.getElementById('user-name');
+    if (nameEl) nameEl.textContent = [prenom, nom].filter(Boolean).join(' ');
+
+    msgEl.style.color = 'var(--teal)';
+  } catch(err) {
+    msgEl.textContent = '⚠ Erreur : ' + err.message;
+    msgEl.style.color = '#f87171';
+  }
+  msgEl.style.display = 'block';
+}
+
+async function saveProfessionalInfo() {
+  const sb   = window._sb;
+  const user = window._user;
+  if (!sb || !user) return;
+
+  const rs      = document.getElementById('ac-rs').value.trim();
+  const siret   = document.getElementById('ac-siret').value.replace(/\s/g,'');
+  const orias   = document.getElementById('ac-orias').value.trim();
+  const metier  = document.getElementById('ac-metier').value;
+  const adresse = document.getElementById('ac-adresse').value.trim();
+  const cp      = document.getElementById('ac-cp').value.trim();
+  const ville   = document.getElementById('ac-ville').value.trim();
+  const adresseFull = [adresse, cp, ville].filter(Boolean).join(', ');
+  const msgEl   = document.getElementById('ac-pro-msg');
+
+  try {
+    const { error } = await sb.from('profiles').update({
+      raison_sociale: rs || null,
+      siret:          siret || null,
+      orias:          orias || null,
+      metier:         metier || null,
+      adresse:        adresseFull || null
+    }).eq('id', user.id);
+    if (error) throw error;
+
+    // Mettre à jour le cache
+    window._user = { ...window._user, raison_sociale: rs, siret, orias, metier, adresse: adresseFull };
+
+    // Masquer le bandeau ORIAS si renseigné
+    if (orias) {
+      document.getElementById('orias-banner').style.display = 'none';
+      document.getElementById('ac-orias').style.borderColor = '';
+      document.getElementById('ac-orias-hint').textContent  = '✓ Renseigné';
+      document.getElementById('ac-orias-hint').style.color  = 'var(--teal)';
+    }
+
+    msgEl.textContent = '✓ Informations professionnelles mises à jour.';
+    msgEl.style.color = 'var(--teal)';
+  } catch(err) {
+    msgEl.textContent = '⚠ Erreur : ' + err.message;
+    msgEl.style.color = '#f87171';
+  }
+  msgEl.style.display = 'block';
+}
+
+async function savePreferences() {
+  const sb   = window._sb;
+  const user = window._user;
+  if (!sb || !user) return;
+  const msgEl = document.getElementById('ac-pref-msg');
+
+  try {
+    const { error } = await sb.from('profiles').update({
+      notif_nouveaux_modules: document.getElementById('ac-notif-modules').checked,
+      notif_rappels_dda:      document.getElementById('ac-notif-rappels').checked,
+      notif_facturation:      document.getElementById('ac-notif-facturation').checked,
+    }).eq('id', user.id);
+    if (error) throw error;
+    msgEl.textContent = '✓ Préférences enregistrées.';
+    msgEl.style.color = 'var(--teal)';
+  } catch(err) {
+    msgEl.textContent = '⚠ Erreur : ' + err.message;
+    msgEl.style.color = '#f87171';
+  }
+  msgEl.style.display = 'block';
+}
+
+// ===== VIDEO EMBED =====
+function getVideoEmbedUrl(url) {
+  if (!url) return null;
+  const ytMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\s]+)/);
+  if (ytMatch) return `https://www.youtube.com/embed/${ytMatch[1]}?rel=0&modestbranding=1`;
+  const viMatch = url.match(/vimeo\.com\/(\d+)/);
+  if (viMatch) return `https://player.vimeo.com/video/${viMatch[1]}?title=0&byline=0`;
+  return null;
+}
+
+// ===== MODAL =====
+const OUTIL_URLS = {
+  'OUTIL-COMPARATEUR': '/outils/comparateur',
+  'OUTIL-CALCULATRICE': '/outils/emprunt',
+};
+
+function openModal(code) {
+  const mod = MODS[code];
+  if (!mod) return;
+  // Les outils redirigent vers leur page dédiée
+  if (mod.type === 'outil') {
+    const url = OUTIL_URLS[code];
+    if (url) window.location.href = url;
+    return;
+  }
+  const th     = THUMB[mod.sec] || THUMB['tp']; // fallback si section inconnue
+
+  const photo  = mod.thumb || MOD_PHOTO[code] || null;
+  if (photo) {
+    document.getElementById('modalHeaderBg').style.cssText = `background:url('${photo}') center/cover no-repeat; background-color:#0b0f1a;`;
+  } else {
+    document.getElementById('modalHeaderBg').style.background = 'linear-gradient(135deg,#071428 0%,#0d2a5c 100%)';
+  }
+  document.getElementById('modalHeaderVisual').textContent = '';
+  document.getElementById('modalCode').textContent  = code;
+  document.getElementById('modalTitle').textContent = mod.title;
+  document.getElementById('modalBadge').innerHTML = '';
+
+  const SEC_LBL = { tc:'Tronc Commun', reg:'Réglementaire', tp:'Technique Produit', tv:'Techniques de Vente', rc:'Réglementation Complémentaire', dc:'Développement Commercial', mc:'Management Commercial', pe:'Pratiques & Expertises', bm:'Benchmark', go:'Gestion & Organisation', cs:'Compétences Soft', aa:'Assurance Avancée' };
+  document.getElementById('modalMeta').innerHTML = `
+    <div class="modal-meta-item"><strong>⏱ ${mod.dur}</strong></div>
+    <div class="sep"></div>
+    <div class="modal-meta-item"><strong>${SEC_LBL[mod.sec] || mod.sec}</strong></div>
+    <div class="sep"></div>
+    <div class="modal-meta-item"><span class="mod-card-lvl lvl-${mod.lvl}" style="padding:3px 10px;border-radius:4px">${LVL_LBL[mod.lvl]}</span></div>
+    <div class="modal-actions">
+    </div>`;
+
+  const body = document.getElementById('modalBody');
+  body.innerHTML = mod.desc ? `<p class="modal-desc">${mod.desc}</p>` : '';
+
+  // Message si module déjà validé
+  if (mDone[code]) {
+    body.innerHTML += `<div style="
+      display:flex;align-items:center;gap:10px;
+      background:rgba(45,212,191,.06);border:1px solid rgba(45,212,191,.15);
+      border-radius:8px;padding:10px 14px;margin-bottom:16px;font-size:12px;color:#a0aec0;
+    ">
+      <span style="font-size:16px;flex-shrink:0;">✓</span>
+      <span><strong style="color:var(--teal);">Module déjà validé</strong> — Vous pouvez le revoir librement, mais il ne sera plus décompté dans vos 15h annuelles.</span>
+    </div>`;
+  }
+
+  // Variante outil
+  if (mod.type === 'outil') {
+    const thumbUrl = mod.thumb || (code === 'OUTIL-COMPARATEUR' ? 'https://images.unsplash.com/photo-1589330694653-ded6df03f754?w=600&q=75' : 'https://images.unsplash.com/photo-1631511258193-252ab3da6b8b?w=600&q=75');
+    card.innerHTML = `
+      <div class="mod-card-thumb">
+        <div class="mod-card-thumb-bg" style="background:url('${thumbUrl}') center/cover no-repeat;background-color:#0b0f1a;"></div>
+        <div class="mod-card-overlay"></div>
+        <div class="mod-card-play"><div class="mod-card-play-btn" style="border-radius:8px;padding-left:0;font-size:18px;">⚙</div></div>
+        <div class="mod-card-badges"></div>
+      </div>
+      <div class="mod-card-body">
+        <div class="mod-card-title">${mod.title}</div>
+        <div class="mod-card-meta">
+          <span class="mod-card-type" style="font-size:9px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;padding:2px 7px;border-radius:3px;background:rgba(200,168,75,.12);color:#c8a84b;border:1px solid rgba(200,168,75,.2);">⚙ Outil</span>
+          <span class="mod-card-dur" style="font-size:10px;color:var(--muted);">Accès libre</span>
+        </div>
+      </div>`;
+    card.addEventListener('click', () => openModal(code));
+    grid.appendChild(card);
+    return;
+  }
+
+  // Variante veille
+  if (mod.type === 'veille') {
+    document.getElementById('modalMeta').innerHTML = `
+      <div class="modal-meta-item"><strong>⏱ ${mod.dur}</strong></div>
+      <div class="sep"></div>
+      <div class="modal-meta-item"><strong>📡 Veille Hebdomadaire</strong></div>
+      ${mod.semaine ? `<div class="sep"></div><div class="modal-meta-item">S${mod.semaine.split('-W')[1]} · ${mod.semaine.split('-W')[0]}</div>` : ''}
+      <div class="sep"></div>
+      <div class="modal-meta-item">📰 ${mod.items_count || 0} article${(mod.items_count||0) > 1 ? 's' : ''}</div>`;
+    body.innerHTML += mod.content
+      ? `<div class="modal-content-area" style="font-size:14px;line-height:1.7;">${mod.content}</div>`
+      : '<p style="color:var(--muted);text-align:center;padding:40px;">Contenu en cours de chargement…</p>';
+    document.getElementById('modalOverlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+    startVeilleTimer(code, mod);
+    return;
+  }
+
+  if (mod.type === 'video' && mod.video_url) {
+    // Player vidéo embarqué
+    const embedUrl = getVideoEmbedUrl(mod.video_url);
+    if (embedUrl) {
+      body.innerHTML += `
+        <div style="width:100%;aspect-ratio:16/9;border-radius:8px;overflow:hidden;margin-bottom:20px;">
+          <iframe src="${embedUrl}" style="width:100%;height:100%;border:none;" allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>
+        </div>`;
+    } else {
+      body.innerHTML += `<div style="text-align:center;padding:32px;color:var(--muted);">
+        <a href="${mod.video_url}" target="_blank" style="color:var(--accent2);">▶ Voir la vidéo</a>
+      </div>`;
+    }
+  } else if (mod.content) {
+    body.innerHTML += `<div class="modal-content-area">${mod.content}</div>`;
+  } else {
+    body.innerHTML += `<div style="text-align:center;padding:48px 20px;color:var(--muted)"><div style="font-size:56px;margin-bottom:14px">📄</div><p>Contenu de ce module à venir prochainement.</p></div>`;
+  }
+  // Quiz : depuis MODS (chargé de Supabase) ou fallback QUIZZES hardcodé
+  const quizData = MODS[code]?.quiz_data || QUIZZES[code];
+  if (quizData) body.innerHTML += buildQuiz(code, quizData);
+
+  document.getElementById('modalOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  // Pas de timerStart — le temps est crédité à la validation du quiz uniquement
+}
+
+function buildQuiz(code, qs) {
+  if (!qs || !qs.length) return '';
+
+  // Mode exploration — quiz non disponible
+  if (window._explorationMode) {
+    return `<div class="quiz-wrap" style="text-align:center;padding:32px;">
+      <div style="font-size:32px;margin-bottom:12px;">🔒</div>
+      <div style="font-size:15px;font-weight:600;color:var(--white);margin-bottom:8px;">Quiz disponible après activation</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.6;">Votre mandat SEPA est en cours de validation. Les quiz et les attestations DDA seront accessibles dès confirmation (1-3 jours ouvrés).</div>
+    </div>`;
+  }
+  let html = `<div class="quiz-wrap">
+    <div class="quiz-header"><h3>🎯 Quiz de validation</h3><div class="quiz-score-circle" id="sc-${code}">—</div></div>
+    <div class="quiz-body" id="qb-${code}">
+      <div class="quiz-progress"><div class="quiz-progress-fill" id="qpf-${code}" style="width:0%"></div></div>`;
+  qs.forEach((q, i) => {
+    html += `<div class="quiz-question" id="qbl-${code}-${i}" ${i > 0 ? 'style="display:none"' : ''}>
+      <div class="q-num">Question ${i+1} / ${qs.length}</div>
+      <div class="q-text">${q.q}</div>
+      <div class="q-answers">`;
+    q.opts.forEach((opt, j) => {
+      html += `<div class="q-ans" id="qa-${code}-${i}-${j}" onclick="ansQ('${code}',${i},${j},${q.correct},${qs.length})">
+        <div class="q-radio"></div><div class="q-ans-text">${opt}</div></div>`;
+    });
+    html += `</div><div class="q-expl" id="qe-${code}-${i}">${q.exp}</div></div>`;
+  });
+  html += `</div>
+    <div class="quiz-results" id="qr-${code}">
+      <div class="quiz-score-big" id="rsc-${code}">0%</div>
+      <div class="quiz-result-label" id="rl-${code}">—</div>
+      <div class="quiz-result-sub" id="rs-${code}">—</div>
+
+    </div></div>`;
+  return html;
+}
+
+function ansQ(code, qi, sel, correct, total) {
+  const key = `${code}-${qi}`;
+  if (qSt[key + '-done']) return;
+  qSt[key + '-done'] = true;
+  qSt[key + '-ok']   = (sel === correct);
+  for (let j = 0; j < 4; j++) {
+    const el = document.getElementById(`qa-${code}-${qi}-${j}`);
+    if (!el) continue;
+    if (j === sel)     el.classList.add(sel === correct ? 'correct' : 'incorrect');
+    if (j === correct && sel !== correct) el.classList.add('correct');
+  }
+  const expl = document.getElementById(`qe-${code}-${qi}`);
+  if (expl) expl.classList.add('show');
+  const pf = document.getElementById(`qpf-${code}`);
+  if (pf) pf.style.width = (((qi+1)/total)*100) + '%';
+  setTimeout(() => {
+    if (qi+1 < total) {
+      const nb = document.getElementById(`qbl-${code}-${qi+1}`);
+      if (nb) nb.style.display = 'block';
+      const cur = document.getElementById(`qbl-${code}-${qi}`);
+      if (cur) cur.style.opacity = '.5';
+    } else {
+      showQuizResults(code, total);
+    }
+  }, 1300);
+}
+
+function showQuizResults(code, total) {
+  let ok = 0;
+  for (let i = 0; i < total; i++) if (qSt[`${code}-${i}-ok`]) ok++;
+  const pct = Math.round((ok/total)*100), passed = pct >= 70;
+  document.getElementById(`qpf-${code}`).style.width = '100%';
+  document.getElementById(`qb-${code}`).style.display = 'none';
+  document.getElementById(`qr-${code}`).classList.add('show');
+  document.getElementById(`rsc-${code}`).textContent = pct + '%';
+  document.getElementById(`sc-${code}`).textContent  = pct + '%';
+  document.getElementById(`rl-${code}`).textContent  = passed ? '✅ Quiz réussi !' : '⚠️ À retravailler';
+  document.getElementById(`rs-${code}`).textContent  = `${ok} / ${total} bonnes réponses · ${passed ? 'Attestation DDA disponible' : 'Score minimum requis : 70%'}`;
+  if (passed) {
+    markDone(code);
+    const mod = MODS[code];
+    if (mod) {
+      const mins = parseInt(mod.dur) || 0;
+      timerTotal += mins * 60;
+      localStorage.setItem('ddaTimer3', timerTotal); // cache local
+      // Sauvegarder progression complète en Supabase
+      saveProgressToSupabase(code, timerTotal, true, pct);
+      timerRender();
+      const timerEl = document.getElementById('ddaTimer');
+      const badge   = document.getElementById('topTimerBadge');
+      if (timerEl) timerEl.classList.add('visible');
+      if (badge)   badge.style.display = 'flex';
+      if (timerTotal >= 15 * 3600) showAnnualCertificate();
+    }
+  } else {
+    // Sauvegarder tentative échouée
+    saveProgressToSupabase(code, timerTotal, false, pct);
+  }
+  toast(passed ? `🏆 Quiz réussi ! (${pct}%) — ${parseInt((MODS[code]||{}).dur)||0} min crédités` : `💪 Score : ${pct}% · Réessayez pour atteindre 70%`);
+}
+
+function markDone(code) {
+  mDone[code] = true;
+  localStorage.setItem('ddaDone', JSON.stringify(mDone)); // cache local
+  toast('✓ Module marqué comme terminé');
+  renderCatalogue();
+}
+
+// ===== ATTESTATION / CERTIFICAT =====
+async function downloadAttestation() {
+  const btn = document.getElementById('btn-attestation');
+  if (!window._user?.orias) {
+    toast('⚠ Renseignez votre N° ORIAS dans Mon compte pour obtenir votre attestation.');
+    goView('account');
+    setTimeout(() => {
+      const oriasEl = document.getElementById('ac-orias');
+      if (oriasEl) { oriasEl.focus(); oriasEl.style.borderColor = 'rgba(251,191,36,.6)'; }
+    }, 300);
+    return;
+  }
+
+  if (btn) { btn.textContent = '⏳ Génération en cours…'; btn.disabled = true; }
+
+  try {
+    const { data: { session } } = await window._sb.auth.getSession();
+    if (!session) throw new Error('Session expirée');
+
+    const SUPABASE_URL = 'https://vrufldjydjrgcqwhmpnt.supabase.co';
+    const res = await fetch(`${SUPABASE_URL}/functions/v1/generate-attestation`, {
+      method:  'POST',
+      headers: { 'Authorization': 'Bearer ' + session.access_token }
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.error || 'Erreur serveur');
+    }
+
+    // Déclencher le téléchargement
+    const blob     = await res.blob();
+    const url      = URL.createObjectURL(blob);
+    const a        = document.createElement('a');
+    const isOfficial = timerTotal >= 15 * 3600;
+    a.href         = url;
+    a.download     = isOfficial ? 'certificat-dda.pdf' : 'attestation-suivi-dda.pdf';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    toast(isOfficial ? '🏆 Certificat DDA téléchargé !' : '✓ Attestation de suivi téléchargée');
+  } catch(err) {
+    toast('⚠ Erreur : ' + err.message);
+  } finally {
+    if (btn) {
+      const isOfficial = timerTotal >= 15 * 3600;
+      btn.textContent = isOfficial ? '⬇ Télécharger mon certificat DDA' : '⬇ Télécharger mon attestation';
+      btn.disabled = false;
+      if (isOfficial) btn.style.background = 'rgba(45,212,191,.12)';
+    }
+  }
+}
+
+function showAnnualCertificate() {
+  // Redirige vers downloadAttestation — le certificat est maintenant généré côté serveur
+  downloadAttestation();
+  toast('🏆 15h atteintes ! Génération de votre certificat DDA…');
+}
+function closeModal(e) {
+  if (e.target === document.getElementById('modalOverlay')) {
+    const modal = document.getElementById('modalContent');
+    if (modal) {
+      modal.classList.remove('shake');
+      void modal.offsetWidth;
+      modal.classList.add('shake');
+      setTimeout(() => modal.classList.remove('shake'), 400);
+    }
+  }
+}
+function closeModalDirect() {
+  stopVeilleTimer();
+  // Arrêter la lecture vidéo en vidant le src de l'iframe
+  const iframe = document.querySelector('#modalBody iframe');
+  if (iframe) { iframe.src = iframe.src; }
+  document.getElementById('modalOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+// ===== VEILLE TIMER =====
+let _veilleTimer   = null;
+let _veilleSeconds = 0;
+const VEILLE_MAX  = 1800;
+const VEILLE_STEP = 600;
+
+function startVeilleTimer(code, mod) {
+  stopVeilleTimer();
+  _veilleSeconds = Math.min(mProgress[code]?.seconds_spent || 0, VEILLE_MAX);
+  if (_veilleSeconds >= VEILLE_MAX) return; // déjà validé
+
+  _veilleTimer = setInterval(async () => {
+    _veilleSeconds += VEILLE_STEP;
+    await callVeilleTimeAPI(code, VEILLE_STEP);
+    if (_veilleSeconds >= VEILLE_MAX) {
+      stopVeilleTimer();
+      markDone(code);
+      toast('🏆 Veille lue ! Module validé.');
+    }
+  }, VEILLE_STEP * 1000);
+}
+
+function stopVeilleTimer() {
+  if (_veilleTimer) { clearInterval(_veilleTimer); _veilleTimer = null; }
+}
+
+async function callVeilleTimeAPI(code, increment) {
+  try {
+    const session = window._sbSession || (await window._sb.auth.getSession())?.data?.session;
+    if (!session) return;
+    await fetch('/api/veille-time', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        module_code: code,
+        user_id:     session.user.id,
+        increment
+      })
+    });
+    // Mettre à jour le cache local
+    if (!mProgress[code]) mProgress[code] = { seconds_spent: 0 };
+    mProgress[code].seconds_spent = Math.min(
+      (mProgress[code].seconds_spent || 0) + increment,
+      VEILLE_MAX
+    );
+  } catch(e) {
+    console.warn('veille-time API error', e);
+  }
+}
+
+// ===== TOAST =====
+function toast(msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toastTxt').textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+// Topbar scroll
+window.addEventListener('scroll', () => {
+  document.getElementById('topbar').classList.toggle('scrolled', window.scrollY > 40);
+});
+
+// ===== INIT — chargement Supabase au démarrage =====
+window.addEventListener('DOMContentLoaded', async () => {
+
+  // 1. VÉRIFICATION AUTH
+  try {
+    const { data: { session } } = await window._sb.auth.getSession();
+
+    if (!session) {
+      window.location.href = '/?auth=required';
+      return;
+    }
+
+    const { data: sub } = await window._sb.from('subscriptions')
+      .select('status, current_period_end, created_at')
+      .eq('user_id', session.user.id)
+      .maybeSingle();
+
+    // Mode exploration : accès 48h pour les mandats en attente de validation
+    const urlParams      = new URLSearchParams(window.location.search);
+    const isExploration  = urlParams.get('mode') === 'exploration' || sub?.status === 'pending';
+    // Accès exploration : tout mandat pending dans les 7 jours (marge large)
+    const explorationOk = sub?.status === 'pending' &&
+      (!sub.created_at || (Date.now() - new Date(sub.created_at).getTime()) < 7 * 24 * 60 * 60 * 1000);
+
+    if (!sub) {
+      // Pas d'abonnement du tout → redirection
+      window.location.href = '/?subscription=inactive';
+      return;
+    }
+
+    if (!['active'].includes(sub.status) && !explorationOk) {
+      window.location.href = '/?subscription=inactive';
+      return;
+    }
+
+    // Stocker le mode pour la plateforme
+    window._explorationMode = isExploration && explorationOk;
+
+    // Nettoyer l'URL
+    if (urlParams.get('mode')) window.history.replaceState({}, '', '/formation');
+
+    const { data: profile } = await window._sb.from('profiles')
+      .select('prenom, nom, raison_sociale, orias, metier, role')
+      .eq('id', session.user.id)
+      .single();
+
+    window._user     = { ...session.user, ...profile, subscription: sub };
+    window._sbSession = session;
+
+    // Afficher le nom dans la topbar
+    const prenom   = profile?.prenom || '';
+    const nameEl   = document.getElementById('user-name');
+    const logoutEl = document.getElementById('btn-logout');
+    const accountEl = document.getElementById('btn-account');
+    const adminEl  = document.getElementById('admin-link-contenu');
+    const fullName = [prenom, profile?.nom].filter(Boolean).join(' ');
+    if (fullName && nameEl)  { nameEl.textContent = fullName; nameEl.style.display = 'block'; }
+    if (logoutEl)  logoutEl.style.display  = 'block';
+    if (accountEl) accountEl.style.display = 'block';
+    if (adminEl && profile?.role === 'admin') adminEl.style.display = 'inline-flex';
+
+    // Bandeau ORIAS si manquant
+    if (!profile?.orias && !window._explorationMode) {
+      const banner = document.getElementById('orias-banner');
+      if (banner) banner.style.display = 'flex';
+    }
+
+    // Message de bienvenue personnalisé
+    const titleEl = document.getElementById('ob-title');
+    const subEl   = document.getElementById('ob-sub');
+    if (prenom && titleEl) {
+      titleEl.innerHTML = `<span class="ob-greeting">Bonjour,</span><em>${prenom}</em>`;
+    }
+
+    // Bannière mode exploration
+    if (window._explorationMode) {
+      const banner = document.createElement('div');
+      banner.id = 'exploration-banner';
+      banner.style.cssText = `
+        position:fixed;bottom:0;left:0;right:0;z-index:200;
+        background:linear-gradient(90deg,#0d2a5c,#071428);
+        border-top:1px solid rgba(61,127,255,.3);
+        padding:12px 24px;display:flex;align-items:center;justify-content:space-between;
+        font-family:'DM Sans',sans-serif;gap:16px;flex-wrap:wrap;
+      `;
+      banner.innerHTML = `
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span style="font-size:16px;">⏳</span>
+          <span style="font-size:13px;color:#c8d4e8;">
+            <strong style="color:#6b9fff;">Mode exploration</strong> — 
+            Votre mandat SEPA est en cours de validation (1-3 jours ouvrés). 
+            Vous pouvez parcourir le catalogue librement. Les quiz seront disponibles dès l'activation.
+          </span>
+        </div>
+        <a href="/" style="font-size:11px;font-weight:700;color:#6b9fff;text-decoration:none;
+          background:rgba(61,127,255,.15);border:1px solid rgba(61,127,255,.3);
+          border-radius:5px;padding:5px 12px;white-space:nowrap;">
+          Retour à l'accueil
+        </a>
+      `;
+      document.body.appendChild(banner);
+    }
+
+    // Rappel compteur si progression existante
+    if (subEl && timerTotal > 0) {
+      const heures  = Math.floor(timerTotal / 3600);
+      const minutes = Math.floor((timerTotal % 3600) / 60);
+      const restant = Math.max(0, 15 * 3600 - timerTotal);
+      const rh = Math.floor(restant / 3600);
+      const rm = Math.floor((restant % 3600) / 60);
+      const pct = Math.min(100, Math.round(timerTotal / (15*3600) * 100));
+      if (timerTotal >= 15 * 3600) {
+        subEl.innerHTML = `🏆 Vous avez atteint vos <strong>15h DDA</strong> cette année. Félicitations !`;
+      } else {
+        subEl.innerHTML = `Vous avez complété <strong>${heures}h ${minutes}min</strong> sur 15h (${pct}%). Il vous reste <strong>${rh}h ${rm}min</strong> pour valider votre obligation annuelle.`;
+      }
+    }
+
+    // Redirection vers dernière vue si connue
+    const lastView = localStorage.getItem('dda-last-view');
+    if (lastView && lastView !== 'onboarding') {
+      // Vérifier que le profil est déjà complété
+      const lastType = localStorage.getItem('dda-last-type');
+      if (lastType) {
+        P.type   = lastType;
+        P.prods  = JSON.parse(localStorage.getItem('dda-last-prods') || '[]');
+        P.niveau = localStorage.getItem('dda-last-niveau') || 'debutant';
+      }
+    }
+
+  } catch (err) {
+    console.error('Auth check error:', err);
+  }
+
+  // 2. CHARGEMENT MODULES depuis Supabase
+  const body = document.getElementById('cat-body');
+  if (body) body.innerHTML = `
+    <div style="text-align:center;padding:80px 20px;color:var(--muted);">
+      <div style="font-size:32px;margin-bottom:12px;">⟳</div>
+      <div style="font-size:14px;">Chargement du catalogue…</div>
+    </div>`;
+  loadFromSupabase();
+});
+</script>
+</body>
+</html>

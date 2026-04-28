@@ -1,0 +1,74 @@
+{
+  "rewrites": [
+    {
+      "source": "/",
+      "destination": "/DDAFLIX-Landing_Funnel.html"
+    },
+    {
+      "source": "/formation",
+      "destination": "/DDAFLIX-Contenu.html"
+    },
+    {
+      "source": "/admin",
+      "destination": "/DDAFLIX-Admin.html"
+    },
+    {
+      "source": "/outils/comparateur",
+      "destination": "/DDAFLIX-Comparateur.html"
+    },
+    {
+      "source": "/outils/emprunt",
+      "destination": "/DDAFLIX-Emprunt.html"
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/DDAFLIX-Admin.html",
+      "destination": "/admin",
+      "permanent": false
+    },
+    {
+      "source": "/DDAFLIX-Contenu.html",
+      "destination": "/formation",
+      "permanent": false
+    },
+    {
+      "source": "/DDAFLIX-Landing_Funnel.html",
+      "destination": "/",
+      "permanent": false
+    }
+  ],
+  "crons": [
+    {
+      "path": "/api/cron/veille-hebdo",
+      "schedule": "0 5 * * 1"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(), microphone=(), geolocation=()"
+        },
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://api.unsplash.com https://api.anthropic.com https://vrufldjydjrgcqwhmpnt.supabase.co wss://vrufldjydjrgcqwhmpnt.supabase.co https://recherche-entreprises.api.gouv.fr https://api-adresse.data.gouv.fr https://www.googleapis.com https://img.youtube.com https://vimeo.com/api https://fast.wistia.net https://api.piste.gouv.fr https://oauth.piste.gouv.fr; img-src 'self' data: blob: https://img.youtube.com https://i.ytimg.com https://images.unsplash.com https://i.vimeocdn.com https://*.supabase.co https://lh3.googleusercontent.com https://yt3.ggpht.com https://yt3.googleusercontent.com; frame-src https://www.youtube.com https://player.vimeo.com https://fast.wistia.net; object-src 'none';"
+        }
+      ]
+    }
+  ]
+}

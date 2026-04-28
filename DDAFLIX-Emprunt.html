@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNyIgZmlsbD0iIzBiMGYxYSIvPgogIDxwYXRoIGQ9Ik04IDZoOGMyLjUgMCA0LjUgMS44IDQuNSA0LjIgMCAxLjQtLjcgMi42LTEuOCAzLjMgMS41LjcgMi41IDIuMSAyLjUgMy44QzIxLjIgMjAgMTkgMjIgMTYuMiAyMkg4VjZ6bTMgM3Y0aDQuNWMxIDAgMS44LS44IDEuOC0ycy0uOC0yLTEuOC0ySDExem0wIDd2NGg1YzEuMSAwIDItLjkgMi0ycy0uOS0yLTItMmgtNXoiIGZpbGw9IiMzZDdmZmYiLz4KICA8Y2lyY2xlIGN4PSIyNSIgY3k9IjI1IiByPSI0LjUiIGZpbGw9IiMyZGQ0YmYiLz4KPC9zdmc+">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculatrice emprunt & assurance — BingeDDA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:      #080c14;
+  --bg2:     #0b0f1a;
+  --bg3:     #0f1628;
+  --surface: #141e30;
+  --s2:      #1a2640;
+  --accent:  #3d7fff;
+  --accent2: #6b9fff;
+  --teal:    #2dd4bf;
+  --gold:    #e0c472;
+  --red:     #ef4444;
+  --green:   #22c55e;
+  --text:    #c8d4e8;
+  --muted:   #5a6a88;
+  --white:   #f0f4ff;
+  --border:  rgba(61,127,255,0.15);
+  --border2: rgba(61,127,255,0.25);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden;}
+.topbar{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(8,12,20,0.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 2rem;height:56px;}
+.topbar-logo{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:var(--white);}
+.topbar-logo span{color:var(--accent);}
+.topbar-badge{background:var(--surface);border:1px solid var(--border2);border-radius:20px;padding:4px 14px;font-size:0.7rem;font-weight:600;letter-spacing:0.08em;color:var(--teal);text-transform:uppercase;}
+.topbar-back{font-size:0.82rem;color:var(--muted);cursor:pointer;transition:color 0.2s;background:none;border:none;font-family:inherit;}
+.topbar-back:hover{color:var(--white);}
+.hero{padding:88px 2rem 32px;text-align:center;max-width:720px;margin:0 auto;}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border2);border-radius:20px;padding:5px 16px;font-size:0.7rem;font-weight:600;letter-spacing:0.1em;color:var(--accent);text-transform:uppercase;margin-bottom:18px;}
+.hero h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(2rem,5vw,3.2rem);line-height:1.05;color:var(--white);letter-spacing:0.02em;margin-bottom:12px;}
+.hero h1 em{color:var(--accent);font-style:normal;}
+.hero-sub{font-size:0.9rem;color:var(--muted);line-height:1.6;}
+.main{max-width:1100px;margin:0 auto;padding:0 1.5rem 5rem;}
+.grid-main{display:grid;grid-template-columns:340px 1fr;gap:24px;align-items:start;}
+.grid-left{display:flex;flex-direction:column;}
+.grid-left.assur-mode{flex-direction:row;gap:16px;}
+.grid-left.assur-mode .card{flex:1;min-width:0;margin-bottom:0;}
+@media(max-width:820px){.grid-main{grid-template-columns:1fr;}.grid-left.assur-mode{flex-direction:column;}}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:1.6rem;margin-bottom:20px;animation:fadeUp 0.35s ease forwards;}
+.card:last-child{margin-bottom:0;}
+.card-title{font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:0.05em;color:var(--white);margin-bottom:1.2rem;display:flex;align-items:center;gap:10px;}
+.card-title-icon{width:24px;height:24px;border-radius:6px;background:rgba(61,127,255,0.15);display:flex;align-items:center;justify-content:center;font-size:0.8rem;}
+.type-switch{display:flex;gap:6px;margin-bottom:1.2rem;}
+.type-btn{flex:1;padding:7px 8px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:0.75rem;font-weight:600;cursor:pointer;transition:all 0.2s;}
+.type-btn.active{background:rgba(61,127,255,0.15);border-color:var(--accent);color:var(--accent);}
+.field{margin-bottom:1rem;}
+.field label{display:block;font-size:0.68rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);margin-bottom:4px;}
+.field-value{display:flex;align-items:baseline;justify-content:space-between;}
+.field-num{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;color:var(--white);letter-spacing:0.02em;}
+.field-unit{font-size:0.72rem;color:var(--muted);}
+input[type=range]{width:100%;-webkit-appearance:none;height:3px;border-radius:2px;background:var(--s2);outline:none;cursor:pointer;margin-top:6px;}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 0 0 3px rgba(61,127,255,0.18);}
+input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:var(--accent);cursor:pointer;border:none;}
+.result-hero{background:rgba(45,212,191,0.07);border:1px solid rgba(45,212,191,0.2);border-radius:12px;padding:1rem 1.2rem;text-align:center;margin-bottom:12px;}
+.result-hero-label{font-size:0.65rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;}
+.result-hero-value{font-family:'Bebas Neue',sans-serif;font-size:2.2rem;color:var(--teal);letter-spacing:0.03em;line-height:1;}
+.result-hero-sub{font-size:0.68rem;color:var(--muted);margin-top:5px;line-height:1.5;}
+.results-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.result-card{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:0.9rem 1rem;text-align:center;}
+.result-label{font-size:0.6rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);margin-bottom:5px;}
+.result-value{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:0.02em;}
+.result-value.gold{color:var(--gold);}
+.result-value.white{color:var(--white);}
+.result-value.muted{color:var(--muted);}
+.result-sub{font-size:0.62rem;color:var(--muted);margin-top:2px;}
+.cost-bar-wrap{margin:12px 0;}
+.cost-bar-label{display:flex;gap:12px;font-size:0.65rem;margin-bottom:5px;}
+.cost-bar{height:6px;border-radius:3px;background:var(--s2);overflow:hidden;display:flex;gap:2px;}
+.cost-bar-capital{background:var(--accent);transition:width 0.35s ease;}
+.cost-bar-interets{background:var(--gold);transition:width 0.35s ease;}
+.cost-bar-assurance{background:rgba(45,212,191,0.6);transition:width 0.35s ease;}
+.taea-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0;}
+.taea-card{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:0.9rem 1rem;text-align:center;}
+.taea-card.better{border-color:rgba(45,212,191,0.3);background:rgba(45,212,191,0.05);}
+.taea-label{font-size:0.6rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);margin-bottom:5px;}
+.taea-value{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:0.02em;color:var(--white);}
+.taea-value.teal{color:var(--teal);}
+.taea-sub{font-size:0.62rem;color:var(--muted);margin-top:2px;}
+.economie-banner{background:rgba(34,197,94,0.07);border:1px solid rgba(34,197,94,0.2);border-radius:10px;padding:0.8rem 1rem;margin-top:10px;display:none;}
+.economie-banner.show{display:block;}
+.economie-text{font-size:0.82rem;color:var(--green);font-weight:600;}
+.economie-sub{font-size:0.7rem;color:var(--muted);margin-top:3px;}
+.toggle-table{width:100%;margin-top:12px;background:transparent;border:1px solid var(--border2);border-radius:8px;padding:8px;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:0.75rem;font-weight:600;cursor:pointer;transition:all 0.2s;}
+.toggle-table:hover{border-color:var(--accent);color:var(--accent);}
+.btn-export{width:100%;margin-top:8px;display:flex;align-items:center;justify-content:center;gap:8px;padding:9px;border-radius:8px;background:rgba(45,212,191,0.1);border:1px solid rgba(45,212,191,0.25);color:var(--teal);font-family:'DM Sans',sans-serif;font-size:0.78rem;font-weight:600;cursor:pointer;transition:all 0.2s;}
+.btn-export:hover{background:rgba(45,212,191,0.2);}
+.table-wrap{overflow-x:auto;margin-top:1rem;}
+.amort-table{width:100%;border-collapse:collapse;font-size:0.74rem;}
+.amort-table th{background:var(--bg3);color:var(--muted);font-weight:700;letter-spacing:0.06em;text-transform:uppercase;font-size:0.6rem;padding:7px 10px;text-align:right;border-bottom:1px solid var(--border2);}
+.amort-table th:first-child{text-align:left;}
+.amort-table td{padding:6px 10px;text-align:right;border-bottom:1px solid var(--border);color:var(--text);font-variant-numeric:tabular-nums;}
+.amort-table td:first-child{text-align:left;color:var(--muted);font-size:0.7rem;}
+.amort-table tr:last-child td{border-bottom:none;font-weight:600;color:var(--white);}
+.amort-table tr:hover td{background:rgba(61,127,255,0.03);}
+.td-interets{color:var(--gold);}
+.td-capital{color:var(--accent2);}
+.td-assB{color:var(--muted);}
+.td-assD{color:var(--teal);}
+.td-restant{color:var(--muted);}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+</style>
+</head>
+<body>
+
+<nav class="topbar">
+  <div class="topbar-logo"><span>Binge</span>DDA</div>
+  <div class="topbar-badge">🧮 Outil · Emprunt</div>
+  <button class="topbar-back" onclick="window.location.href='/formation?view=catalogue'">← Retour au catalogue</button>
+</nav>
+
+<div class="hero">
+  <div class="hero-eyebrow">🧮 Outil professionnel</div>
+  <h1>Calculatrice <em>emprunt & assurance</em></h1>
+  <p class="hero-sub">Mensualités, coût total, TAEG et TAEA. Comparez l'assurance groupe de la banque et une assurance déléguée, et exportez le tableau d'amortissement en PDF.</p>
+</div>
+
+<div class="main">
+  <div class="grid-main">
+
+    <div class="grid-left">
+      <div class="card">
+        <div class="card-title"><div class="card-title-icon">⚙</div>Type de calcul</div>
+        <div class="type-switch">
+          <button class="type-btn active" data-type="credit" onclick="setType(this)">Crédit</button>
+          <button class="type-btn" data-type="immo" onclick="setType(this)">Crédit Immobilier</button>
+          <button class="type-btn" data-type="assurance" onclick="setType(this)">Assurance emprunteur</button>
+        </div>
+        <div class="field">
+          <label>Montant emprunté</label>
+          <div class="field-value"><div class="field-num" id="valCapital">200 000</div><div class="field-unit">€</div></div>
+          <input type="range" id="slCapital" min="5000" max="1000000" step="5000" value="200000" oninput="update()">
+        </div>
+        <div class="field">
+          <label>Durée</label>
+          <div class="field-value"><div class="field-num" id="valDuree">20</div><div class="field-unit">ans</div></div>
+          <input type="range" id="slDuree" min="1" max="30" step="1" value="20" oninput="update()">
+        </div>
+        <div class="field">
+          <label>Taux d'intérêt annuel</label>
+          <div class="field-value"><div class="field-num" id="valTaux">3,50</div><div class="field-unit">%</div></div>
+          <input type="range" id="slTaux" min="0.1" max="15" step="0.05" value="3.5" oninput="update()">
+        </div>
+        <div class="field">
+          <label>Apport personnel</label>
+          <div class="field-value"><div class="field-num" id="valApport">0</div><div class="field-unit">€</div></div>
+          <input type="range" id="slApport" min="0" max="500000" step="1000" value="0" oninput="update()">
+        </div>
+        <div class="field">
+          <label>Frais de dossier</label>
+          <div class="field-value"><div class="field-num" id="valFrais">1 000</div><div class="field-unit">€</div></div>
+          <input type="range" id="slFrais" min="0" max="5000" step="100" value="1000" oninput="update()">
+        </div>
+      </div>
+
+      <div class="card" id="cardAssurance" style="display:none;">
+        <div class="card-title"><div class="card-title-icon">🛡</div>Assurance emprunteur</div>
+        <div class="field">
+          <label>Cotisation assurance banque (% annuel / capital initial)</label>
+          <div class="field-value"><div class="field-num" id="valAssurBanque">0,36</div><div class="field-unit">%</div></div>
+          <input type="range" id="slAssurBanque" min="0.05" max="1.5" step="0.01" value="0.36" oninput="update()">
+        </div>
+        <div class="field">
+          <label>Cotisation assurance déléguée (% annuel / capital initial)</label>
+          <div class="field-value"><div class="field-num" id="valAssurDel">0,18</div><div class="field-unit">%</div></div>
+          <input type="range" id="slAssurDel" min="0.05" max="1.5" step="0.01" value="0.18" oninput="update()">
+        </div>
+        <div class="taea-grid">
+          <div class="taea-card">
+            <div class="taea-label">TAEA banque</div>
+            <div class="taea-value" id="resTAEABanque">—</div>
+            <div class="taea-sub">Taux Annuel Effectif Assurance</div>
+          </div>
+          <div class="taea-card better">
+            <div class="taea-label">TAEA délégué</div>
+            <div class="taea-value teal" id="resTAEADel">—</div>
+            <div class="taea-sub">Taux Annuel Effectif Assurance</div>
+          </div>
+        </div>
+        <div class="economie-banner" id="economieBanner">
+          <div class="economie-text" id="economieText"></div>
+          <div class="economie-sub" id="economieSub"></div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="card">
+        <div class="card-title"><div class="card-title-icon">📊</div>Résultats</div>
+        <div class="result-hero">
+          <div class="result-hero-label">Mensualité hors assurance</div>
+          <div class="result-hero-value" id="resMensualite">—</div>
+          <div class="result-hero-sub" id="resMensualiteSub"></div>
+        </div>
+        <div class="results-grid">
+          <div class="result-card">
+            <div class="result-label">Coût intérêts</div>
+            <div class="result-value gold" id="resCoutInterets">—</div>
+            <div class="result-sub">sur toute la durée</div>
+          </div>
+          <div class="result-card" id="resCardAssur">
+            <div class="result-label">Assurance banque (total)</div>
+            <div class="result-value white" id="resAssurBanqueTotal">—</div>
+            <div class="result-sub">sur toute la durée</div>
+          </div>
+          <div class="result-card">
+            <div class="result-label">Total à rembourser</div>
+            <div class="result-value white" id="resTotal">—</div>
+            <div class="result-sub">capital + intérêts + ass. + frais</div>
+          </div>
+          <div class="result-card">
+            <div class="result-label">TAEG estimé</div>
+            <div class="result-value muted" id="resTAEG">—</div>
+            <div class="result-sub" id="resTAEGSub">avec assurance banque</div>
+          </div>
+        </div>
+        <div class="cost-bar-wrap" id="costBarWrap">
+          <div class="cost-bar-label">
+            <span style="color:var(--accent)">■ Capital</span>
+            <span style="color:var(--gold)">■ Intérêts</span>
+            <span style="color:var(--teal)">■ Assurance</span>
+          </div>
+          <div class="cost-bar">
+            <div class="cost-bar-capital" id="barCapital"></div>
+            <div class="cost-bar-interets" id="barInterets"></div>
+            <div class="cost-bar-assurance" id="barAssurance"></div>
+          </div>
+        </div>
+        <div id="creditActions">
+          <button class="toggle-table" id="btnToggle" onclick="toggleTable()">▾ Afficher le tableau d'amortissement</button>
+          <button class="btn-export" onclick="exportPDF()">📄 Exporter PDF</button>
+        </div>
+      </div>
+
+      <div class="card" id="tableCard" style="display:none;">
+        <div class="card-title"><div class="card-title-icon">📋</div>Tableau d'amortissement annuel</div>
+        <div class="table-wrap">
+          <table class="amort-table">
+            <thead>
+              <tr>
+                <th>Année</th><th>Mensualité</th><th>Capital</th>
+                <th>Intérêts</th><th>Ass. banque</th><th>Ass. déléguée</th><th>Restant dû</th>
+              </tr>
+            </thead>
+            <tbody id="amortBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+let loanType = 'credit';
+let tableVisible = false;
+const PRESETS = {
+  credit:    {capital:15000,  duree:5,  taux:5.5, apport:0, frais:300,  capMax:75000,   capStep:500,  dureeMax:10, tauxMax:25},
+  immo:      {capital:200000, duree:20, taux:3.5, apport:0, frais:1000, capMax:1000000, capStep:5000, dureeMax:30, tauxMax:8 },
+  assurance: {capital:200000, duree:20, taux:3.5, apport:0, frais:0,    capMax:1000000, capStep:5000, dureeMax:30, tauxMax:8 },
+};
+function fmt(n,dec=0){return n.toLocaleString('fr-FR',{minimumFractionDigits:dec,maximumFractionDigits:dec});}
+
+function applyVisibility(){
+  const isAssur = loanType === 'assurance';
+  const isCreditMode = !isAssur;
+  // Section assurance
+  document.getElementById('cardAssurance').style.display = isAssur ? 'block' : 'none';
+  // Éléments résultats masqués en mode crédit pur
+  document.getElementById('resCardAssur').style.display = isCreditMode ? 'none' : '';
+  document.getElementById('costBarWrap').style.display = isCreditMode ? 'none' : '';
+  document.getElementById('creditActions').style.display = isAssur ? 'none' : '';
+  // Tableau d'amortissement masqué en mode assurance
+  if (isAssur && tableVisible) toggleTable();
+  // Libellé mensualité
+  document.getElementById('resMensualiteSub').style.display = isAssur ? 'none' : '';
+  // TAEG libellé
+  const taegSub = document.getElementById('resTAEGSub');
+  if (taegSub) taegSub.textContent = isAssur ? 'hors assurance' : 'avec assurance banque';
+}
+
+function setType(btn){
+  document.querySelectorAll('.type-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active'); loanType=btn.dataset.type;
+  const p=PRESETS[loanType];
+  const sl=id=>document.getElementById(id);
+  sl('slCapital').max=p.capMax;sl('slCapital').step=p.capStep;sl('slCapital').value=p.capital;
+  sl('slDuree').max=p.dureeMax;sl('slDuree').value=p.duree;
+  sl('slTaux').max=p.tauxMax;sl('slTaux').value=p.taux;
+  sl('slApport').max=p.capMax/2;sl('slApport').value=p.apport;
+  sl('slFrais').value=p.frais;
+  applyVisibility();
+  update();
+}
+function calcTAEG(net,n,mensT,frais){
+  if(net<=0||n===0)return 0;
+  let r=mensT/net/n;
+  const mn=net-frais;
+  for(let i=0;i<60;i++){
+    if(r<=0)r=0.0001;
+    const f=mensT*(1-Math.pow(1+r,-n))/r-mn;
+    const df=mensT*(Math.pow(1+r,-n)*n/r-(1-Math.pow(1+r,-n))/(r*r));
+    if(Math.abs(df)<1e-12)break;
+    r-=f/df;
+    if(Math.abs(f)<0.01)break;
+  }
+  return Math.max(0,r*12*100);
+}
+function calc(){
+  const capital=+document.getElementById('slCapital').value;
+  const duree=+document.getElementById('slDuree').value;
+  const taux=+document.getElementById('slTaux').value;
+  const apport=+document.getElementById('slApport').value;
+  const frais=+document.getElementById('slFrais').value;
+  const assurBanque=+document.getElementById('slAssurBanque').value;
+  const assurDel=+document.getElementById('slAssurDel').value;
+  const net=Math.max(0,capital-apport);
+  const n=duree*12;
+  const r=taux/100/12;
+  const mens=r===0?net/n:net*r*Math.pow(1+r,n)/(Math.pow(1+r,n)-1);
+  const assurBanqueM=net*assurBanque/100/12;
+  const assurDelM=net*assurDel/100/12;
+  const totInt=Math.max(0,mens*n-net);
+  const totAssB=assurBanqueM*n;
+  const totAssD=assurDelM*n;
+  const totGenB=net+totInt+totAssB+frais;
+  const economie=totAssB-totAssD;
+  const taegSans=calcTAEG(net,n,mens,frais);
+  const taegAvecBanque=calcTAEG(net,n,mens+assurBanqueM,frais);
+  const taegAvecDel=calcTAEG(net,n,mens+assurDelM,frais);
+  const taeaBanque=Math.max(0,taegAvecBanque-taegSans);
+  const taeaDel=Math.max(0,taegAvecDel-taegSans);
+  const rows=[];let restant=net;
+  for(let m=1;m<=n;m++){
+    const int=restant*r;const cap=mens-int;
+    restant=Math.max(0,restant-cap);
+    rows.push({m,mens,int,cap,assurBanqueM,assurDelM,restant});
+  }
+  return {capital,net,duree,taux,assurBanque,assurDel,apport,frais,mens,assurBanqueM,assurDelM,
+          totInt,totAssB,totAssD,totGenB,economie,taegAvecBanque,taeaBanque,taeaDel,rows};
+}
+function update(){
+  applyVisibility();
+  document.getElementById('valCapital').textContent=fmt(+document.getElementById('slCapital').value);
+  document.getElementById('valDuree').textContent=document.getElementById('slDuree').value;
+  document.getElementById('valTaux').textContent=fmt(+document.getElementById('slTaux').value,2).replace('.',',');
+  document.getElementById('valApport').textContent=fmt(+document.getElementById('slApport').value);
+  document.getElementById('valFrais').textContent=fmt(+document.getElementById('slFrais').value);
+  document.getElementById('valAssurBanque').textContent=fmt(+document.getElementById('slAssurBanque').value,2).replace('.',',');
+  document.getElementById('valAssurDel').textContent=fmt(+document.getElementById('slAssurDel').value,2).replace('.',',');
+  const d=calc();
+  document.getElementById('resMensualite').textContent=fmt(d.mens,2)+' €';
+  document.getElementById('resMensualiteSub').textContent='Avec ass. banque : '+fmt(d.mens+d.assurBanqueM,2)+' €/mois · Avec déléguée : '+fmt(d.mens+d.assurDelM,2)+' €/mois';
+  document.getElementById('resCoutInterets').textContent=fmt(d.totInt,0)+' €';
+  document.getElementById('resAssurBanqueTotal').textContent=fmt(d.totAssB,0)+' €';
+  document.getElementById('resTotal').textContent=fmt(d.totGenB,0)+' €';
+  document.getElementById('resTAEG').textContent=fmt(d.taegAvecBanque,2).replace('.',',')+' %';
+  document.getElementById('resTAEABanque').textContent=fmt(d.taeaBanque,2).replace('.',',')+' %';
+  document.getElementById('resTAEADel').textContent=fmt(d.taeaDel,2).replace('.',',')+' %';
+  const banner=document.getElementById('economieBanner');
+  if(d.economie>0){
+    banner.classList.add('show');
+    document.getElementById('economieText').textContent='↓ Économie avec assurance déléguée : '+fmt(d.economie,0)+' €';
+    document.getElementById('economieSub').textContent='Soit '+fmt(d.economie/d.duree,0)+' €/an · '+fmt(d.economie/12/d.duree,2)+' €/mois';
+  } else { banner.classList.remove('show'); }
+  const tot=d.net+d.totInt+d.totAssB;
+  if(tot>0){
+    document.getElementById('barCapital').style.width=Math.round(d.net/tot*100)+'%';
+    document.getElementById('barInterets').style.width=Math.round(d.totInt/tot*100)+'%';
+    document.getElementById('barAssurance').style.width=Math.round(d.totAssB/tot*100)+'%';
+  }
+  buildTable(d);
+}
+function buildTable(d){
+  const tbody=document.getElementById('amortBody');tbody.innerHTML='';
+  let a=1,capA=0,intA=0,assBA=0,assDA=0,menA=0,cnt=0;
+  d.rows.forEach((row,i)=>{
+    capA+=row.cap;intA+=row.int;assBA+=row.assurBanqueM;assDA+=row.assurDelM;menA+=row.mens;cnt++;
+    if(cnt===12||i===d.rows.length-1){
+      const tr=document.createElement('tr');
+      tr.innerHTML=`<td>Année ${a}</td><td>${fmt(menA/cnt,0)} €</td><td class="td-capital">${fmt(capA,0)} €</td><td class="td-interets">${fmt(intA,0)} €</td><td class="td-assB">${fmt(assBA,0)} €</td><td class="td-assD">${fmt(assDA,0)} €</td><td class="td-restant">${fmt(row.restant,0)} €</td>`;
+      tbody.appendChild(tr);
+      a++;capA=0;intA=0;assBA=0;assDA=0;menA=0;cnt=0;
+    }
+  });
+}
+function toggleTable(){
+  tableVisible=!tableVisible;
+  document.getElementById('tableCard').style.display=tableVisible?'block':'none';
+  document.getElementById('btnToggle').textContent=tableVisible?"▴ Masquer le tableau d'amortissement":"▾ Afficher le tableau d'amortissement";
+}
+let _jsPDFLoaded=false;
+function loadJsPDF(){
+  if(_jsPDFLoaded)return Promise.resolve();
+  return new Promise((res,rej)=>{
+    const s=document.createElement('script');
+    s.src='https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+    s.onload=()=>{_jsPDFLoaded=true;res();};s.onerror=rej;
+    document.head.appendChild(s);
+  });
+}
+async function exportPDF(){
+  const btn=document.querySelector('.btn-export');
+  btn.textContent='⏳ Génération…';btn.disabled=true;
+  try{
+    await loadJsPDF();
+    const{jsPDF}=window.jspdf;
+    const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+    const d=calc();const W=210,H=297;
+    const date=new Date().toLocaleDateString('fr-FR');
+    const C={bg:[8,12,20],surface:[20,30,48],accent:[61,127,255],teal:[45,212,191],gold:[224,196,114],muted:[90,106,136],white:[240,244,255],text:[200,212,232],green:[34,197,94]};
+    doc.setFillColor(...C.bg);doc.rect(0,0,W,H,'F');
+    doc.setFillColor(...C.surface);doc.rect(0,0,W,22,'F');
+    doc.setFillColor(...C.accent);doc.rect(0,0,2,22,'F');
+    doc.setFont('helvetica','bold');doc.setFontSize(14);doc.setTextColor(...C.accent);doc.text('Binge',7,14);
+    doc.setTextColor(...C.white);doc.text('DDA',23,14);
+    doc.setFontSize(10);doc.text('Calculatrice emprunt & assurance',42,14);
+    doc.setFontSize(8);doc.setTextColor(...C.muted);doc.text(date,W-8,14,{align:'right'});
+    let y=32;
+    const typeLabel=loanType==='immo'?'Crédit Immobilier':loanType==='assurance'?'Assurance emprunteur':'Crédit';
+    const section=t=>{doc.setFont('helvetica','bold');doc.setFontSize(7.5);doc.setTextColor(...C.muted);doc.text(t,8,y);y+=5;};
+    const row=(label,value,color)=>{
+      doc.setFont('helvetica','normal');doc.setFontSize(8);
+      doc.setTextColor(...C.muted);doc.text(label,10,y);
+      doc.setTextColor(...(color||C.text));doc.text(value,130,y,{align:'right'});
+      doc.setDrawColor(...C.surface);doc.line(10,y+1.5,130,y+1.5);y+=7;
+    };
+    section('PARAMÈTRES DU PRÊT');
+    row('Type de prêt',typeLabel);row('Capital emprunté',fmt(d.capital)+' €');row('Apport personnel',fmt(d.apport)+' €');
+    row('Capital net financé',fmt(d.net)+' €');row('Durée',d.duree+' ans ('+d.duree*12+' mois)');
+    row("Taux d'intérêt",fmt(d.taux,2).replace('.',',')+' %');row('Frais de dossier',fmt(d.frais)+' €');
+    y+=4;section('RÉSULTATS');
+    row('Mensualité (hors assurance)',fmt(d.mens,2)+' €',C.teal);
+    row('Avec assurance banque',fmt(d.mens+d.assurBanqueM,2)+' €/mois');
+    row('Avec assurance déléguée',fmt(d.mens+d.assurDelM,2)+' €/mois');
+    row("Coût total des intérêts",fmt(d.totInt,0)+' €',C.gold);
+    row('Total à rembourser (ass. banque)',fmt(d.totGenB,0)+' €');
+    row('TAEG estimé (avec ass. banque)',fmt(d.taegAvecBanque,2).replace('.',',')+' %');
+    y+=4;section('ASSURANCE EMPRUNTEUR — TAEA');
+    row('Cotisation assurance banque',fmt(d.assurBanque,2).replace('.',',')+' % / an');
+    row('Cotisation assurance déléguée',fmt(d.assurDel,2).replace('.',',')+' % / an');
+    row('TAEA assurance banque',fmt(d.taeaBanque,2).replace('.',',')+' %');
+    row('TAEA assurance déléguée',fmt(d.taeaDel,2).replace('.',',')+' %',C.teal);
+    row('Coût total assurance banque',fmt(d.totAssB,0)+' €');
+    row('Coût total assurance déléguée',fmt(d.totAssD,0)+' €',C.teal);
+    if(d.economie>0)row('Économie avec assurance déléguée',fmt(d.economie,0)+' €',C.green);
+    y+=4;section("TABLEAU D'AMORTISSEMENT ANNUEL");
+    const cols=['Année','Mensualité','Capital','Intérêts','Ass. banque','Ass. déléguée','Restant dû'];
+    const cx=[10,38,65,90,115,140,165];
+    doc.setFontSize(6.5);doc.setTextColor(...C.muted);doc.setFont('helvetica','bold');
+    cols.forEach((h,i)=>doc.text(h,cx[i],y,{align:i===0?'left':'right'}));
+    y+=2;doc.setDrawColor(...C.surface);doc.line(10,y,198,y);y+=4;
+    let a=1,capA=0,intA=0,assBA=0,assDA=0,menA=0,cnt=0;
+    doc.setFont('helvetica','normal');doc.setFontSize(7);
+    d.rows.forEach((r2,i)=>{
+      capA+=r2.cap;intA+=r2.int;assBA+=r2.assurBanqueM;assDA+=r2.assurDelM;menA+=r2.mens;cnt++;
+      if(cnt===12||i===d.rows.length-1){
+        if(y>H-14){doc.addPage();doc.setFillColor(...C.bg);doc.rect(0,0,W,H,'F');y=15;}
+        doc.setTextColor(...C.text);doc.text('Année '+a,cx[0],y);
+        doc.setTextColor(...C.text);doc.text(fmt(menA/cnt,0)+' €',cx[1],y,{align:'right'});
+        doc.setTextColor(...C.accent);doc.text(fmt(capA,0)+' €',cx[2],y,{align:'right'});
+        doc.setTextColor(...C.gold);doc.text(fmt(intA,0)+' €',cx[3],y,{align:'right'});
+        doc.setTextColor(...C.muted);doc.text(fmt(assBA,0)+' €',cx[4],y,{align:'right'});
+        doc.setTextColor(...C.teal);doc.text(fmt(assDA,0)+' €',cx[5],y,{align:'right'});
+        doc.setTextColor(...C.muted);doc.text(fmt(r2.restant,0)+' €',cx[6],y,{align:'right'});
+        doc.setDrawColor(...C.surface);doc.line(10,y+1.5,198,y+1.5);
+        y+=6;a++;capA=0;intA=0;assBA=0;assDA=0;menA=0;cnt=0;
+      }
+    });
+    const pages=doc.getNumberOfPages();
+    for(let p=1;p<=pages;p++){
+      doc.setPage(p);doc.setFillColor(...C.surface);doc.rect(0,H-8,W,8,'F');
+      doc.setFontSize(6);doc.setTextColor(...C.muted);
+      doc.text('BingeDDA · Calculatrice emprunt & assurance · Document à titre indicatif, ne constitue pas un conseil financier',8,H-3);
+      doc.text('Page '+p+'/'+pages,W-8,H-3,{align:'right'});
+    }
+    doc.save('simulation-emprunt-'+date.replace(/\//g,'-')+'.pdf');
+  }catch(e){console.error(e);alert('Erreur lors de la génération du PDF.');}
+  finally{btn.innerHTML='📄 Exporter PDF';btn.disabled=false;}
+}
+update();
+</script>
+</body>
+</html>

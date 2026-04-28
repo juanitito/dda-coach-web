@@ -1,0 +1,3566 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPCEtLSBGb25kIGFycm9uZGkgc29tYnJlIC0tPgogIDxyZWN0IHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgcng9IjciIGZpbGw9IiMwYjBmMWEiLz4KICA8IS0tIExldHRyZSBCIGJvbGQgYmxldWUgLS0+CiAgPHBhdGggZD0iTTggNmg4YzIuNSAwIDQuNSAxLjggNC41IDQuMiAwIDEuNC0uNyAyLjYtMS44IDMuMyAxLjUuNyAyLjUgMi4xIDIuNSAzLjhDMjEuMiAyMCAxOSAyMiAxNi4yIDIySDhWNnptMyAzdjRoNC41YzEgMCAxLjgtLjggMS44LTJzLS44LTItMS44LTJIMTF6bTAgN3Y0aDVjMS4xIDAgMi0uOSAyLTJzLS45LTItMi0yaC01eiIgZmlsbD0iIzNkN2ZmZiIvPgogIDwhLS0gUG9pbnQgdGVhbCBhY2NlbnQgLS0+CiAgPGNpcmNsZSBjeD0iMjUiIGN5PSIyNSIgcj0iNC41IiBmaWxsPSIjMmRkNGJmIi8+Cjwvc3ZnPgo=">
+
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BingeDDA · Administration</title>
+<meta name="robots" content="noindex, nofollow">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script>
+// ── ADMIN AUTH GUARD ──
+document.documentElement.style.visibility = 'hidden';
+
+const _SURL = 'https://vrufldjydjrgcqwhmpnt.supabase.co';
+const _SKEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZydWZsZGp5ZGpyZ2Nxd2htcG50Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5NTA3ODksImV4cCI6MjA5MjUyNjc4OX0.jW1CQ5yzJr4Ccac9-OI2RgVLXqFn-X0MjAxCkc9Xbfc';
+
+window._sbAdmin = window.supabase.createClient(_SURL, _SKEY, {
+  auth: { storageKey: 'dda-coach-auth', persistSession: true, autoRefreshToken: true }
+});
+
+(async () => {
+  try {
+    const { data: { session } } = await window._sbAdmin.auth.getSession();
+    if (!session) { window.location.href = '/?auth=required'; return; }
+
+    const { data: profile } = await window._sbAdmin.from('profiles')
+      .select('role, prenom, nom')
+      .eq('id', session.user.id)
+      .single();
+
+    if (!profile || profile.role !== 'admin') {
+      window.location.href = '/formation';
+      return;
+    }
+
+    // Stocker pour usage dans l'admin
+    window._adminUser = { ...session.user, ...profile };
+    document.documentElement.style.visibility = 'visible';
+
+  } catch (err) {
+    console.error('Admin guard error:', err);
+    document.documentElement.style.visibility = 'visible';
+  }
+})();
+</script>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:      #080c14;
+  --bg2:     #0b1020;
+  --bg3:     #0f1628;
+  --surface: #141e30;
+  --surface2:#1a2640;
+  --border:  rgba(255,255,255,0.06);
+  --border2: rgba(255,255,255,0.1);
+  --accent:  #3d7fff;
+  --accent2: #6b9fff;
+  --teal:    #2dd4bf;
+  --gold:    #e0c472;
+  --red:     #ef4444;
+  --orange:  #f97316;
+  --green:   #22c55e;
+  --text:    #c8d4e8;
+  --muted:   #5a6a88;
+  --white:   #f0f4ff;
+  --r:       8px;
+  --sidebar: 220px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;}
+
+/* ── SIDEBAR ── */
+.sidebar{
+  width:var(--sidebar);flex-shrink:0;
+  background:var(--bg2);border-right:1px solid var(--border);
+  display:flex;flex-direction:column;
+  position:fixed;top:0;left:0;bottom:0;z-index:100;
+}
+.sb-logo{
+  padding:24px 20px 20px;
+  font-family:'Bebas Neue',sans-serif;font-size:22px;
+  letter-spacing:3px;color:var(--accent);
+  border-bottom:1px solid var(--border);
+}
+.sb-logo span{color:var(--text);}
+.sb-badge{
+  font-size:9px;font-family:'DM Sans',sans-serif;
+  background:rgba(239,68,68,.15);color:#ef4444;
+  border:1px solid rgba(239,68,68,.3);border-radius:3px;
+  padding:1px 6px;letter-spacing:1px;font-weight:700;
+  display:inline-block;margin-top:4px;
+}
+.sb-nav{flex:1;padding:16px 0;overflow-y:auto;}
+.sb-section{
+  font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+  color:var(--muted);padding:12px 20px 6px;
+}
+.sb-item{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 20px;cursor:pointer;
+  font-size:13px;font-weight:500;color:var(--muted);
+  transition:all .15s;border-left:2px solid transparent;
+}
+.sb-item:hover{color:var(--text);background:rgba(255,255,255,.03);}
+.sb-item.active{color:var(--accent2);background:rgba(61,127,255,.07);border-left-color:var(--accent);}
+.sb-icon{font-size:14px;width:16px;text-align:center;}
+.sb-footer{padding:16px 20px;border-top:1px solid var(--border);}
+.sb-user{font-size:12px;color:var(--muted);}
+.sb-user strong{color:var(--text);display:block;margin-bottom:2px;}
+.sb-logout{
+  font-size:11px;color:var(--muted);background:none;border:none;
+  cursor:pointer;padding:0;margin-top:8px;transition:color .2s;
+  font-family:'DM Sans',sans-serif;
+}
+.sb-logout:hover{color:var(--red);}
+
+/* ── MAIN ── */
+.main{margin-left:var(--sidebar);flex:1;min-height:100vh;}
+.topbar{
+  height:58px;display:flex;align-items:center;justify-content:space-between;
+  padding:0 32px;border-bottom:1px solid var(--border);
+  background:rgba(8,12,20,.9);backdrop-filter:blur(12px);
+  position:sticky;top:0;z-index:50;
+}
+.tb-title{font-size:15px;font-weight:600;color:var(--white);}
+.tb-right{display:flex;align-items:center;gap:12px;}
+.tb-date{font-size:12px;color:var(--muted);}
+.tb-refresh{
+  font-size:11px;font-weight:600;color:var(--accent2);
+  background:rgba(61,127,255,.1);border:1px solid rgba(61,127,255,.2);
+  border-radius:var(--r);padding:5px 12px;cursor:pointer;
+  transition:all .2s;font-family:'DM Sans',sans-serif;
+}
+.tb-refresh:hover{background:rgba(61,127,255,.18);}
+
+/* ── VIEWS ── */
+.view{display:none;padding:28px 32px 60px;}
+.view.active{display:block;}
+
+/* ── GRID KPI ── */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:28px;}
+.kpi-card{
+  background:var(--surface);border:1px solid var(--border2);
+  border-radius:var(--r);padding:20px;position:relative;overflow:hidden;
+}
+.kpi-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+}
+.kpi-blue::before{background:linear-gradient(90deg,var(--accent),var(--accent2));}
+.kpi-teal::before{background:linear-gradient(90deg,var(--teal),#34d399);}
+.kpi-gold::before{background:linear-gradient(90deg,var(--gold),#c8a84b);}
+.kpi-red::before{background:linear-gradient(90deg,var(--orange),var(--red));}
+.kpi-label{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;}
+.kpi-value{font-family:'Bebas Neue',sans-serif;font-size:40px;color:var(--white);line-height:1;margin-bottom:4px;}
+.kpi-value.euro::after{content:' €';font-size:22px;color:var(--muted);}
+.kpi-sub{font-size:11px;color:var(--muted);}
+.kpi-delta{
+  display:inline-flex;align-items:center;gap:4px;
+  font-size:11px;font-weight:600;padding:2px 7px;border-radius:3px;margin-top:6px;
+}
+.delta-up{background:rgba(34,197,94,.12);color:var(--green);}
+.delta-down{background:rgba(239,68,68,.12);color:var(--red);}
+
+/* ── CHART AREA ── */
+.chart-row{display:grid;grid-template-columns:2fr 1fr;gap:12px;margin-bottom:28px;}
+.chart-card{
+  background:var(--surface);border:1px solid var(--border2);
+  border-radius:var(--r);padding:20px;
+}
+.chart-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;}
+.chart-title{font-size:13px;font-weight:600;color:var(--white);}
+.chart-sub{font-size:11px;color:var(--muted);margin-top:2px;}
+.chart-legend{display:flex;gap:14px;}
+.cl-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted);}
+.cl-dot{width:8px;height:8px;border-radius:50%;}
+
+/* Bars */
+.bar-chart{display:flex;align-items:flex-end;gap:8px;height:120px;padding-top:10px;}
+.bar-group{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;}
+.bar-wrap{flex:1;width:100%;display:flex;align-items:flex-end;justify-content:center;gap:3px;}
+.bar{
+  flex:1;border-radius:3px 3px 0 0;min-height:2px;
+  transition:opacity .2s;cursor:default;
+}
+.bar:hover{opacity:.8;}
+.bar-label{font-size:10px;color:var(--muted);}
+
+/* Donut */
+.donut-wrap{display:flex;flex-direction:column;align-items:center;gap:14px;}
+.donut-legend{width:100%;}
+.donut-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);}
+.donut-row:last-child{border-bottom:none;}
+.donut-name{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text);}
+.donut-bar-bg{height:4px;border-radius:2px;background:rgba(255,255,255,.06);flex:1;margin:0 10px;overflow:hidden;}
+.donut-bar-fill{height:100%;border-radius:2px;transition:width .6s ease;}
+.donut-pct{font-size:12px;font-weight:600;color:var(--white);}
+
+/* ── TABLE ── */
+.table-card{
+  background:var(--surface);border:1px solid var(--border2);
+  border-radius:var(--r);overflow:hidden;margin-bottom:20px;
+}
+.table-head-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 20px;border-bottom:1px solid var(--border);
+}
+.table-title{font-size:13px;font-weight:600;color:var(--white);}
+.table-actions{display:flex;gap:8px;}
+.tbl-btn{
+  font-size:11px;color:var(--muted);background:var(--surface2);
+  border:1px solid var(--border2);border-radius:5px;
+  padding:5px 10px;cursor:pointer;transition:all .15s;font-family:'DM Sans',sans-serif;
+}
+.tbl-btn:hover{color:var(--text);border-color:rgba(255,255,255,.18);}
+.tbl-btn.primary{color:var(--accent2);border-color:rgba(61,127,255,.3);background:rgba(61,127,255,.08);}
+.search-input{
+  background:var(--surface2);border:1px solid var(--border2);border-radius:5px;
+  padding:5px 10px 5px 28px;font-size:12px;color:var(--text);
+  font-family:'DM Sans',sans-serif;outline:none;width:180px;
+}
+.search-input::placeholder{color:var(--muted);}
+.search-wrap{position:relative;}
+.search-icon{position:absolute;left:9px;top:50%;transform:translateY(-50%);font-size:11px;color:var(--muted);}
+table{width:100%;border-collapse:collapse;}
+thead th{
+  font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;
+  color:var(--muted);padding:10px 20px;text-align:left;
+  border-bottom:1px solid var(--border);white-space:nowrap;
+}
+tbody tr{border-bottom:1px solid var(--border);transition:background .15s;cursor:default;}
+tbody tr:last-child{border-bottom:none;}
+tbody tr:hover{background:rgba(255,255,255,.02);}
+tbody td{padding:12px 20px;font-size:13px;color:var(--text);}
+.td-mono{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);}
+.td-name{font-weight:600;color:var(--white);}
+.td-email{font-size:11px;color:var(--muted);}
+
+/* Badges */
+.badge{
+  display:inline-flex;align-items:center;gap:4px;
+  padding:3px 8px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:.3px;
+}
+.badge-active{background:rgba(34,197,94,.12);color:var(--green);border:1px solid rgba(34,197,94,.2);}
+.badge-pending{background:rgba(224,196,114,.1);color:var(--gold);border:1px solid rgba(224,196,114,.2);}
+.badge-past_due{background:rgba(249,115,22,.12);color:var(--orange);border:1px solid rgba(249,115,22,.2);}
+.badge-cancelled{background:rgba(107,114,136,.1);color:var(--muted);border:1px solid var(--border2);}
+.badge-paid{background:rgba(34,197,94,.1);color:var(--green);}
+.badge-failed{background:rgba(239,68,68,.12);color:var(--red);}
+.status-dot{width:5px;height:5px;border-radius:50%;}
+
+/* Actions inline */
+.td-actions{display:flex;gap:6px;}
+.act-btn{
+  font-size:10px;padding:3px 8px;border-radius:4px;cursor:pointer;
+  border:1px solid var(--border2);background:var(--surface2);
+  color:var(--muted);transition:all .15s;font-family:'DM Sans',sans-serif;
+}
+.act-btn:hover{color:var(--text);border-color:rgba(255,255,255,.18);}
+.act-btn.danger:hover{color:var(--red);border-color:rgba(239,68,68,.3);background:rgba(239,68,68,.08);}
+
+/* Pagination */
+.pagination{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-top:1px solid var(--border);}
+.pag-info{font-size:11px;color:var(--muted);}
+.pag-btns{display:flex;gap:4px;}
+.pag-btn{
+  font-size:11px;padding:4px 10px;border-radius:4px;cursor:pointer;
+  border:1px solid var(--border2);background:var(--surface2);
+  color:var(--muted);transition:all .15s;font-family:'DM Sans',sans-serif;
+}
+.pag-btn.active{background:rgba(61,127,255,.15);color:var(--accent2);border-color:rgba(61,127,255,.3);}
+.pag-btn:hover:not(.active){color:var(--text);}
+
+/* ── MODULES EDITOR ── */
+.module-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-top:16px;}
+.mod-admin-card{
+  background:var(--surface);border:1px solid var(--border2);
+  border-radius:var(--r);padding:16px;position:relative;
+}
+.mac-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;}
+.mac-code{
+  font-family:'DM Mono',monospace;font-size:11px;font-weight:500;
+  color:var(--accent2);background:rgba(61,127,255,.1);
+  border-radius:4px;padding:2px 7px;
+}
+.mac-title{font-size:13px;font-weight:600;color:var(--white);margin-bottom:4px;line-height:1.35;}
+.mac-meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;}
+.mac-tag{
+  font-size:10px;padding:2px 7px;border-radius:3px;
+  background:rgba(255,255,255,.05);color:var(--muted);
+}
+.mac-actions{display:flex;gap:6px;margin-top:12px;padding-top:10px;border-top:1px solid var(--border);}
+.toggle-pub{
+  font-size:10px;font-weight:700;padding:4px 10px;border-radius:4px;cursor:pointer;
+  border:none;transition:all .2s;font-family:'DM Sans',sans-serif;
+}
+.toggle-pub.published{background:rgba(34,197,94,.12);color:var(--green);}
+.toggle-pub.draft{background:rgba(107,114,136,.1);color:var(--muted);}
+
+/* ── EMAIL LOG ── */
+.email-filters{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;}
+.ef-btn{
+  font-size:11px;padding:5px 12px;border-radius:20px;cursor:pointer;
+  border:1px solid var(--border2);background:transparent;
+  color:var(--muted);transition:all .2s;font-family:'DM Sans',sans-serif;
+}
+.ef-btn.active{background:rgba(61,127,255,.1);color:var(--accent2);border-color:rgba(61,127,255,.3);}
+
+/* ── STATS ── */
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;}
+.stat-mini{
+  background:var(--surface);border:1px solid var(--border2);
+  border-radius:var(--r);padding:16px;
+}
+.sm-label{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;}
+.sm-value{font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--white);line-height:1;}
+.sm-sub{font-size:11px;color:var(--muted);margin-top:4px;}
+
+/* ── NOTIFICATIONS PANEL ── */
+.notif-panel{
+  background:var(--surface);border:1px solid var(--border2);
+  border-radius:var(--r);padding:0;overflow:hidden;
+}
+.notif-item{
+  display:flex;align-items:flex-start;gap:12px;
+  padding:14px 20px;border-bottom:1px solid var(--border);
+  transition:background .15s;
+}
+.notif-item:last-child{border-bottom:none;}
+.notif-item:hover{background:rgba(255,255,255,.02);}
+.notif-dot{
+  width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px;
+}
+.nd-red{background:var(--red);}
+.nd-orange{background:var(--orange);}
+.nd-teal{background:var(--teal);}
+.nd-blue{background:var(--accent);}
+.notif-body{flex:1;}
+.notif-title{font-size:13px;font-weight:600;color:var(--white);margin-bottom:2px;}
+.notif-sub{font-size:11px;color:var(--muted);line-height:1.5;}
+.notif-time{font-size:10px;color:rgba(90,106,136,.6);flex-shrink:0;}
+
+/* ── MODAL ── */
+.modal-overlay{
+  position:fixed;inset:0;z-index:500;
+  background:rgba(0,0,0,.7);backdrop-filter:blur(4px);
+  display:flex;align-items:center;justify-content:center;
+  padding:20px;opacity:0;pointer-events:none;transition:opacity .2s;
+}
+.modal-overlay.open{opacity:1;pointer-events:all;}
+@keyframes shake{0%,100%{transform:translateX(0)}15%{transform:translateX(-6px)}30%{transform:translateX(6px)}45%{transform:translateX(-4px)}60%{transform:translateX(4px)}75%{transform:translateX(-2px)}90%{transform:translateX(2px)}}
+.modal.shake{animation:shake 0.4s ease;}
+.modal{
+  background:var(--bg2);border:1px solid var(--border2);
+  border-radius:12px;width:100%;max-width:520px;
+  max-height:90vh;display:flex;flex-direction:column;
+  animation:slideUp .25s ease;
+}
+@keyframes slideUp{from{transform:translateY(16px);opacity:0}to{transform:none;opacity:1}}
+.modal-header{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.modal-title{font-size:15px;font-weight:600;color:var(--white);}
+.modal-close{background:none;border:none;cursor:pointer;font-size:14px;color:var(--muted);padding:4px 8px;transition:color .2s;}
+.modal-close:hover{color:var(--white);}
+.modal-body{padding:24px;overflow-y:auto;flex:1;}
+.modal-footer{padding:16px 24px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px;}
+.form-group{margin-bottom:16px;}
+.form-label{font-size:12px;font-weight:600;color:var(--text);margin-bottom:6px;display:block;}
+.form-input{
+  width:100%;background:var(--surface2);border:1.5px solid var(--border2);
+  border-radius:var(--r);padding:9px 12px;font-size:13px;color:var(--white);
+  font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s;
+}
+.form-input:focus{border-color:var(--accent);}
+.form-textarea{min-height:80px;resize:vertical;}
+.btn-primary{
+  font-size:13px;font-weight:700;background:var(--accent);color:#fff;
+  border:none;border-radius:var(--r);padding:9px 20px;cursor:pointer;
+  font-family:'DM Sans',sans-serif;transition:all .2s;
+}
+.btn-primary:hover{background:var(--accent2);}
+.btn-secondary{
+  font-size:13px;font-weight:500;background:var(--surface2);color:var(--muted);
+  border:1px solid var(--border2);border-radius:var(--r);padding:9px 20px;cursor:pointer;
+  font-family:'DM Sans',sans-serif;transition:all .2s;
+}
+.btn-secondary:hover{color:var(--text);}
+
+/* ── RESPONSIVE ── */
+@media(max-width:1100px){
+  .kpi-grid{grid-template-columns:repeat(2,1fr);}
+  .chart-row{grid-template-columns:1fr;}
+  .stats-grid{grid-template-columns:repeat(2,1fr);}
+}
+@media(max-width:768px){
+  .sidebar{transform:translateX(-100%);}
+  .main{margin-left:0;}
+  .kpi-grid{grid-template-columns:1fr 1fr;}
+}
+
+/* ── MODULE TYPE BADGES ── */
+.mod-type-badge{
+  display:inline-flex;align-items:center;gap:4px;
+  padding:2px 8px;border-radius:3px;font-size:9px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;
+}
+.mtb-elearning{background:rgba(61,127,255,.1);color:var(--accent2);border:1px solid rgba(61,127,255,.2);}
+.mtb-video{background:rgba(239,68,68,.1);color:#f87171;border:1px solid rgba(239,68,68,.2);}
+
+/* ── MODULE THUMBNAIL ── */
+.mac-thumb{
+  width:100%;height:120px;border-radius:5px;object-fit:cover;
+  background:var(--bg3);margin-bottom:10px;position:relative;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+}
+.mac-thumb img{width:100%;height:100%;object-fit:cover;border-radius:5px;}
+.mac-thumb-placeholder{
+  width:100%;height:100%;background:linear-gradient(135deg,var(--bg3),var(--surface2));
+  display:flex;align-items:center;justify-content:center;
+  font-size:28px;color:var(--muted);border-radius:5px;
+}
+.mac-play-overlay{
+  position:absolute;inset:0;background:rgba(0,0,0,.4);
+  display:flex;align-items:center;justify-content:center;border-radius:5px;
+  opacity:0;transition:opacity .2s;
+}
+.mac-thumb:hover .mac-play-overlay{opacity:1;}
+.mac-play-btn{
+  width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.9);
+  display:flex;align-items:center;justify-content:center;font-size:14px;
+}
+
+/* ── MODULE FORM TOGGLE ── */
+.type-toggle{display:flex;gap:0;margin-bottom:16px;border-radius:var(--r);overflow:hidden;border:1px solid var(--border2);}
+.type-toggle-btn{
+  flex:1;padding:9px;font-size:12px;font-weight:700;cursor:pointer;
+  background:var(--surface2);color:var(--muted);border:none;
+  font-family:'DM Sans',sans-serif;transition:all .2s;text-align:center;
+}
+.type-toggle-btn.active-el{background:rgba(61,127,255,.15);color:var(--accent2);}
+.type-toggle-btn.active-vid{background:rgba(239,68,68,.12);color:#f87171;}
+
+/* ── VIDEO PREVIEW ── */
+.video-preview{
+  width:100%;aspect-ratio:16/9;border-radius:var(--r);overflow:hidden;
+  background:var(--bg3);border:1px solid var(--border2);margin-top:8px;
+  display:flex;align-items:center;justify-content:center;
+}
+.video-preview iframe{width:100%;height:100%;border:none;}
+.video-preview-placeholder{font-size:12px;color:var(--muted);text-align:center;padding:20px;}
+
+/* ── YOUTUBE ── */
+.yt-channel-card{
+  background:var(--surface);border:1px solid var(--border2);
+  border-radius:var(--r);overflow:hidden;cursor:pointer;
+  transition:all .2s;position:relative;
+}
+.yt-channel-card:hover{border-color:rgba(255,0,0,.4);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.3);}
+.yt-channel-card.inactive{opacity:.5;}
+.yt-ch-thumb{width:100%;aspect-ratio:16/9;object-fit:cover;background:var(--bg3);}
+.yt-ch-thumb-placeholder{width:100%;aspect-ratio:16/9;background:linear-gradient(135deg,var(--bg3),var(--surface2));display:flex;align-items:center;justify-content:center;font-size:32px;}
+.yt-ch-body{padding:12px 14px;}
+.yt-ch-name{font-size:13px;font-weight:600;color:var(--white);margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.yt-ch-meta{font-size:11px;color:var(--muted);}
+.yt-ch-actions{display:flex;gap:6px;padding:10px 14px;border-top:1px solid var(--border);}
+
+.yt-video-card{
+  background:var(--surface);border:1px solid var(--border2);
+  border-radius:var(--r);overflow:hidden;position:relative;
+  transition:all .2s;
+}
+.yt-video-card:hover:not(.imported){border-color:rgba(61,127,255,.4);transform:translateY(-2px);}
+.yt-video-card.imported{opacity:.45;pointer-events:none;}
+.yt-vid-thumb{width:100%;aspect-ratio:16/9;object-fit:cover;background:var(--bg3);display:block;}
+.yt-vid-overlay{
+  position:absolute;top:0;left:0;right:0;bottom:0;
+  background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;
+  opacity:0;transition:opacity .2s;cursor:pointer;
+}
+.yt-video-card:hover .yt-vid-overlay{opacity:1;}
+.yt-vid-play{width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.9);display:flex;align-items:center;justify-content:center;font-size:16px;}
+.yt-vid-body{padding:10px 12px;}
+.yt-vid-title{font-size:12px;font-weight:600;color:var(--white);line-height:1.4;margin-bottom:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.yt-vid-meta{font-size:10px;color:var(--muted);display:flex;justify-content:space-between;}
+.yt-imported-badge{position:absolute;top:6px;right:6px;background:rgba(34,197,94,.2);border:1px solid rgba(34,197,94,.4);border-radius:4px;padding:2px 7px;font-size:9px;font-weight:700;color:var(--green);}
+
+/* ── INTÉGRATIONS ── */
+.integrations-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-top:8px;}
+.integ-card{
+  background:var(--surface);border:1px solid var(--border2);
+  border-radius:var(--r);overflow:hidden;
+}
+.integ-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:18px 20px;border-bottom:1px solid var(--border);
+}
+.integ-logo{
+  display:flex;align-items:center;gap:12px;
+}
+.integ-icon{
+  width:36px;height:36px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;flex-shrink:0;font-weight:700;font-family:'DM Mono',monospace;
+}
+.integ-name{font-size:14px;font-weight:700;color:var(--white);}
+.integ-category{font-size:10px;color:var(--muted);margin-top:1px;}
+.integ-status{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:4px 10px;border-radius:20px;font-size:10px;font-weight:700;
+}
+.is-active{background:rgba(34,197,94,.12);color:var(--green);border:1px solid rgba(34,197,94,.2);}
+.is-pending{background:rgba(224,196,114,.1);color:var(--gold);border:1px solid rgba(224,196,114,.2);}
+.is-inactive{background:rgba(90,106,136,.1);color:var(--muted);border:1px solid var(--border2);}
+.is-future{background:rgba(61,127,255,.08);color:var(--accent2);border:1px solid rgba(61,127,255,.2);}
+.integ-body{padding:16px 20px;}
+.integ-desc{font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:14px;}
+.integ-details{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;}
+.integ-detail-row{display:flex;justify-content:space-between;align-items:center;}
+.integ-detail-label{font-size:11px;color:var(--muted);}
+.integ-detail-value{font-size:11px;font-weight:600;color:var(--text);}
+.integ-detail-value.ok{color:var(--green);}
+.integ-detail-value.warn{color:var(--orange);}
+.integ-detail-value.future{color:var(--accent2);}
+.integ-actions{display:flex;gap:8px;padding-top:12px;border-top:1px solid var(--border);}
+.integ-btn{
+  font-size:11px;font-weight:600;padding:6px 14px;border-radius:5px;cursor:pointer;
+  border:1px solid var(--border2);background:var(--surface2);
+  color:var(--muted);transition:all .15s;font-family:'DM Sans',sans-serif;flex:1;text-align:center;
+}
+.integ-btn:hover{color:var(--text);border-color:rgba(255,255,255,.18);}
+.integ-btn.primary{
+  background:rgba(61,127,255,.1);color:var(--accent2);
+  border-color:rgba(61,127,255,.3);
+}
+.integ-btn.primary:hover{background:rgba(61,127,255,.18);}
+.integ-btn.disabled{opacity:.4;cursor:not-allowed;pointer-events:none;}
+.integ-roadmap{
+  background:rgba(61,127,255,.04);border:1px solid rgba(61,127,255,.12);
+  border-radius:var(--r);padding:14px 16px;margin-top:16px;
+}
+.integ-roadmap-title{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--accent2);margin-bottom:10px;}
+.integ-roadmap-item{
+  display:flex;align-items:center;gap:10px;
+  padding:6px 0;border-bottom:1px solid rgba(61,127,255,.08);font-size:12px;
+}
+.integ-roadmap-item:last-child{border-bottom:none;}
+.irm-step{
+  width:18px;height:18px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:9px;font-weight:700;
+}
+.irm-done{background:rgba(34,197,94,.2);color:var(--green);}
+.irm-active{background:rgba(61,127,255,.2);color:var(--accent2);}
+.irm-future{background:rgba(90,106,136,.1);color:var(--muted);}
+.irm-label{color:var(--text);flex:1;}
+.irm-label.muted{color:var(--muted);}
+.irm-date{font-size:10px;color:var(--muted);}
+
+/* ── BILLING MODE BANNER ── */
+.billing-banner{
+  display:flex;align-items:center;gap:14px;
+  background:rgba(224,196,114,.06);border:1px solid rgba(224,196,114,.2);
+  border-radius:var(--r);padding:14px 18px;margin-bottom:20px;
+}
+.bb-icon{font-size:20px;flex-shrink:0;}
+.bb-title{font-size:13px;font-weight:600;color:var(--gold);margin-bottom:2px;}
+.bb-sub{font-size:11px;color:var(--muted);line-height:1.5;}
+.bb-action{
+  font-size:11px;font-weight:700;color:var(--accent2);
+  background:rgba(61,127,255,.1);border:1px solid rgba(61,127,255,.25);
+  border-radius:5px;padding:6px 14px;cursor:pointer;
+  white-space:nowrap;font-family:'DM Sans',sans-serif;transition:all .2s;
+}
+.bb-action:hover{background:rgba(61,127,255,.2);}
+
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:rgba(61,127,255,.2);border-radius:2px;}
+
+/* ── VEILLE ── */
+.veille-kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px;}
+.score-bar{display:flex;align-items:center;gap:8px;}
+.score-track{flex:1;height:4px;border-radius:2px;background:rgba(255,255,255,.06);overflow:hidden;min-width:60px;}
+.score-fill{height:100%;border-radius:2px;transition:width .4s ease;}
+.item-row{display:flex;align-items:flex-start;gap:14px;padding:14px 20px;border-bottom:1px solid var(--border);transition:background .15s;}
+.item-row:last-child{border-bottom:none;}
+.item-row:hover{background:rgba(255,255,255,.015);}
+.item-checkbox{flex-shrink:0;margin-top:2px;width:16px;height:16px;accent-color:var(--accent);cursor:pointer;}
+.item-body{flex:1;min-width:0;}
+.item-title{font-size:13px;font-weight:600;color:var(--white);line-height:1.35;margin-bottom:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;word-break:break-word;}
+.item-resume{font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:6px;}
+.item-meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.item-source{font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;padding:2px 7px;border-radius:3px;background:rgba(61,127,255,.08);color:var(--accent2);}
+.item-cat{font-size:10px;color:var(--muted);padding:2px 7px;border-radius:3px;background:rgba(255,255,255,.04);}
+.item-link{font-size:10px;color:var(--accent2);text-decoration:none;opacity:.7;transition:opacity .2s;}
+.item-link:hover{opacity:1;}
+.item-actions{display:flex;gap:6px;flex-shrink:0;align-items:flex-start;margin-top:2px;}
+.act-btn-select{font-size:10px;padding:3px 8px;border-radius:4px;cursor:pointer;border:1px solid rgba(61,127,255,.3);background:rgba(61,127,255,.08);color:var(--accent2);transition:all .15s;font-family:'DM Sans',sans-serif;}
+.act-btn-selected{font-size:10px;padding:3px 8px;border-radius:4px;cursor:pointer;border:1px solid rgba(34,197,94,.3);background:rgba(34,197,94,.08);color:var(--green);transition:all .15s;font-family:'DM Sans',sans-serif;}
+.act-btn-reject{font-size:10px;padding:3px 8px;border-radius:4px;cursor:pointer;border:1px solid var(--border2);background:var(--surface2);color:var(--muted);transition:all .15s;font-family:'DM Sans',sans-serif;}
+.act-btn-reject:hover{color:var(--red);border-color:rgba(239,68,68,.3);background:rgba(239,68,68,.06);}
+.act-btn-restore{font-size:10px;padding:3px 8px;border-radius:4px;cursor:pointer;border:1px solid var(--border2);background:var(--surface2);color:var(--muted);transition:all .15s;font-family:'DM Sans',sans-serif;}
+.act-btn-restore:hover{color:var(--text);}
+.badge-published{background:rgba(34,197,94,.12);color:var(--green);border:1px solid rgba(34,197,94,.2);}
+.badge-draft{background:rgba(90,106,136,.08);color:var(--muted);border:1px solid var(--border2);}
+.veille-mod-card{background:var(--surface);border:1px solid var(--border2);border-radius:var(--r);overflow:hidden;transition:border-color .2s;}
+.veille-mod-thumb{width:100%;height:130px;object-fit:cover;background:var(--bg3);display:block;}
+.veille-mod-thumb-ph{width:100%;height:130px;background:linear-gradient(135deg,var(--bg3),var(--surface2));display:flex;align-items:center;justify-content:center;font-size:32px;}
+.veille-mod-body{padding:14px;}
+.veille-mod-week{font-family:'DM Mono',monospace;font-size:10px;color:var(--accent2);margin-bottom:4px;}
+.veille-mod-title{font-size:13px;font-weight:600;color:var(--white);line-height:1.35;margin-bottom:8px;}
+.veille-mod-footer{padding:10px 14px;border-top:1px solid var(--border);display:flex;gap:6px;}
+.veille-thumb-preview{width:100%;height:160px;border-radius:var(--r);border:1px solid var(--border2);margin-top:8px;overflow:hidden;background:var(--bg3);display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:12px;}
+.veille-thumb-preview img{width:100%;height:100%;object-fit:cover;}
+.empty-state{text-align:center;padding:48px 20px;color:var(--muted);}
+.empty-state .es-icon{font-size:36px;margin-bottom:12px;}
+.empty-state .es-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:6px;}
+.empty-state .es-sub{font-size:12px;line-height:1.6;}
+</style>
+</head>
+<body>
+
+<!-- ══ SIDEBAR ══ -->
+<aside class="sidebar">
+  <div class="sb-logo">Binge<span>DDA</span><br><span class="sb-badge">ADMIN</span></div>
+  <nav class="sb-nav">
+    <div class="sb-section">Tableau de bord</div>
+    <div class="sb-item active" onclick="showView('dashboard')">
+      <span class="sb-icon">◈</span> Vue d'ensemble
+    </div>
+    <div class="sb-item" onclick="showView('revenue')">
+      <span class="sb-icon">◎</span> Chiffre d'affaires
+    </div>
+
+    <div class="sb-section">Clients</div>
+    <div class="sb-item" onclick="showView('subscribers')">
+      <span class="sb-icon">◉</span> Abonnés
+    </div>
+    <div class="sb-item" onclick="showView('payments')">
+      <span class="sb-icon">◐</span> Paiements
+    </div>
+    <div class="sb-item" onclick="showView('churn')">
+      <span class="sb-icon">◑</span> Churn & résiliations
+    </div>
+
+    <div class="sb-section">Contenu</div>
+    <div class="sb-item" onclick="showView('modules')">
+      <span class="sb-icon">▣</span> Modules
+    </div>
+    <div class="sb-item" onclick="showView('youtube')">
+      <span class="sb-icon">▶</span> Import YouTube
+    </div>
+    <div class="sb-item" onclick="showView('progress')">
+      <span class="sb-icon">▤</span> Progression apprenants
+    </div>
+    <div class="sb-item" onclick="showView('veille')">
+      <span class="sb-icon">📡</span> Veille hebdo
+    </div>
+
+    <div class="sb-section">Communication</div>
+    <div class="sb-item" onclick="showView('emails')">
+      <span class="sb-icon">◻</span> Emails envoyés
+    </div>
+    <div class="sb-item" onclick="showView('campaigns')">
+      <span class="sb-icon">◼</span> Campagnes
+    </div>
+
+    <div class="sb-section">Technique</div>
+    <div class="sb-item" onclick="showView('webhooks')">
+      <span class="sb-icon">◈</span> Webhooks GoCardless
+    </div>
+    <div class="sb-item" onclick="showView('integrations')">
+      <span class="sb-icon">⬡</span> Intégrations
+    </div>
+  </nav>
+  <div class="sb-footer">
+    <div class="sb-user">
+      <strong id="admin-name">Admin</strong>
+      <span id="admin-email" style="font-size:11px;color:var(--muted);"></span>
+    </div>
+    <a href="/formation?view=catalogue" style="display:block;font-size:12px;color:var(--muted);text-decoration:none;padding:8px 20px;margin-bottom:4px;transition:color .2s;" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted)'">← Retour au catalogue</a>
+    <button class="sb-logout" onclick="adminLogout()">→ Déconnexion</button>
+  </div>
+</aside>
+
+<!-- ══ MAIN ══ -->
+<main class="main">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="tb-title" id="page-title">Vue d'ensemble</div>
+    <div class="tb-right">
+      <div id="sb-status" style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);">
+        <span id="sb-dot" style="width:6px;height:6px;border-radius:50%;background:var(--muted);display:inline-block;"></span>
+        <span id="sb-label">Connexion…</span>
+      </div>
+      <div class="tb-date" id="current-date"></div>
+      <button class="tb-refresh" onclick="refreshData()">↺ Actualiser</button>
+    </div>
+  </div>
+
+  <!-- ══ VUE DASHBOARD ══ -->
+  <div class="view active" id="view-dashboard">
+
+    <!-- KPIs -->
+    <div class="kpi-grid">
+      <div class="kpi-card kpi-blue">
+        <div class="kpi-label">MRR</div>
+        <div class="kpi-value euro" id="kpi-mrr">0</div>
+        <div class="kpi-sub">Revenus récurrents mensuels HT</div>
+        <div class="kpi-delta delta-up" id="kpi-mrr-delta">↑ —</div>
+      </div>
+      <div class="kpi-card kpi-teal">
+        <div class="kpi-label">Abonnés actifs</div>
+        <div class="kpi-value" id="kpi-active">0</div>
+        <div class="kpi-sub">Mandats SEPA actifs</div>
+        <div class="kpi-delta delta-up" id="kpi-active-delta">↑ —</div>
+      </div>
+      <div class="kpi-card kpi-gold">
+        <div class="kpi-label">ARR</div>
+        <div class="kpi-value euro" id="kpi-arr">0</div>
+        <div class="kpi-sub">Revenus annuels récurrents HT</div>
+        <div class="kpi-delta delta-up" id="kpi-arr-delta">↑ —</div>
+      </div>
+      <div class="kpi-card kpi-red">
+        <div class="kpi-label">Taux de churn</div>
+        <div class="kpi-value" id="kpi-churn">0%</div>
+        <div class="kpi-sub">Résiliations / abonnés actifs</div>
+        <div class="kpi-delta delta-down" id="kpi-churn-delta">↓ —</div>
+      </div>
+    </div>
+
+    <!-- Charts row -->
+    <div class="chart-row">
+      <!-- Évolution MRR -->
+      <div class="chart-card">
+        <div class="chart-head">
+          <div>
+            <div class="chart-title">Évolution MRR — 6 derniers mois</div>
+            <div class="chart-sub">Nouveaux vs renouvellements</div>
+          </div>
+          <div class="chart-legend">
+            <div class="cl-item"><div class="cl-dot" style="background:var(--accent)"></div>Nouveaux</div>
+            <div class="cl-item"><div class="cl-dot" style="background:var(--teal)"></div>Renouvellements</div>
+          </div>
+        </div>
+        <div class="bar-chart" id="mrr-chart"></div>
+      </div>
+      <!-- Répartition abonnements -->
+      <div class="chart-card">
+        <div class="chart-head">
+          <div>
+            <div class="chart-title">État des abonnements</div>
+            <div class="chart-sub">Distribution par statut</div>
+          </div>
+        </div>
+        <div class="donut-legend" id="donut-legend"></div>
+      </div>
+    </div>
+
+    <!-- Alertes -->
+    <div style="margin-bottom:20px;">
+      <div class="chart-head" style="margin-bottom:12px;">
+        <div class="chart-title">Alertes & événements récents</div>
+      </div>
+      <div class="notif-panel" id="notif-panel"></div>
+    </div>
+
+    <!-- Abonnés récents -->
+    <div class="table-card">
+      <div class="table-head-row">
+        <div class="table-title">Abonnés récents</div>
+        <div class="table-actions">
+          <button class="tbl-btn primary" onclick="showView('subscribers')">Voir tous →</button>
+        </div>
+      </div>
+      <table id="recent-table">
+        <thead><tr>
+          <th>Abonné</th><th>Structure</th><th>Statut</th><th>Depuis</th><th>Prochain prélt.</th>
+        </tr></thead>
+        <tbody id="recent-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ══ VUE ABONNÉS ══ -->
+  <div class="view" id="view-subscribers">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+      <div>
+        <div style="font-size:18px;font-weight:600;color:var(--white);margin-bottom:4px;">Gestion des abonnés</div>
+        <div style="font-size:12px;color:var(--muted);">Comptes clients · Mandats SEPA · Abonnements</div>
+      </div>
+      <button class="tbl-btn primary" onclick="openModal('new-subscriber')">+ Ajouter manuellement</button>
+    </div>
+    <div class="table-card">
+      <div class="table-head-row">
+        <div class="table-title" id="sub-count">— abonnés</div>
+        <div class="table-actions">
+          <div class="search-wrap">
+            <span class="search-icon">🔍</span>
+            <input class="search-input" placeholder="Nom, email, SIRET…" oninput="filterSubscribers(this.value)">
+          </div>
+          <button class="tbl-btn" onclick="exportCSV()">↓ Export CSV</button>
+        </div>
+      </div>
+      <table>
+        <thead><tr>
+          <th>Abonné</th><th>ORIAS</th><th>Métier</th><th>Statut</th>
+          <th>Depuis</th><th>Échéance</th><th>Progression DDA</th><th>Actions</th>
+        </tr></thead>
+        <tbody id="subscribers-tbody"></tbody>
+      </table>
+      <div class="pagination">
+        <div class="pag-info" id="pag-info">—</div>
+        <div class="pag-btns" id="pag-btns"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ VUE PAIEMENTS ══ -->
+  <div class="view" id="view-payments">
+    <div style="margin-bottom:20px;">
+      <div style="font-size:18px;font-weight:600;color:var(--white);margin-bottom:4px;">Historique des paiements</div>
+      <div style="font-size:12px;color:var(--muted);">Prélèvements SEPA via GoCardless</div>
+    </div>
+    <div class="kpi-grid" style="margin-bottom:20px;">
+      <div class="kpi-card kpi-blue">
+        <div class="kpi-label">Encaissé ce mois</div>
+        <div class="kpi-value euro" id="pay-month">0</div>
+        <div class="kpi-sub">Montant HT confirmé</div>
+      </div>
+      <div class="kpi-card kpi-teal">
+        <div class="kpi-label">Paiements confirmés</div>
+        <div class="kpi-value" id="pay-ok">0</div>
+        <div class="kpi-sub">Ce mois</div>
+      </div>
+      <div class="kpi-card kpi-red">
+        <div class="kpi-label">Échecs</div>
+        <div class="kpi-value" id="pay-fail">0</div>
+        <div class="kpi-sub">Ce mois · À relancer</div>
+      </div>
+      <div class="kpi-card kpi-gold">
+        <div class="kpi-label">En attente</div>
+        <div class="kpi-value" id="pay-pending">0</div>
+        <div class="kpi-sub">Soumis à la banque</div>
+      </div>
+    </div>
+    <div class="table-card">
+      <div class="table-head-row">
+        <div class="table-title">Tous les paiements</div>
+        <div class="table-actions">
+          <button class="tbl-btn" onclick="exportCSV()">↓ Export CSV</button>
+        </div>
+      </div>
+      <table>
+        <thead><tr>
+          <th>Facture</th><th>Abonné</th><th>Montant HT</th><th>TVA</th>
+          <th>TTC</th><th>Statut</th><th>Date prélèvement</th><th>GoCardless ID</th>
+        </tr></thead>
+        <tbody id="payments-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ══ VUE MODULES ══ -->
+  <div class="view" id="view-modules">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+      <div>
+        <div style="font-size:18px;font-weight:600;color:var(--white);margin-bottom:4px;">Gestion des modules</div>
+        <div style="font-size:12px;color:var(--muted);">Catalogue formation DDA — Publication & édition</div>
+      </div>
+      <button class="tbl-btn primary" onclick="openModal('new-module')">+ Nouveau module</button>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;align-items:center;" id="module-filters">
+      <button class="ef-btn active" onclick="filterModules('all',this)">Tous</button>
+      <button class="ef-btn" onclick="filterModules('elearning',this)">📄 E-learning</button>
+      <button class="ef-btn" onclick="filterModules('video',this)">▶ Vidéo</button>
+      <button class="ef-btn" onclick="filterModules('veille',this)">📡 Veille</button>
+      <button class="ef-btn" onclick="filterModules('outil',this)">⚙ Outils</button>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:16px;align-items:center;">
+      <input type="text" id="module-search" placeholder="🔍 Rechercher…" oninput="renderModules(currentModFilter||'all')"
+        style="flex:1;background:var(--bg3);border:1px solid var(--border2);border-radius:6px;padding:6px 12px;color:var(--text);font-size:13px;font-family:inherit;outline:none;">
+      <select id="module-sort" onchange="renderModules(currentModFilter||'all')"
+        style="background:var(--bg3);border:1px solid var(--border2);border-radius:6px;padding:6px 10px;color:var(--text);font-size:13px;font-family:inherit;outline:none;">
+        <option value="default">Tri par défaut</option>
+        <option value="recent">Plus récents</option>
+        <option value="az">A → Z</option>
+      </select>
+    </div>
+    <div class="module-grid" id="module-grid"></div>
+  </div>
+
+  <!-- ══ VUE PROGRESSION ══ -->
+  <div class="view" id="view-progress">
+    <div style="margin-bottom:20px;">
+      <div style="font-size:18px;font-weight:600;color:var(--white);margin-bottom:4px;">Progression des apprenants</div>
+      <div style="font-size:12px;color:var(--muted);">Suivi DDA — Timer · Quiz · Modules complétés</div>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-mini">
+        <div class="sm-label">Heures totales tracées</div>
+        <div class="sm-value" id="stat-hours">0h</div>
+        <div class="sm-sub">Toutes formations confondues</div>
+      </div>
+      <div class="stat-mini">
+        <div class="sm-label">Score quiz moyen</div>
+        <div class="sm-value" id="stat-score">—</div>
+        <div class="sm-sub">Sur l'ensemble des tentatives</div>
+      </div>
+      <div class="stat-mini">
+        <div class="sm-label">Modules complétés</div>
+        <div class="sm-value" id="stat-completions">0</div>
+        <div class="sm-sub">Quiz validés à 70%+</div>
+      </div>
+    </div>
+    <div class="table-card">
+      <div class="table-head-row">
+        <div class="table-title">Top modules — taux de complétion</div>
+      </div>
+      <table>
+        <thead><tr>
+          <th>Module</th><th>Section</th><th>Démarrés</th><th>Complétés</th><th>Taux</th><th>Score moyen</th>
+        </tr></thead>
+        <tbody id="progress-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ══ VUE EMAILS ══ -->
+  <div class="view" id="view-emails">
+    <div style="margin-bottom:20px;">
+      <div style="font-size:18px;font-weight:600;color:var(--white);margin-bottom:4px;">Emails envoyés</div>
+      <div style="font-size:12px;color:var(--muted);">Log transactionnel · Séquences onboarding · Rappels DDA</div>
+    </div>
+    <div class="email-filters" id="email-filters">
+      <button class="ef-btn active" onclick="filterEmails('all',this)">Tous</button>
+      <button class="ef-btn" onclick="filterEmails('onboarding',this)">Onboarding</button>
+      <button class="ef-btn" onclick="filterEmails('rappel_dda',this)">Rappels DDA</button>
+      <button class="ef-btn" onclick="filterEmails('facture',this)">Factures</button>
+      <button class="ef-btn" onclick="filterEmails('echec',this)">Échecs paiement</button>
+    </div>
+    <div class="table-card">
+      <table>
+        <thead><tr>
+          <th>Date</th><th>Destinataire</th><th>Template</th><th>Statut</th><th>ID Brevo</th>
+        </tr></thead>
+        <tbody id="emails-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ══ VUE WEBHOOKS ══ -->
+  <div class="view" id="view-webhooks">
+    <div style="margin-bottom:20px;">
+      <div style="font-size:18px;font-weight:600;color:var(--white);margin-bottom:4px;">Webhooks GoCardless</div>
+      <div style="font-size:12px;color:var(--muted);">Log des événements reçus et traités</div>
+    </div>
+    <div class="table-card">
+      <table>
+        <thead><tr>
+          <th>Reçu le</th><th>Type</th><th>Ressource ID</th><th>Traité</th><th>Payload</th>
+        </tr></thead>
+        <tbody id="webhooks-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ══ AUTRES VUES (placeholders) ══ -->
+  <div class="view" id="view-revenue">
+    <div style="font-size:18px;font-weight:600;color:var(--white);margin-bottom:20px;">Chiffre d'affaires</div>
+    <div class="kpi-grid">
+      <div class="kpi-card kpi-blue"><div class="kpi-label">CA HT cumulé</div><div class="kpi-value euro" id="rev-total">0</div><div class="kpi-sub">Depuis le lancement</div></div>
+      <div class="kpi-card kpi-teal"><div class="kpi-label">CA HT ce mois</div><div class="kpi-value euro" id="rev-month">0</div><div class="kpi-sub">Paiements confirmés</div></div>
+      <div class="kpi-card kpi-gold"><div class="kpi-label">Ticket moyen</div><div class="kpi-value euro" id="rev-avg">24,99</div><div class="kpi-sub">Par prélèvement HT</div></div>
+      <div class="kpi-card kpi-red"><div class="kpi-label">Impayés</div><div class="kpi-value euro" id="rev-unpaid">0</div><div class="kpi-sub">Échecs non recouvrés</div></div>
+    </div>
+  </div>
+  <div class="view" id="view-churn"><div style="font-size:18px;font-weight:600;color:var(--white);">Churn & résiliations</div><div style="color:var(--muted);margin-top:8px;font-size:13px;">Données disponibles après connexion Supabase.</div></div>
+  <div class="view" id="view-campaigns"><div style="font-size:18px;font-weight:600;color:var(--white);">Campagnes email</div><div style="color:var(--muted);margin-top:8px;font-size:13px;">Gestion des campagnes marketing via l'API Brevo.</div></div>
+
+  <!-- ══ VUE YOUTUBE ══ -->
+  <div class="view" id="view-youtube">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+      <div>
+        <div style="font-size:18px;font-weight:600;color:var(--white);margin-bottom:4px;">Import YouTube</div>
+        <div style="font-size:12px;color:var(--muted);">Gérez vos chaînes et importez des vidéos en modules DDA</div>
+      </div>
+      <button class="tbl-btn primary" onclick="openModal('add-channel')">+ Ajouter une chaîne</button>
+    </div>
+
+    <!-- Liste des chaînes -->
+    <div id="yt-channels-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;margin-bottom:28px;">
+      <div style="text-align:center;padding:40px;color:var(--muted);font-size:13px;grid-column:1/-1;">
+        Chargement des chaînes…
+      </div>
+    </div>
+
+    <!-- Vidéos de la chaîne sélectionnée -->
+    <div id="yt-videos-panel" style="display:none;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <button onclick="closeVideosPanel()" style="background:var(--surface2);border:1px solid var(--border2);border-radius:5px;padding:6px 12px;cursor:pointer;font-size:12px;color:var(--muted);font-family:'DM Sans',sans-serif;">← Retour</button>
+          <div id="yt-channel-title" style="font-size:15px;font-weight:600;color:var(--white);"></div>
+          <div id="yt-video-count" style="font-size:12px;color:var(--muted);"></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <label style="font-size:12px;color:var(--muted);">Tri :</label>
+          <select id="yt-sort" onchange="sortVideos()" style="background:var(--surface2);border:1px solid var(--border2);border-radius:5px;padding:5px 10px;font-size:12px;color:var(--text);font-family:'DM Sans',sans-serif;">
+            <option value="desc">Plus récentes d'abord</option>
+            <option value="asc">Plus anciennes d'abord</option>
+            <option value="title">Titre A→Z</option>
+          </select>
+          <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);cursor:pointer;">
+            <input type="checkbox" id="yt-hide-imported" onchange="filterImported()" style="accent-color:var(--accent);">
+            Masquer déjà importées
+          </label>
+        </div>
+      </div>
+      <div id="yt-videos-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;"></div>
+      <div id="yt-load-more" style="display:none;text-align:center;margin-top:20px;">
+        <button onclick="loadMoreVideos()" class="tbl-btn primary" style="padding:10px 28px;">Charger plus de vidéos</button>
+      </div>
+    </div>
+  </div><!-- /view-youtube -->
+
+  <!-- ══ VUE INTÉGRATIONS ══ -->
+  <div class="view" id="view-integrations">
+    <div style="margin-bottom:20px;">
+      <div style="font-size:18px;font-weight:600;color:var(--white);margin-bottom:4px;">Intégrations</div>
+      <div style="font-size:12px;color:var(--muted);">Services tiers connectés à BingeDDA · État et configuration</div>
+    </div>
+
+    <!-- Bannière mode facturation dégradé -->
+    <div class="billing-banner">
+      <div class="bb-icon">⚡</div>
+      <div style="flex:1">
+        <div class="bb-title">Mode facturation — En attente de Pennylane</div>
+        <div class="bb-sub">Les numéros de facture sont générés et stockés en base. L'émission réelle des factures électroniques Factur-X sera activée dès la connexion Pennylane. Aucun client n'est facturé pour l'instant.</div>
+      </div>
+      <button class="bb-action" onclick="openModal('connect-pennylane')">Connecter Pennylane</button>
+    </div>
+
+    <div class="integrations-grid">
+
+      <!-- GoCardless -->
+      <div class="integ-card">
+        <div class="integ-header">
+          <div class="integ-logo">
+            <div class="integ-icon" style="background:rgba(45,212,191,.12);color:var(--teal);">GC</div>
+            <div>
+              <div class="integ-name">GoCardless</div>
+              <div class="integ-category">Paiement SEPA récurrent</div>
+            </div>
+          </div>
+          <div class="integ-status is-active">● Connecté</div>
+        </div>
+        <div class="integ-body">
+          <div class="integ-desc">Prélèvements SEPA automatiques, gestion des mandats et webhooks de paiement. Environnement sandbox actif.</div>
+          <div class="integ-details">
+            <div class="integ-detail-row"><span class="integ-detail-label">Environnement</span><span class="integ-detail-value warn">Sandbox</span></div>
+            <div class="integ-detail-row"><span class="integ-detail-label">Webhook</span><span class="integ-detail-value ok">Configuré</span></div>
+            <div class="integ-detail-row"><span class="integ-detail-label">Dernier événement</span><span class="integ-detail-value">il y a 2h</span></div>
+            <div class="integ-detail-row"><span class="integ-detail-label">Commission</span><span class="integ-detail-value">1% + 0,20€ / transaction</span></div>
+          </div>
+          <div class="integ-actions">
+            <button class="integ-btn" onclick="alert('Logs GoCardless — Voir onglet Webhooks')">Voir les logs</button>
+            <button class="integ-btn primary" onclick="alert('Passage en production : remplacer GOCARDLESS_ACCESS_TOKEN par le token live_ dans Supabase Settings → Secrets')">Passer en prod</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Supabase -->
+      <div class="integ-card">
+        <div class="integ-header">
+          <div class="integ-logo">
+            <div class="integ-icon" style="background:rgba(61,127,255,.12);color:var(--accent2);">SB</div>
+            <div>
+              <div class="integ-name">Supabase</div>
+              <div class="integ-category">Auth · Base de données · Edge Functions</div>
+            </div>
+          </div>
+          <div class="integ-status is-active">● Connecté</div>
+        </div>
+        <div class="integ-body">
+          <div class="integ-desc">Authentification utilisateurs, base de données PostgreSQL, et fonctions serverless. Cœur technique de la plateforme.</div>
+          <div class="integ-details">
+            <div class="integ-detail-row"><span class="integ-detail-label">Plan</span><span class="integ-detail-value ok">Free tier</span></div>
+            <div class="integ-detail-row"><span class="integ-detail-label">Edge Functions</span><span class="integ-detail-value ok">4 déployées</span></div>
+            <div class="integ-detail-row"><span class="integ-detail-label">Tables</span><span class="integ-detail-value ok">7 tables · RLS actif</span></div>
+            <div class="integ-detail-row"><span class="integ-detail-label">Auth branché</span><span class="integ-detail-value ok">✓ Opérationnel</span></div>
+            <div class="integ-detail-row"><span class="integ-detail-label">Modules en base</span><span class="integ-detail-value ok">96 modules</span></div>
+          </div>
+          <div class="integ-actions">
+            <button class="integ-btn" onclick="window.open('https://supabase.com/dashboard','_blank')">Dashboard Supabase</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Brevo -->
+      <div class="integ-card">
+        <div class="integ-header">
+          <div class="integ-logo">
+            <div class="integ-icon" style="background:rgba(45,212,191,.1);color:var(--teal);">BR</div>
+            <div>
+              <div class="integ-name">Brevo</div>
+              <div class="integ-category">Emails transactionnels · Séquences</div>
+            </div>
+          </div>
+          <div class="integ-status is-pending">◐ Partiel</div>
+        </div>
+        <div class="integ-body">
+          <div class="integ-desc">Emails transactionnels (factures, onboarding, rappels DDA) et séquences automatisées. Clé API configurée, templates à créer.</div>
+          <div class="integ-details">
+            <div class="integ-detail-row"><span class="integ-detail-label">Clé API</span><span class="integ-detail-value ok">Configurée</span></div>
+            <div class="integ-detail-row"><span class="integ-detail-label">Templates créés</span><span class="integ-detail-value warn">0 / 13</span></div>
+            <div class="integ-detail-row"><span class="integ-detail-label">Plan</span><span class="integ-detail-value ok">Gratuit · 300/jour</span></div>
+            <div class="integ-detail-row"><span class="integ-detail-label">Sender vérifié</span><span class="integ-detail-value warn">À configurer</span></div>
+          </div>
+          <div class="integ-actions">
+            <button class="integ-btn" onclick="window.open('https://app.brevo.com','_blank')">Dashboard Brevo</button>
+            <button class="integ-btn primary" onclick="openModal('brevo-templates')">Créer les templates</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pennylane -->
+      <div class="integ-card">
+        <div class="integ-header">
+          <div class="integ-logo">
+            <div class="integ-icon" style="background:rgba(224,196,114,.1);color:var(--gold);">PL</div>
+            <div>
+              <div class="integ-name">Pennylane</div>
+              <div class="integ-category">Facturation électronique · Factur-X</div>
+            </div>
+          </div>
+          <div class="integ-status is-future">○ À connecter</div>
+        </div>
+        <div class="integ-body">
+          <div class="integ-desc">Génération des factures électroniques conformes Factur-X, e-reporting TVA et dépôt PPF. À activer lors de la première facturation réelle.</div>
+          <div class="integ-details">
+            <div class="integ-detail-row"><span class="integ-detail-label">Statut</span><span class="integ-detail-value future">Non souscrit</span></div>
+            <div class="integ-detail-row"><span class="integ-detail-label">Plan recommandé</span><span class="integ-detail-value future">Essentiel · 24€ HT/mois</span></div>
+            <div class="integ-detail-row"><span class="integ-detail-label">Conformité 2026</span><span class="integ-detail-value ok">PDP agréée DGFiP</span></div>
+            <div class="integ-detail-row"><span class="integ-detail-label">Intégration GoCardless</span><span class="integ-detail-value ok">Native</span></div>
+          </div>
+          <div class="integ-roadmap">
+            <div class="integ-roadmap-title">Étapes d'intégration</div>
+            <div class="integ-roadmap-item">
+              <div class="irm-step irm-future">1</div>
+              <div class="irm-label muted">Souscrire au plan Essentiel Pennylane</div>
+              <div class="irm-date">Au 1er client</div>
+            </div>
+            <div class="integ-roadmap-item">
+              <div class="irm-step irm-future">2</div>
+              <div class="irm-label muted">Récupérer la clé API Pennylane</div>
+              <div class="irm-date"></div>
+            </div>
+            <div class="integ-roadmap-item">
+              <div class="irm-step irm-future">3</div>
+              <div class="irm-label muted">Ajouter PENNYLANE_API_KEY dans Supabase Secrets</div>
+              <div class="irm-date"></div>
+            </div>
+            <div class="integ-roadmap-item">
+              <div class="irm-step irm-future">4</div>
+              <div class="irm-label muted">Déployer Edge Function pennylane-invoice</div>
+              <div class="irm-date"></div>
+            </div>
+            <div class="integ-roadmap-item">
+              <div class="irm-step irm-future">5</div>
+              <div class="irm-label muted">Connecter GoCardless → Pennylane via webhook</div>
+              <div class="irm-date"></div>
+            </div>
+          </div>
+          <div class="integ-actions" style="margin-top:14px;">
+            <button class="integ-btn" onclick="window.open('https://pennylane.com','_blank')">Site Pennylane</button>
+            <button class="integ-btn disabled">Connecter (inactif)</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Vercel -->
+      <div class="integ-card">
+        <div class="integ-header">
+          <div class="integ-logo">
+            <div class="integ-icon" style="background:rgba(255,255,255,.06);color:var(--white);">▲</div>
+            <div>
+              <div class="integ-name">Vercel</div>
+              <div class="integ-category">Hébergement · CDN · CI/CD</div>
+            </div>
+          </div>
+          <div class="integ-status is-active">● Déployé</div>
+        </div>
+        <div class="integ-body">
+          <div class="integ-desc">Hébergement des fichiers HTML statiques, CDN mondial, HTTPS automatique et déploiement continu.</div>
+          <div class="integ-details">
+            <div class="integ-detail-row"><span class="integ-detail-label">URL production</span><span class="integ-detail-value ok">bingedda.vercel.app</span></div>
+            <div class="integ-detail-row"><span class="integ-detail-label">Plan</span><span class="integ-detail-value ok">Gratuit (Hobby)</span></div>
+            <div class="integ-detail-row"><span class="integ-detail-label">Domaine custom</span><span class="integ-detail-value warn">À configurer</span></div>
+            <div class="integ-detail-row"><span class="integ-detail-label">Dernier déploiement</span><span class="integ-detail-value">Aujourd'hui</span></div>
+          </div>
+          <div class="integ-actions">
+            <button class="integ-btn" onclick="window.open('https://vercel.com/dashboard','_blank')">Dashboard Vercel</button>
+            <button class="integ-btn primary" onclick="alert('Pour redéployer :\ncd ~/dda-coach-web\nvercel --prod')">Redéployer</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Salesforce -->
+      <div class="integ-card">
+        <div class="integ-header">
+          <div class="integ-logo">
+            <div class="integ-icon" style="background:rgba(0,161,224,.12);color:#00a1e0;">SF</div>
+            <div>
+              <div class="integ-name">Salesforce</div>
+              <div class="integ-category">CRM · Gestion commerciale</div>
+            </div>
+          </div>
+          <div class="integ-status is-future">○ Prévu</div>
+        </div>
+        <div class="integ-body">
+          <div class="integ-desc">CRM pour la gestion des prospects, du pipeline commercial et du suivi client. Synchronisation bidirectionnelle avec Supabase.</div>
+          <div class="integ-details">
+            <div class="integ-detail-row"><span class="integ-detail-label">Statut</span><span class="integ-detail-value future">Non configuré</span></div>
+            <div class="integ-detail-row"><span class="integ-detail-label">Flux prévu</span><span class="integ-detail-value future">Supabase → Salesforce</span></div>
+            <div class="integ-detail-row"><span class="integ-detail-label">Données sync</span><span class="integ-detail-value future">Abonnés · Statuts · MRR</span></div>
+            <div class="integ-detail-row"><span class="integ-detail-label">Méthode</span><span class="integ-detail-value future">API REST + webhook</span></div>
+          </div>
+          <div class="integ-roadmap">
+            <div class="integ-roadmap-title">Étapes d'intégration</div>
+            <div class="integ-roadmap-item">
+              <div class="irm-step irm-future">1</div>
+              <div class="irm-label muted">Créer une Connected App Salesforce</div>
+              <div class="irm-date">Quand CRM actif</div>
+            </div>
+            <div class="integ-roadmap-item">
+              <div class="irm-step irm-future">2</div>
+              <div class="irm-label muted">Ajouter SALESFORCE_CLIENT_ID/SECRET dans Supabase</div>
+              <div class="irm-date"></div>
+            </div>
+            <div class="integ-roadmap-item">
+              <div class="irm-step irm-future">3</div>
+              <div class="irm-label muted">Déployer Edge Function salesforce-sync</div>
+              <div class="irm-date"></div>
+            </div>
+            <div class="integ-roadmap-item">
+              <div class="irm-step irm-future">4</div>
+              <div class="irm-label muted">Mapper les objets Supabase → Salesforce Contacts</div>
+              <div class="irm-date"></div>
+            </div>
+          </div>
+          <div class="integ-actions" style="margin-top:14px;">
+            <button class="integ-btn" onclick="window.open('https://developer.salesforce.com','_blank')">Documentation</button>
+            <button class="integ-btn disabled">Connecter (inactif)</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- YouTube API -->
+      <div class="integ-card">
+        <div class="integ-header">
+          <div class="integ-logo">
+            <div class="integ-icon" style="background:rgba(255,0,0,.12);color:#ff4444;">▶</div>
+            <div>
+              <div class="integ-name">YouTube Data API v3</div>
+              <div class="integ-category">Import vidéos · Chaînes · Thumbnails</div>
+            </div>
+          </div>
+          <div class="integ-status is-active">● Connecté</div>
+        </div>
+        <div class="integ-body">
+          <div class="integ-desc">Import automatique de vidéos YouTube en modules pédagogiques. Récupération des titres, thumbnails, durées et métadonnées.</div>
+          <div class="integ-details">
+            <div class="integ-detail-row"><span class="integ-detail-label">Clé API</span><span class="integ-detail-value ok">Configurée</span></div>
+            <div class="integ-detail-row"><span class="integ-detail-label">Quota journalier</span><span class="integ-detail-value ok">10 000 unités / jour</span></div>
+            <div class="integ-detail-row"><span class="integ-detail-label">Coût par chaîne</span><span class="integ-detail-value ok">~2 unités / 100 vidéos</span></div>
+            <div class="integ-detail-row"><span class="integ-detail-label">Chaînes configurées</span><span class="integ-detail-value future" id="yt-channel-count">—</span></div>
+          </div>
+          <div class="integ-actions">
+            <button class="integ-btn" onclick="window.open('https://console.cloud.google.com/apis/api/youtube.googleapis.com','_blank')">Console Google</button>
+            <button class="integ-btn primary" onclick="showView('youtube')">Gérer les chaînes →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Plausible -->
+      <div class="integ-card">
+        <div class="integ-header">
+          <div class="integ-logo">
+            <div class="integ-icon" style="background:rgba(167,139,250,.1);color:#a78bfa;">PL</div>
+            <div>
+              <div class="integ-name">Plausible Analytics</div>
+              <div class="integ-category">Stats · Funnel · Conversion</div>
+            </div>
+          </div>
+          <div class="integ-status is-future">○ À connecter</div>
+        </div>
+        <div class="integ-body">
+          <div class="integ-desc">Analytics RGPD sans cookies. Suivi du funnel de conversion landing → inscription → mandat signé. 9€/mois.</div>
+          <div class="integ-details">
+            <div class="integ-detail-row"><span class="integ-detail-label">Statut</span><span class="integ-detail-value future">Non installé</span></div>
+            <div class="integ-detail-row"><span class="integ-detail-label">Installation</span><span class="integ-detail-value future">1 ligne de script</span></div>
+            <div class="integ-detail-row"><span class="integ-detail-label">Cookies requis</span><span class="integ-detail-value ok">Aucun</span></div>
+            <div class="integ-detail-row"><span class="integ-detail-label">Tarif</span><span class="integ-detail-value future">9€ HT/mois</span></div>
+          </div>
+          <div class="integ-actions">
+            <button class="integ-btn" onclick="window.open('https://plausible.io','_blank')">Site Plausible</button>
+            <button class="integ-btn primary" onclick="openModal('install-plausible')">Instructions</button>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /integrations-grid -->
+  </div><!-- /view-integrations -->
+
+  <!-- ══ VUE VEILLE ══ -->
+  <div class="view" id="view-veille">
+
+    <!-- Sous-navigation -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
+      <div>
+        <div style="font-size:18px;font-weight:600;color:var(--white);margin-bottom:4px;">Veille hebdomadaire</div>
+        <div style="font-size:12px;color:var(--muted);">Collecte automatique · Sélection éditoriale · Publication catalogue</div>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="ef-btn active" id="vtab-items"   onclick="switchVeilleTab('items')">Items collectés</button>
+        <button class="ef-btn"        id="vtab-modules" onclick="switchVeilleTab('modules')">Modules publiés</button>
+      </div>
+    </div>
+
+    <!-- KPIs -->
+    <div class="veille-kpi-row">
+      <div class="kpi-card kpi-gold">
+        <div class="kpi-label">En attente</div>
+        <div class="kpi-value" id="v-kpi-pending">—</div>
+        <div class="kpi-sub">Items non traités</div>
+      </div>
+      <div class="kpi-card kpi-blue">
+        <div class="kpi-label">Sélectionnés</div>
+        <div class="kpi-value" id="v-kpi-selected">—</div>
+        <div class="kpi-sub">Prêts à publier</div>
+      </div>
+      <div class="kpi-card kpi-teal">
+        <div class="kpi-label">Cette semaine</div>
+        <div class="kpi-value" id="v-kpi-week">—</div>
+        <div class="kpi-sub" id="v-kpi-week-label">—</div>
+      </div>
+      <div class="kpi-card" style="background:var(--surface);border:1px solid var(--border2);border-radius:var(--r);padding:18px;position:relative;overflow:hidden;">
+        <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--green),#16a34a);"></div>
+        <div class="kpi-label">Modules publiés</div>
+        <div class="kpi-value" id="v-kpi-published">—</div>
+        <div class="kpi-sub">Veilles au catalogue</div>
+      </div>
+    </div>
+
+    <!-- TAB ITEMS -->
+    <div id="vtab-panel-items">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:16px;">
+        <div class="email-filters" style="margin:0;" id="v-week-filters">
+          <button class="ef-btn active" onclick="vFilterByWeek('all',this)">Toutes les semaines</button>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button class="tbl-btn" onclick="vSelectAll()">Tout sélectionner</button>
+          <button class="tbl-btn" onclick="vRejectAll()">Tout rejeter</button>
+          <button class="tbl-btn primary" id="v-btn-generate" onclick="openVeilleGenerateModal()" disabled>✦ Générer module</button>
+        </div>
+      </div>
+      <div class="table-card">
+        <div class="table-head-row">
+          <div class="table-title" id="v-items-count">— items</div>
+          <div class="table-actions">
+            <div class="email-filters" style="margin:0;">
+              <button class="ef-btn active" onclick="vFilterByStatus('all',this)">Tous</button>
+              <button class="ef-btn" onclick="vFilterByStatus('pending',this)">En attente</button>
+              <button class="ef-btn" onclick="vFilterByStatus('selected',this)">Sélectionnés</button>
+              <button class="ef-btn" onclick="vFilterByStatus('rejected',this)">Rejetés</button>
+            </div>
+          </div>
+        </div>
+        <div id="v-items-list">
+          <div class="empty-state"><div class="es-icon">📡</div><div class="es-title">Chargement…</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB MODULES PUBLIÉS -->
+    <div id="vtab-panel-modules" style="display:none;">
+      <div class="module-grid" id="v-published-grid">
+        <div class="empty-state" style="grid-column:1/-1;">
+          <div class="es-icon">📰</div><div class="es-title">Chargement…</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /view-veille -->
+
+<!-- ══ MODAL VEILLE GENERATE ══ -->
+<div class="modal-overlay" id="v-modal-overlay" onclick="if(event.target===this){const m=document.getElementById('v-modal');m.classList.remove('shake');void m.offsetWidth;m.classList.add('shake');setTimeout(()=>m.classList.remove('shake'),400);}">
+  <div class="modal" id="v-modal" style="max-width:640px;">
+    <div class="modal-header">
+      <div class="modal-title" id="v-modal-title">Générer le module Veille</div>
+      <button class="modal-close" onclick="closeVeilleModal()">✕</button>
+    </div>
+    <div class="modal-body" id="v-modal-body"></div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeVeilleModal()">Annuler</button>
+      <button class="btn-primary" id="v-modal-confirm" onclick="vPublishModule()">Publier au catalogue</button>
+    </div>
+  </div>
+</div>
+<div class="modal-overlay" id="modal-overlay" onclick="handleModalClick(event)">
+  <div class="modal" id="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-title">—</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-footer" id="modal-footer">
+      <button class="btn-secondary" onclick="closeModal()">Annuler</button>
+      <button class="btn-primary" onclick="saveModal()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── ADMIN AUTH ──
+async function adminLogout() {
+  if (window._sbAdmin) await window._sbAdmin.auth.signOut();
+  window.location.href = '/';
+}
+
+// Peupler le nom admin dans la sidebar
+window.addEventListener('DOMContentLoaded', () => {
+  if (window._adminUser) {
+    const name = [window._adminUser.prenom, window._adminUser.nom].filter(Boolean).join(' ');
+    const nameEl  = document.getElementById('admin-name');
+    const emailEl = document.getElementById('admin-email');
+    if (nameEl)  nameEl.textContent  = name || 'Admin';
+    if (emailEl) emailEl.textContent = window._adminUser.email || '';
+  }
+});
+
+// ══════════════════════════════════════
+// SUPABASE CLIENT
+// ══════════════════════════════════════
+const SUPABASE_URL = 'https://vrufldjydjrgcqwhmpnt.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZydWZsZGp5ZGpyZ2Nxd2htcG50Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5NTA3ODksImV4cCI6MjA5MjUyNjc4OX0.jW1CQ5yzJr4Ccac9-OI2RgVLXqFn-X0MjAxCkc9Xbfc';
+const sb = window._sbAdmin; // réutilise le client créé par le guard
+
+// ══════════════════════════════════════
+// CHARGEMENT DONNÉES SUPABASE
+// ══════════════════════════════════════
+async function loadSupabaseData() {
+  if (!sb) return false;
+  try {
+    // KPIs : santé abonnements
+    const { data: health } = await sb.from('v_subscription_health').select('*').single();
+    // MRR mensuel
+    const { data: mrrData } = await sb.from('v_mrr_monthly').select('*').limit(6);
+    // Abonnés
+    const { data: subs } = await sb
+      .from('subscriptions')
+      .select('*, profiles(prenom, nom, email, orias, metier, raison_sociale)')
+      .order('created_at', { ascending: false })
+      .limit(50);
+    // Paiements
+    const { data: pays } = await sb
+      .from('payments')
+      .select('*, profiles(prenom, nom)')
+      .order('created_at', { ascending: false })
+      .limit(50);
+    // Modules
+    const { data: mods } = await sb
+      .from('modules')
+      .select('code, section, title, duree_minutes, niveau, published, type, video_url, thumbnail_url')
+      .order('created_at', { ascending: false });
+    // Stats progression
+    const { data: learningStats } = await sb.from('v_learning_stats').select('*').single();
+    const { data: topMods } = await sb.from('v_top_modules').select('*').limit(10);
+    // Email log
+    const { data: emails } = await sb
+      .from('email_log')
+      .select('sent_at, email_to, template_id, status, brevo_msg_id')
+      .order('sent_at', { ascending: false })
+      .limit(30);
+    // Webhooks
+    const { data: hooks } = await sb
+      .from('webhook_events')
+      .select('received_at, event_type, resource_id, processed')
+      .order('received_at', { ascending: false })
+      .limit(20);
+
+    // Mettre à jour les données globales
+    if (health) updateKPIsFromSupabase(health, mrrData);
+    if (subs)   window._sbSubs = subs;
+    if (pays)   window._sbPays = pays;
+    if (mods)   window._sbMods = mods;
+    if (learningStats) window._sbLearn = learningStats;
+    if (topMods)  window._sbTopMods = topMods;
+    if (emails)   window._sbEmails = emails;
+    if (hooks)    window._sbHooks = hooks;
+
+    return true;
+  } catch (err) {
+    console.warn('Erreur chargement Supabase admin:', err);
+    return false;
+  }
+}
+
+function updateKPIsFromSupabase(health, mrrData) {
+  const active   = health.active || 0;
+  const mrr      = active * 24.99;
+  const arr      = mrr * 12;
+  const churn    = health.churn_rate_pct || 0;
+  const pastDue  = health.past_due || 0;
+
+  DEMO.kpis.active   = active;
+  DEMO.kpis.mrr      = Math.round(mrr);
+  DEMO.kpis.arr      = Math.round(arr);
+  DEMO.kpis.churn    = churn;
+
+  if (mrrData && mrrData.length > 0) {
+    DEMO.mrr_history = mrrData.slice(0,6).reverse().map(m => ({
+      month: new Date(m.month).toLocaleDateString('fr-FR', { month: 'short' }),
+      new:   Math.round((m.mrr_ht || 0) * 0.4),
+      renew: Math.round((m.mrr_ht || 0) * 0.6)
+    }));
+  }
+
+  DEMO.subscription_health = [
+    { label:'Actifs',     count: health.active    || 0, color:'#22c55e' },
+    { label:'En attente', count: health.pending   || 0, color:'#e0c472' },
+    { label:'Impayés',    count: health.past_due  || 0, color:'#f97316' },
+    { label:'Résiliés',   count: health.cancelled || 0, color:'#5a6a88' },
+  ];
+
+  // Alertes dynamiques
+  const notifs = [];
+  if (pastDue > 0) notifs.push({ dot:'nd-red', title:`${pastDue} prélèvement${pastDue>1?'s':''} échoué${pastDue>1?'s':''}`, sub:'Relances automatiques prévues J+3', time:'récent' });
+  if (health.pending > 0) notifs.push({ dot:'nd-orange', title:`${health.pending} mandat${health.pending>1?'s':''} en attente`, sub:'Validation bancaire en cours', time:'récent' });
+  if (notifs.length === 0) notifs.push({ dot:'nd-teal', title:'Tout est nominal', sub:'Aucune alerte active', time:'maintenant' });
+  DEMO.notifications = notifs;
+}
+
+// ══════════════════════════════════════
+// DONNÉES DE DÉMO (fallback si Supabase indisponible)
+// ══════════════════════════════════════
+
+const DEMO = {
+  kpis: {
+    mrr: 0, mrr_prev: 0,
+    active: 0, active_prev: 0,
+    arr: 0,
+    churn: 0, churn_prev: 0,
+  },
+  mrr_history: [
+    { month:'Nov', new: 750,  renew: 1750 },
+    { month:'Déc', new: 1000, renew: 2000 },
+    { month:'Jan', new: 1250, renew: 2100 },
+    { month:'Fév', new: 1500, renew: 2350 },
+    { month:'Mar', new: 1750, renew: 2480 },
+    { month:'Avr', new: 1893, renew: 2480 },
+  ],
+  subscription_health: [
+    { label:'Actifs',    count:175, color:'#22c55e' },
+    { label:'En attente',count:12,  color:'#e0c472' },
+    { label:'Impayés',   count:8,   color:'#f97316' },
+    { label:'Résiliés',  count:23,  color:'#5a6a88' },
+  ],
+  subscribers: [
+    { id:'s1', prenom:'Marie',   nom:'Bernard',  email:'m.bernard@courtage-lyon.fr',  orias:'07 123 456', metier:'Courtier',  status:'active',    started:'2024-11-03', period_end:'2025-11-03', progress:11.5 },
+    { id:'s2', prenom:'Thierry', nom:'Laurent',  email:'t.laurent@agence-bdx.fr',    orias:'07 234 567', metier:'Agent',     status:'active',    started:'2024-12-10', period_end:'2025-12-10', progress:8.2  },
+    { id:'s3', prenom:'Sophie',  nom:'Cartier',  email:'s.cartier@gmail.com',         orias:'07 345 678', metier:'Courtier',  status:'active',    started:'2025-01-15', period_end:'2026-01-15', progress:15.0 },
+    { id:'s4', prenom:'Paul',    nom:'Dubois',   email:'p.dubois@cabinet-dp.fr',      orias:'07 456 789', metier:'Manager',   status:'past_due',  started:'2025-02-01', period_end:'2026-02-01', progress:3.1  },
+    { id:'s5', prenom:'Nathalie',nom:'Morin',    email:'n.morin@mutuelle-idf.fr',     orias:'07 567 890', metier:'Mutualiste',status:'active',   started:'2025-02-18', period_end:'2026-02-18', progress:6.7  },
+    { id:'s6', prenom:'Antoine', nom:'Petit',    email:'a.petit@courtier75.fr',       orias:'07 678 901', metier:'Courtier',  status:'active',    started:'2025-03-05', period_end:'2026-03-05', progress:9.4  },
+    { id:'s7', prenom:'Claire',  nom:'Simon',    email:'c.simon@assur-conseil.fr',    orias:'07 789 012', metier:'Agent',     status:'pending',   started:'2025-04-18', period_end:'—',           progress:0    },
+    { id:'s8', prenom:'Luc',     nom:'Martin',   email:'l.martin@groupe-martin.fr',   orias:'07 890 123', metier:'Courtier',  status:'cancelled', started:'2024-10-01', period_end:'2025-04-01', progress:14.2 },
+  ],
+  payments: [
+    { invoice:'DDA-2025-0042', nom:'Sophie Cartier',    ht:24.99, tva:5.00, ttc:29.99, status:'paid_out',  date:'2025-04-01', gc_id:'PM0034JXY...' },
+    { invoice:'DDA-2025-0041', nom:'Thierry Laurent',   ht:24.99, tva:5.00, ttc:29.99, status:'paid_out',  date:'2025-04-01', gc_id:'PM0034JXZ...' },
+    { invoice:'DDA-2025-0040', nom:'Marie Bernard',     ht:24.99, tva:5.00, ttc:29.99, status:'paid_out',  date:'2025-04-01', gc_id:'PM0034JYA...' },
+    { invoice:'DDA-2025-0039', nom:'Paul Dubois',       ht:24.99, tva:5.00, ttc:29.99, status:'failed',    date:'2025-04-01', gc_id:'PM0034JYB...' },
+    { invoice:'DDA-2025-0038', nom:'Nathalie Morin',    ht:24.99, tva:5.00, ttc:29.99, status:'confirmed', date:'2025-04-02', gc_id:'PM0034JYC...' },
+    { invoice:'DDA-2025-0037', nom:'Antoine Petit',     ht:24.99, tva:5.00, ttc:29.99, status:'submitted', date:'2025-04-05', gc_id:'PM0034JYD...' },
+  ],
+  modules: [
+    { code:'TC-01', type:'elearning', section:'tc', title:'La DDA — Fondements et obligations', dur:60, niveau:'Débutant', published:true,  completions:142, score:84, thumbnail:null, video_url:null },
+    { code:'TC-02', type:'elearning', section:'tc', title:'Éthique et déontologie',              dur:45, niveau:'Débutant', published:true,  completions:128, score:79, thumbnail:null, video_url:null },
+    { code:'TC-03', type:'elearning', section:'tc', title:'Protection du consommateur',          dur:60, niveau:'Confirmé', published:true,  completions:98,  score:76, thumbnail:null, video_url:null },
+    { code:'TC-04', type:'elearning', section:'tc', title:'LCB-FT',                              dur:45, niveau:'Confirmé', published:true,  completions:87,  score:81, thumbnail:null, video_url:null },
+    { code:'REG-01', type:'elearning', section:'reg', title:'Responsabilité civile professionnelle', dur:60, niveau:'Confirmé', published:true,  completions:76, score:72, thumbnail:null, video_url:null },
+    { code:'REG-02', type:'elearning', section:'reg', title:'Veille réglementaire 2024-2025',    dur:45, niveau:'Expert',   published:true,  completions:54,  score:83, thumbnail:null, video_url:null },
+    { code:'TP-01', type:'elearning', section:'tp', title:'Santé individuelle — Technique produit', dur:45, niveau:'Confirmé', published:true, completions:62, score:78, thumbnail:null, video_url:null },
+    { code:'TP-02', type:'elearning', section:'tp', title:'Prévoyance — ITT, invalidité, décès', dur:60, niveau:'Confirmé', published:false, completions:0,   score:0,  thumbnail:null, video_url:null },
+    { code:'TV-01', type:'elearning', section:'tv', title:'Découverte client et recueil des besoins', dur:45, niveau:'Débutant', published:true, completions:89, score:86, thumbnail:null, video_url:null },
+    { code:'TV-02', type:'elearning', section:'tv', title:'Conseil patrimonial et assurance vie', dur:60, niveau:'Expert',   published:false, completions:0,   score:0,  thumbnail:null, video_url:null },
+    { code:'VID-01', type:'video', section:'reg', title:'Interview — La DDA expliquée par l\'ACPR', dur:18, niveau:'Débutant', published:true,  completions:34, score:0, thumbnail:'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&q=75', video_url:'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
+    { code:'VID-02', type:'video', section:'tc',  title:'Benchmark — Les meilleures pratiques DDA en Europe', dur:25, niveau:'Confirmé', published:false, completions:0, score:0, thumbnail:'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&q=75', video_url:null },
+  ],
+  emails: [
+    { date:'2025-04-23 09:14', to:'c.simon@assur-conseil.fr',  template:'onboarding_j0',    status:'sent',   id:'msg-0834xy' },
+    { date:'2025-04-22 08:00', to:'a.petit@courtier75.fr',     template:'rappel_dda_j30',   status:'sent',   id:'msg-0833ab' },
+    { date:'2025-04-21 08:00', to:'p.dubois@cabinet-dp.fr',    template:'echec_prelevement',status:'sent',   id:'msg-0832cd' },
+    { date:'2025-04-20 08:00', to:'n.morin@mutuelle-idf.fr',   template:'onboarding_j3',    status:'sent',   id:'msg-0831ef' },
+    { date:'2025-04-18 10:31', to:'c.simon@assur-conseil.fr',  template:'onboarding_j0',    status:'sent',   id:'msg-0830gh' },
+    { date:'2025-04-15 08:00', to:'m.bernard@courtage-lyon.fr',template:'rappel_dda_j60',   status:'opened', id:'msg-0829ij' },
+  ],
+  webhooks: [
+    { received:'2025-04-23 09:12', type:'payments/confirmed',           resource:'PM0034JYC...', processed:true  },
+    { received:'2025-04-23 09:11', type:'payments/failed',              resource:'PM0034JYB...', processed:true  },
+    { received:'2025-04-22 14:03', type:'mandates/active',              resource:'MD0012ABX...', processed:true  },
+    { received:'2025-04-01 07:45', type:'payments/paid_out',            resource:'PM0034JXY...', processed:true  },
+    { received:'2025-04-01 07:44', type:'subscriptions/payment_created',resource:'SB0005DEF...', processed:true  },
+  ],
+  notifications: [
+    { dot:'nd-red',    title:'Prélèvement échoué',         sub:'Paul Dubois — Relance automatique prévue J+3',                  time:'il y a 2h' },
+    { dot:'nd-orange', title:'2 abonnés en impayé',         sub:'Paul Dubois, + 1 autre — Vérifier les mandats',                time:'aujourd\'hui' },
+    { dot:'nd-teal',   title:'Claire Simon vient de souscrire', sub:'Mandat SEPA en cours de validation',                      time:'il y a 3h' },
+    { dot:'nd-blue',   title:'Rappel DDA envoyé',           sub:'Antoine Petit — J-30 avant échéance annuelle',                time:'hier' },
+    { dot:'nd-teal',   title:'Module TC-01 — 142 completions', sub:'Record du catalogue ce mois',                              time:'hier' },
+  ]
+};
+
+// ══════════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════════
+const PAGE_TITLES = {
+  dashboard:'Vue d\'ensemble', revenue:'Chiffre d\'affaires',
+  subscribers:'Abonnés', payments:'Paiements', churn:'Churn & résiliations',
+  modules:'Modules', youtube:'Import YouTube', progress:'Progression apprenants',
+  emails:'Emails envoyés', campaigns:'Campagnes', webhooks:'Webhooks GoCardless',
+  integrations:'Intégrations', veille:'Veille hebdomadaire'
+};
+let currentView = 'dashboard';
+
+function showView(name) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('active'));
+  document.getElementById('view-' + name)?.classList.add('active');
+  document.querySelectorAll('.sb-item').forEach(i => {
+    if (i.getAttribute('onclick')?.includes(name)) i.classList.add('active');
+  });
+  document.getElementById('page-title').textContent = PAGE_TITLES[name] ?? name;
+  currentView = name;
+  renderView(name);
+}
+
+function renderView(name) {
+  if (name === 'dashboard') renderDashboard();
+  if (name === 'subscribers') renderSubscribers(DEMO.subscribers);
+  if (name === 'payments') renderPayments();
+  if (name === 'modules') {
+    const _SURL = 'https://vrufldjydjrgcqwhmpnt.supabase.co';
+    const _SKEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZydWZsZGp5ZGpyZ2Nxd2htcG50Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5NTA3ODksImV4cCI6MjA5MjUyNjc4OX0.jW1CQ5yzJr4Ccac9-OI2RgVLXqFn-X0MjAxCkc9Xbfc';
+    // Utiliser le token de session pour voir tous les modules (y compris brouillons)
+    const getToken = async () => {
+      try {
+        const { data } = await window._sbAdmin.auth.getSession();
+        return data?.session?.access_token || _SKEY;
+      } catch { return _SKEY; }
+    };
+    getToken().then(token => {
+      fetch(`${_SURL}/rest/v1/modules?select=code,section,title,duree_minutes,niveau,published,type,thumbnail_url,video_url&order=sort_order`, {
+        headers: { apikey: _SKEY, Authorization: `Bearer ${token}` }
+      }).then(r => r.json()).then(data => {
+        if (Array.isArray(data)) window._sbMods = data;
+        renderModules(currentModFilter || 'all');
+      }).catch(() => renderModules(currentModFilter || 'all'));
+    });
+  }
+  if (name === 'youtube') renderYoutube();
+  if (name === 'integrations') {
+    sb.from('youtube_channels').select('id', { count:'exact', head:true }).then(({ count }) => {
+      const el = document.getElementById('yt-channel-count');
+      if (el) el.textContent = (count || 0) + ' chaîne' + (count > 1 ? 's' : '');
+    });
+  }
+  if (name === 'progress') renderProgress();
+  if (name === 'emails') renderEmails('all');
+  if (name === 'webhooks') renderWebhooks();
+  if (name === 'veille') initVeilleView();
+}
+
+// ══════════════════════════════════════
+// DASHBOARD
+// ══════════════════════════════════════
+function renderDashboard() {
+  const d = DEMO.kpis;
+  // KPIs
+  document.getElementById('kpi-mrr').textContent   = d.mrr.toLocaleString('fr-FR');
+  document.getElementById('kpi-active').textContent = d.active;
+  document.getElementById('kpi-arr').textContent    = d.arr.toLocaleString('fr-FR');
+  document.getElementById('kpi-churn').textContent  = d.churn + '%';
+
+  const mrrDelta = Math.round((d.mrr - d.mrr_prev) / d.mrr_prev * 100);
+  const actDelta = d.active - d.active_prev;
+  document.getElementById('kpi-mrr-delta').textContent    = `↑ +${mrrDelta}% vs mois dernier`;
+  document.getElementById('kpi-active-delta').textContent = `↑ +${actDelta} ce mois`;
+  document.getElementById('kpi-arr-delta').textContent    = `↑ Extrapolé MRR × 12`;
+  document.getElementById('kpi-churn-delta').textContent  = `↓ -${(d.churn_prev - d.churn).toFixed(1)}pt vs mois dernier`;
+
+  // Bar chart MRR
+  const chartEl = document.getElementById('mrr-chart');
+  const maxVal = Math.max(...DEMO.mrr_history.map(m => m.new + m.renew));
+  chartEl.innerHTML = DEMO.mrr_history.map(m => {
+    const newH    = Math.round((m.new  / maxVal) * 100);
+    const renewH  = Math.round((m.renew / maxVal) * 100);
+    return `
+      <div class="bar-group">
+        <div class="bar-wrap">
+          <div class="bar" style="background:var(--accent);height:${newH}%;opacity:.85;" title="Nouveaux: ${m.new}€"></div>
+          <div class="bar" style="background:var(--teal);height:${renewH}%;opacity:.7;" title="Renouvellements: ${m.renew}€"></div>
+        </div>
+        <div class="bar-label">${m.month}</div>
+      </div>`;
+  }).join('');
+
+  // Donut legend
+  const total = DEMO.subscription_health.reduce((s,x) => s + x.count, 0);
+  document.getElementById('donut-legend').innerHTML = DEMO.subscription_health.map(s => {
+    const pct = Math.round(s.count / total * 100);
+    return `
+      <div class="donut-row">
+        <div class="donut-name">
+          <div class="cl-dot" style="background:${s.color};width:8px;height:8px;border-radius:50%;flex-shrink:0;"></div>
+          ${s.label}
+        </div>
+        <div class="donut-bar-bg"><div class="donut-bar-fill" style="width:${pct}%;background:${s.color};"></div></div>
+        <div class="donut-pct">${s.count}</div>
+      </div>`;
+  }).join('');
+
+  // Notifications
+  document.getElementById('notif-panel').innerHTML = DEMO.notifications.map(n => `
+    <div class="notif-item">
+      <div class="notif-dot ${n.dot}"></div>
+      <div class="notif-body">
+        <div class="notif-title">${n.title}</div>
+        <div class="notif-sub">${n.sub}</div>
+      </div>
+      <div class="notif-time">${n.time}</div>
+    </div>`).join('');
+
+  // Recent subscribers — données Supabase si disponibles
+  const recentSubs = window._sbSubs
+    ? window._sbSubs.slice(0,5).map(s => ({
+        prenom:     s.profiles?.prenom || '—',
+        nom:        s.profiles?.nom    || '—',
+        email:      s.profiles?.email  || '—',
+        metier:     s.profiles?.metier || '—',
+        status:     s.status,
+        started:    s.started_at?.split('T')[0] || '—',
+        period_end: s.current_period_end?.split('T')[0] || '—'
+      }))
+    : DEMO.subscribers.slice(0,5);
+
+  document.getElementById('recent-tbody').innerHTML = recentSubs.map(s => `
+    <tr>
+      <td><div class="td-name">${s.prenom} ${s.nom}</div><div class="td-email">${s.email}</div></td>
+      <td>${s.metier}</td>
+      <td>${statusBadge(s.status)}</td>
+      <td class="td-mono">${formatDate(s.started)}</td>
+      <td class="td-mono">${s.period_end === '—' ? '—' : formatDate(s.period_end)}</td>
+    </tr>`).join('') || '<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:20px;">Aucun abonné pour l\'instant</td></tr>';
+}
+
+// ══════════════════════════════════════
+// ABONNÉS
+// ══════════════════════════════════════
+let filteredSubs = [...DEMO.subscribers];
+let subPage = 1; const subPerPage = 6;
+
+function renderSubscribers(subs) {
+  // Utiliser données Supabase si disponibles
+  const data = window._sbSubs
+    ? window._sbSubs.map(s => ({
+        id:         s.id,
+        prenom:     s.profiles?.prenom || '—',
+        nom:        s.profiles?.nom    || '—',
+        email:      s.profiles?.email  || '—',
+        orias:      s.profiles?.orias  || '—',
+        metier:     s.profiles?.metier || '—',
+        status:     s.status,
+        started:    s.started_at?.split('T')[0] || '—',
+        period_end: s.current_period_end?.split('T')[0] || '—',
+        progress:   0
+      }))
+    : subs;
+
+  filteredSubs = data;
+  subPage = 1;
+  document.getElementById('sub-count').textContent = `${data.length} abonné${data.length > 1 ? 's' : ''}`;
+  renderSubPage();
+}
+
+function renderSubPage() {
+  const start = (subPage - 1) * subPerPage;
+  const page  = filteredSubs.slice(start, start + subPerPage);
+  document.getElementById('subscribers-tbody').innerHTML = page.map(s => {
+    const prog = s.progress >= 15
+      ? `<span style="color:var(--green);font-weight:700">✓ ${s.progress}h</span>`
+      : `<span style="color:${s.progress >= 10 ? 'var(--gold)' : 'var(--muted)'}">${s.progress}h / 15h</span>`;
+    return `<tr>
+      <td><div class="td-name">${s.prenom} ${s.nom}</div><div class="td-email">${s.email}</div></td>
+      <td class="td-mono">${s.orias}</td>
+      <td>${s.metier}</td>
+      <td>${statusBadge(s.status)}</td>
+      <td class="td-mono">${formatDate(s.started)}</td>
+      <td class="td-mono">${s.period_end === '—' ? '—' : formatDate(s.period_end)}</td>
+      <td>${prog}</td>
+      <td><div class="td-actions">
+        <button class="act-btn" onclick="viewSubscriber('${s.id}')">Voir</button>
+        <button class="act-btn" onclick="sendEmail('${s.id}')">Email</button>
+        <button class="act-btn danger" onclick="suspendSub('${s.id}')">Suspendre</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+
+  const pages = Math.ceil(filteredSubs.length / subPerPage);
+  document.getElementById('pag-info').textContent = `${start+1}–${Math.min(start+subPerPage, filteredSubs.length)} sur ${filteredSubs.length}`;
+  document.getElementById('pag-btns').innerHTML = Array.from({length:pages},(_,i) =>
+    `<button class="pag-btn ${i+1===subPage?'active':''}" onclick="goSubPage(${i+1})">${i+1}</button>`
+  ).join('');
+}
+
+function goSubPage(p) { subPage = p; renderSubPage(); }
+function filterSubscribers(q) {
+  const f = q.toLowerCase();
+  renderSubscribers(DEMO.subscribers.filter(s =>
+    `${s.prenom} ${s.nom} ${s.email} ${s.orias} ${s.siret||''}`.toLowerCase().includes(f)
+  ));
+}
+
+// ══════════════════════════════════════
+// PAIEMENTS
+// ══════════════════════════════════════
+function renderPayments() {
+  const pays = window._sbPays
+    ? window._sbPays.map(p => ({
+        invoice: p.invoice_number || '—',
+        nom:     `${p.profiles?.prenom||''} ${p.profiles?.nom||''}`.trim() || '—',
+        ht:      p.amount_ht || 0,
+        tva:     p.amount_tva || 0,
+        ttc:     p.amount_ttc || 0,
+        status:  p.status,
+        date:    p.charge_date || p.created_at?.split('T')[0] || '—',
+        gc_id:   p.gc_payment_id || '—'
+      }))
+    : DEMO.payments;
+
+  const confirmed = pays.filter(p => ['paid_out','confirmed'].includes(p.status));
+  const failed    = pays.filter(p => p.status === 'failed');
+  const pending   = pays.filter(p => p.status === 'submitted');
+  document.getElementById('pay-month').textContent    = confirmed.reduce((s,p) => s + (p.ht||0), 0).toFixed(2).replace('.',',');
+  document.getElementById('pay-ok').textContent       = confirmed.length;
+  document.getElementById('pay-fail').textContent     = failed.length;
+  document.getElementById('pay-pending').textContent  = pending.length;
+  document.getElementById('payments-tbody').innerHTML = pays.map(p => `
+    <tr>
+      <td class="td-mono">${p.invoice}</td>
+      <td>${p.nom}</td>
+      <td>${Number(p.ht).toFixed(2)} €</td>
+      <td>${Number(p.tva).toFixed(2)} €</td>
+      <td style="font-weight:600;color:var(--white)">${Number(p.ttc).toFixed(2)} €</td>
+      <td>${paymentBadge(p.status)}</td>
+      <td class="td-mono">${p.date}</td>
+      <td class="td-mono" style="font-size:11px;color:var(--muted)">${p.gc_id}</td>
+    </tr>`).join('');
+}
+
+// ══════════════════════════════════════
+// MODULES
+// ══════════════════════════════════════
+const SECTION_LABELS = {tc:'Tronc Commun',reg:'Réglementaire',tp:'Technique Produit',tv:'Techniques de Vente'};
+const SECTION_COLORS = {tc:'#3d7fff',reg:'#e05c8a',tp:'#2dd4bf',tv:'#a78bfa'};
+let currentModFilter = 'all';
+
+function filterModules(typeFilter, btn) {
+  currentModFilter = typeFilter;
+  document.querySelectorAll('#module-filters .ef-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderModules(typeFilter);
+}
+
+function renderModules(sec) {
+  const searchVal = (document.getElementById('module-search')?.value || '').toLowerCase().trim();
+  const sortVal   = document.getElementById('module-sort')?.value || 'default';
+  const source = window._sbMods
+    ? window._sbMods.map(m => ({
+        code:        m.code,
+        type:        m.type || 'elearning',
+        section:     m.section,
+        title:       m.title,
+        dur:         m.duree_minutes || 30,
+        niveau:      m.niveau === 'debutant' ? 'Débutant' : m.niveau === 'confirme' ? 'Confirmé' : 'Expert',
+        published:   m.published,
+        completions: 0,
+        score:       0,
+        thumbnail:   m.thumbnail_url || null,
+        video_url:   m.video_url     || null
+      }))
+    : DEMO.modules;
+
+  let mods = sec === 'all' ? source : source.filter(m => (m.type || 'elearning') === sec);
+  if (searchVal) mods = mods.filter(m => m.title.toLowerCase().includes(searchVal) || m.code.toLowerCase().includes(searchVal));
+  if (sortVal === 'recent') mods = [...mods].reverse();
+  else if (sortVal === 'az') mods = [...mods].sort((a,b) => a.title.localeCompare(b.title, 'fr'));
+  document.getElementById('module-grid').innerHTML = mods.map(m => {
+    const isVideo = m.type === 'video';
+    const thumbHtml = m.thumbnail ? `
+      <div class="mac-thumb" ${isVideo ? `onclick="previewVideo('${m.video_url || ''}','${m.title}')"` : ''}>
+        <img src="${m.thumbnail}" alt="${m.title}">
+        ${isVideo && m.video_url ? `<div class="mac-play-overlay"><div class="mac-play-btn">▶</div></div>` : ''}
+      </div>` : (isVideo ? `
+      <div class="mac-thumb" onclick="previewVideo('${m.video_url || ''}','${m.title}')">
+        <div class="mac-thumb-placeholder">🎬</div>
+        ${m.video_url ? `<div class="mac-play-overlay"><div class="mac-play-btn">▶</div></div>` : ''}
+      </div>` : '');
+    return `
+    <div class="mod-admin-card">
+      ${thumbHtml}
+      <div class="mac-header">
+        <div class="mac-code">${m.code}</div>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <span class="mod-type-badge ${isVideo ? 'mtb-video' : 'mtb-elearning'}">${isVideo ? '▶ Vidéo' : '📄 E-learning'}</span>
+          <span style="font-size:10px;color:${SECTION_COLORS[m.section]};font-weight:700;">${SECTION_LABELS[m.section]}</span>
+        </div>
+      </div>
+      <div class="mac-title">${m.title}</div>
+      <div class="mac-meta">
+        <span class="mac-tag">⏱ ${m.dur} min</span>
+        <span class="mac-tag">${m.niveau}</span>
+        ${m.completions > 0 ? `<span class="mac-tag">✓ ${m.completions} vues</span>` : ''}
+        ${!isVideo && m.score > 0 ? `<span class="mac-tag">Quiz ~${m.score}%</span>` : ''}
+        ${isVideo && !m.video_url ? `<span class="mac-tag" style="color:var(--orange)">⚠ URL manquante</span>` : ''}
+      </div>
+      <div class="mac-actions">
+        <button class="toggle-pub ${m.published ? 'published' : 'draft'}" onclick="togglePublish('${m.code}',this)">
+          ${m.published ? '● Publié' : '○ Brouillon'}
+        </button>
+        <button class="act-btn" onclick="editModule('${m.code}','${m.type}')">Éditer</button>
+        <button class="act-btn danger" onclick="deleteModule('${m.code}')">Supprimer</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════
+// PROGRESSION
+// ══════════════════════════════════════
+function renderProgress() {
+  const learn = window._sbLearn;
+  const topM  = window._sbTopMods;
+
+  const totalHours    = learn ? Math.round((learn.avg_minutes_per_module || 0) * (learn.learners_total || 0) / 60) : DEMO.subscribers.reduce((s,u) => s + u.progress, 0);
+  const completions   = learn ? (learn.total_modules_passed || 0) : DEMO.modules.reduce((s,m) => s + m.completions, 0);
+  const avgScore      = learn ? (learn.avg_quiz_score || 0) : Math.round(DEMO.modules.filter(m => m.score > 0).reduce((s,m) => s + m.score, 0) / DEMO.modules.filter(m => m.score > 0).length);
+
+  document.getElementById('stat-hours').textContent       = Math.round(totalHours) + 'h';
+  document.getElementById('stat-score').textContent       = avgScore ? avgScore + '%' : '—';
+  document.getElementById('stat-completions').textContent = completions;
+
+  const rows = topM && topM.length
+    ? topM
+    : DEMO.modules.filter(m => m.completions > 0).sort((a,b) => b.completions - a.completions);
+
+  document.getElementById('progress-tbody').innerHTML = rows.map(m => {
+    const rate = topM ? (m.completion_rate_pct || 0) : Math.round(m.completions / DEMO.kpis.active * 100);
+    const score = topM ? (m.avg_score || 0) : m.score;
+    const section = m.section || (m.sec || 'tc');
+    return `<tr>
+      <td><span class="td-mono">${m.code}</span> <span style="color:var(--white)">${m.title}</span></td>
+      <td><span style="color:${SECTION_COLORS[section]||'var(--muted)'}">${SECTION_LABELS[section]||section}</span></td>
+      <td>${m.starts || m.completions || 0}</td>
+      <td>${m.completions || 0}</td>
+      <td><span style="color:${rate>=70?'var(--green)':'var(--muted)'};font-weight:600">${rate}%</span></td>
+      <td>${score > 0 ? score + '%' : '—'}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════
+// EMAILS
+// ══════════════════════════════════════
+function filterEmails(type, btn) {
+  document.querySelectorAll('#email-filters .ef-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const source = window._sbEmails
+    ? window._sbEmails.map(e => ({
+        date:     e.sent_at?.replace('T',' ').substring(0,16) || '—',
+        to:       e.email_to,
+        template: e.template_id,
+        status:   e.status,
+        id:       e.brevo_msg_id || '—'
+      }))
+    : DEMO.emails;
+  const emails = type === 'all' ? source : source.filter(e => e.template.includes(type));
+  renderEmails(type, emails);
+}
+function renderEmails(type, emails) {
+  const source = emails || (window._sbEmails
+    ? window._sbEmails.map(e => ({
+        date:     e.sent_at?.replace('T',' ').substring(0,16) || '—',
+        to:       e.email_to,
+        template: e.template_id,
+        status:   e.status,
+        id:       e.brevo_msg_id || '—'
+      }))
+    : DEMO.emails);
+  document.getElementById('emails-tbody').innerHTML = source.map(e => `
+    <tr>
+      <td class="td-mono">${e.date}</td>
+      <td>${e.to}</td>
+      <td><span class="mac-tag" style="font-size:11px;font-family:'DM Mono',monospace">${e.template}</span></td>
+      <td>${e.status === 'sent' ? '<span class="badge badge-active">✓ Envoyé</span>'
+           : e.status === 'opened' ? '<span class="badge" style="background:rgba(61,127,255,.12);color:var(--accent2);">◎ Ouvert</span>'
+           : '<span class="badge badge-cancelled">⚠ Échec</span>'}</td>
+      <td class="td-mono" style="font-size:10px;color:var(--muted)">${e.id}</td>
+    </tr>`).join('');
+}
+
+// ══════════════════════════════════════
+// WEBHOOKS
+// ══════════════════════════════════════
+function renderWebhooks() {
+  const source = window._sbHooks
+    ? window._sbHooks.map(w => ({
+        received:  w.received_at?.replace('T',' ').substring(0,16) || '—',
+        type:      w.event_type,
+        resource:  w.resource_id || '—',
+        processed: w.processed
+      }))
+    : DEMO.webhooks;
+  document.getElementById('webhooks-tbody').innerHTML = source.map(w => `
+    <tr>
+      <td class="td-mono">${w.received}</td>
+      <td><span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--accent2)">${w.type}</span></td>
+      <td class="td-mono">${w.resource}</td>
+      <td>${w.processed ? '<span class="badge badge-active">✓ Traité</span>' : '<span class="badge badge-pending">⏳ En attente</span>'}</td>
+      <td><button class="act-btn" onclick="showPayload()">Voir JSON</button></td>
+    </tr>`).join('');
+}
+
+// ══════════════════════════════════════
+// HELPERS
+// ══════════════════════════════════════
+function statusBadge(status) {
+  const map = {
+    active:    `<span class="badge badge-active"><span class="status-dot" style="background:var(--green)"></span>Actif</span>`,
+    pending:   `<span class="badge badge-pending"><span class="status-dot" style="background:var(--gold)"></span>En attente</span>`,
+    past_due:  `<span class="badge badge-past_due"><span class="status-dot" style="background:var(--orange)"></span>Impayé</span>`,
+    cancelled: `<span class="badge badge-cancelled"><span class="status-dot" style="background:var(--muted)"></span>Résilié</span>`,
+  };
+  return map[status] ?? status;
+}
+function paymentBadge(status) {
+  const map = {
+    paid_out:  `<span class="badge badge-active">✓ Versé</span>`,
+    confirmed: `<span class="badge badge-active">✓ Confirmé</span>`,
+    failed:    `<span class="badge badge-failed">✗ Échoué</span>`,
+    submitted: `<span class="badge badge-pending">⏳ Soumis</span>`,
+    cancelled: `<span class="badge badge-cancelled">Annulé</span>`,
+  };
+  return map[status] ?? status;
+}
+function formatDate(str) {
+  if (!str || str === '—') return '—';
+  const d = new Date(str);
+  return d.toLocaleDateString('fr-FR', { day:'2-digit', month:'short', year:'numeric' });
+}
+async function refreshData() {
+  const btn = document.querySelector('.tb-refresh');
+  btn.textContent = '↺ Chargement…';
+  await loadSupabaseData();
+  btn.textContent = '↺ Actualiser';
+  renderView(currentView);
+}
+function exportCSV() { alert('Export CSV — Connectez Supabase pour activer l\'export réel.'); }
+
+// ══════════════════════════════════════
+// MODAL
+// ══════════════════════════════════════
+function openModal(type) {
+  const overlay = document.getElementById('modal-overlay');
+  const title = document.getElementById('modal-title');
+  const body  = document.getElementById('modal-body');
+
+  if (type === 'new-subscriber') {
+    title.textContent = 'Ajouter un abonné manuellement';
+    body.innerHTML = `
+      <div class="form-group"><label class="form-label">Prénom</label><input class="form-input" placeholder="Jean"></div>
+      <div class="form-group"><label class="form-label">Nom</label><input class="form-input" placeholder="Dupont"></div>
+      <div class="form-group"><label class="form-label">Email</label><input class="form-input" type="email" placeholder="jean@cabinet.fr"></div>
+      <div class="form-group"><label class="form-label">N° ORIAS</label><input class="form-input" placeholder="07 000 000"></div>
+      <p style="font-size:12px;color:var(--muted);margin-top:8px;">Le mandat SEPA devra être signé par l'abonné via GoCardless.</p>`;
+  }
+  if (type === 'new-module') {
+    title.textContent = 'Nouveau module';
+    body.innerHTML = `
+      <!-- Type toggle -->
+      <div class="type-toggle" id="type-toggle">
+        <button class="type-toggle-btn active-el" id="toggle-el" onclick="switchModuleType('elearning')">📄 E-learning</button>
+        <button class="type-toggle-btn" id="toggle-vid" onclick="switchModuleType('video')">▶ Vidéo</button>
+      </div>
+
+      <!-- Code + Durée -->
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Code <span style="color:var(--accent2)">*</span></label>
+          <input class="form-input" id="mod-code" placeholder="TC-05 ou VID-03">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Durée (minutes) <span style="color:var(--accent2)">*</span></label>
+          <input class="form-input" id="mod-dur" type="number" value="45" min="1">
+        </div>
+      </div>
+
+      <!-- Titre -->
+      <div class="form-group">
+        <label class="form-label">Titre <span style="color:var(--accent2)">*</span></label>
+        <input class="form-input" id="mod-title" placeholder="Titre du module">
+      </div>
+
+      <!-- Section + Niveau -->
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Section <span style="color:var(--accent2)">*</span></label>
+          <select class="form-input" id="mod-section">
+            <optgroup label="Réglementaire">
+              <option value="tc">Tronc Commun</option>
+              <option value="reg">Réglementaire</option>
+            </optgroup>
+            <optgroup label="Technique">
+              <option value="tp">Technique Produit</option>
+              <option value="rc">Réglementation Complémentaire</option>
+              <option value="pe">Pratiques &amp; Expertises</option>
+              <option value="aa">Assurance Avancée</option>
+            </optgroup>
+            <optgroup label="Commercial">
+              <option value="tv">Techniques de Vente</option>
+              <option value="dc">Développement Commercial</option>
+              <option value="mc">Management Commercial</option>
+              <option value="cs">Compétences Soft</option>
+            </optgroup>
+            <optgroup label="Stratégie">
+              <option value="bm">Benchmark</option>
+              <option value="go">Gestion &amp; Organisation</option>
+            </optgroup>
+            <optgroup label="Contenus spéciaux">
+              <option value="veille">Veille Hebdomadaire</option>
+              <option value="outils">Outils</option>
+            </optgroup>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Niveau <span style="color:var(--accent2)">*</span></label>
+          <select class="form-input" id="mod-niveau">
+            <option value="debutant">Débutant</option>
+            <option value="confirme">Confirmé</option>
+            <option value="expert">Expert</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Métiers ciblés -->
+      <div class="form-group">
+        <label class="form-label">Métiers ciblés</label>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;padding:10px;background:var(--surface2);border:1.5px solid var(--border2);border-radius:var(--r);">
+          ${[
+            ['courtier','Courtier IAS'],
+            ['commercial','Commercial'],
+            ['manager','Manager'],
+            ['gestionnaire','Gestionnaire'],
+            ['assistant','Assistant'],
+            ['teleconseiller','Téléconseiller'],
+            ['agent','Agent général'],
+            ['mutualiste','Mutualiste']
+          ].map(([val,lbl]) => `
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text);cursor:pointer;">
+              <input type="checkbox" class="mod-metier-cb" value="${val}"
+                style="accent-color:var(--accent);width:14px;height:14px;">
+              ${lbl}
+            </label>`).join('')}
+        </div>
+        <div style="font-size:11px;color:var(--muted);margin-top:4px;">Décochez pour restreindre l'affichage à certains profils.</div>
+      </div>
+
+      <!-- DDA certifiant -->
+      <div class="form-group">
+        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
+          <input type="checkbox" id="mod-dda" checked
+            style="accent-color:var(--accent);width:16px;height:16px;">
+          <span class="form-label" style="margin:0;">Module DDA certifiant</span>
+        </label>
+        <div style="font-size:11px;color:var(--muted);margin-top:4px;">Les heures de ce module comptent dans le quota de 15h annuelles.</div>
+      </div>
+
+      <!-- Description -->
+      <div class="form-group">
+        <label class="form-label">Description</label>
+        <textarea class="form-input form-textarea" id="mod-desc" placeholder="Courte description visible dans le catalogue…"></textarea>
+      </div>
+
+      <!-- Champs E-learning -->
+      <div id="fields-elearning">
+        <div class="form-group">
+          <label class="form-label">Thumbnail — Recherche Unsplash</label>
+          <div style="display:flex;gap:8px;margin-bottom:8px;">
+            <input class="form-input" id="unsplash-query" placeholder="assurance, formation, contrat…"
+              style="flex:1;" onkeydown="if(event.key==='Enter'){searchUnsplash();event.preventDefault();}">
+            <button onclick="searchUnsplash()" style="
+              background:var(--accent);color:#fff;border:none;border-radius:var(--r);
+              padding:0 16px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:12px;
+              font-weight:700;white-space:nowrap;transition:all .2s;
+            ">🔍 Chercher</button>
+          </div>
+          <div id="unsplash-results" style="display:none;display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:10px;"></div>
+          <div class="form-group" style="margin-top:6px;">
+            <label class="form-label" style="font-size:11px;">URL thumbnail sélectionnée</label>
+            <input class="form-input" id="mod-thumb-el" type="url"
+              placeholder="Sélectionnez une image ci-dessus ou collez une URL…"
+              style="font-size:12px;">
+          </div>
+          <div id="thumb-preview-el" style="display:none;margin-top:6px;">
+            <img id="thumb-preview-el-img" src=""
+              style="width:100%;border-radius:var(--r);max-height:100px;object-fit:cover;">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Contenu HTML</label>
+          <textarea class="form-input" id="mod-content" style="min-height:120px;font-family:'DM Mono',monospace;font-size:11px;" placeholder="Collez le HTML du module ici…"></textarea>
+          <div style="font-size:11px;color:var(--muted);margin-top:4px;">Stocké dans <code style="background:var(--surface2);padding:1px 5px;border-radius:3px;">content_html</code> dans Supabase.</div>
+        </div>
+      </div>
+
+      <!-- Champs Vidéo -->
+      <div id="fields-video" style="display:none;">
+        <div class="form-group">
+          <label class="form-label">URL de la vidéo <span style="color:var(--accent2)">*</span></label>
+          <input class="form-input" id="mod-video-url" type="url"
+            placeholder="https://youtube.com/watch?v=… ou https://vimeo.com/…"
+            oninput="previewEmbedInModal(this.value); autoFetchVideoThumb(this.value);">
+          <div style="font-size:11px;color:var(--muted);margin-top:4px;">YouTube, Vimeo et Wistia supportés.</div>
+        </div>
+        <div id="modal-video-preview" class="video-preview" style="display:none;">
+          <div class="video-preview-placeholder">Entrez une URL valide pour prévisualiser</div>
+        </div>
+        <div class="form-group" style="margin-top:14px;">
+          <label class="form-label">Thumbnail auto-détecté</label>
+          <div id="video-thumb-preview" style="display:none;margin-bottom:8px;">
+            <img id="video-thumb-img" src=""
+              style="width:100%;border-radius:var(--r);max-height:100px;object-fit:cover;">
+            <div style="font-size:11px;color:var(--teal);margin-top:4px;">✓ Thumbnail extrait automatiquement</div>
+          </div>
+          <input class="form-input" id="mod-thumb-url" type="url"
+            placeholder="Généré automatiquement depuis l'URL vidéo">
+          <div style="font-size:11px;color:var(--muted);margin-top:4px;">Modifiez uniquement si vous souhaitez un thumbnail personnalisé.</div>
+        </div>
+      </div>`;
+
+    // Init événements après rendu
+    setTimeout(() => {
+      // Preview thumbnail e-learning
+      const elThumb = document.getElementById('mod-thumb-el');
+      if (elThumb) elThumb.addEventListener('input', function() {
+        const preview = document.getElementById('thumb-preview-el');
+        const img     = document.getElementById('thumb-preview-el-img');
+        if (this.value) { preview.style.display='block'; img.src=this.value; }
+        else { preview.style.display='none'; }
+      });
+      // Pré-remplir la recherche avec le titre
+      const titleVal = document.getElementById('mod-title')?.value;
+      if (titleVal) document.getElementById('unsplash-query').value = titleVal;
+    }, 100);
+  }
+  if (type === 'connect-pennylane') {
+    title.textContent = 'Connecter Pennylane';
+    body.innerHTML = `
+      <p style="font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.6;">Avant de connecter Pennylane, assurez-vous d'avoir souscrit au plan <strong style="color:var(--text)">Essentiel (24€ HT/mois)</strong> sur pennylane.com.</p>
+      <div class="form-group"><label class="form-label">Clé API Pennylane</label><input class="form-input" type="password" placeholder="pk_live_xxxxxxxxxxxxx"></div>
+      <div class="form-group"><label class="form-label">ID Organisation</label><input class="form-input" placeholder="org_xxxxxxxxxxxxx"></div>
+      <div style="background:rgba(61,127,255,.06);border:1px solid rgba(61,127,255,.15);border-radius:var(--r);padding:12px 14px;font-size:12px;color:var(--muted);line-height:1.65;">
+        Après connexion, chaque paiement GoCardless confirmé déclenchera automatiquement la génération d'une facture Factur-X dans Pennylane et l'envoi par email au client.
+      </div>`;
+  }
+  if (type === 'brevo-templates') {
+    title.textContent = 'Templates Brevo à créer';
+    body.innerHTML = `
+      <p style="font-size:12px;color:var(--muted);margin-bottom:14px;">Créez ces 13 templates dans Brevo → Email → Templates. Les IDs doivent correspondre aux numéros ci-dessous.</p>
+      <div style="display:flex;flex-direction:column;gap:6px;">
+        ${[
+          [1,'onboarding_j0','Bienvenue + accès plateforme'],
+          [2,'onboarding_j3','Premier module recommandé'],
+          [3,'onboarding_j7','Rappel progression'],
+          [4,'onboarding_j30','Bilan premier mois'],
+          [5,'facture','Facture mensuelle'],
+          [6,'echec_prelevement','Prélèvement refusé'],
+          [7,'mandat_annule','Mandat SEPA annulé'],
+          [8,'rappel_dda_j60','J-60 avant échéance DDA'],
+          [9,'rappel_dda_j30','J-30 avant échéance DDA'],
+          [10,'rappel_dda_j7','J-7 avant échéance DDA'],
+          [11,'nouveau_contenu','Nouveaux modules disponibles'],
+          [12,'renouvellement','Abonnement renouvelé'],
+          [13,'resiliation','Confirmation résiliation'],
+        ].map(([id,key,label]) => `
+          <div style="display:flex;align-items:center;gap:10px;padding:7px 10px;background:var(--surface2);border-radius:5px;border:1px solid var(--border2);">
+            <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--accent2);width:18px;text-align:right;">${id}</span>
+            <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);flex:1;">${key}</span>
+            <span style="font-size:11px;color:var(--text);">${label}</span>
+          </div>`).join('')}
+      </div>`;
+    document.getElementById('modal-footer').innerHTML = `<button class="btn-primary" onclick="window.open('https://app.brevo.com/email-campaign/template/list','_blank')">Ouvrir Brevo →</button>`;
+  }
+  if (type === 'install-plausible') {
+    title.textContent = 'Installer Plausible Analytics';
+    body.innerHTML = `
+      <p style="font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.6;">Ajoutez cette ligne dans le <code style="background:var(--surface2);padding:1px 5px;border-radius:3px;">&lt;head&gt;</code> de <strong style="color:var(--text)">DDAFLIX-Landing_Funnel.html</strong> et <strong style="color:var(--text)">DDAFLIX-Contenu.html</strong> :</p>
+      <div style="background:var(--surface2);border:1px solid var(--border2);border-radius:var(--r);padding:14px;font-family:'DM Mono',monospace;font-size:11px;color:var(--accent2);line-height:1.6;word-break:break-all;">
+        &lt;script defer data-domain="bingedda.fr" src="https://plausible.io/js/script.js"&gt;&lt;/script&gt;
+      </div>
+      <p style="font-size:12px;color:var(--muted);margin-top:12px;line-height:1.6;">Remplacez <code style="background:var(--surface2);padding:1px 5px;border-radius:3px;">bingedda.fr</code> par votre domaine Vercel (<code style="background:var(--surface2);padding:1px 5px;border-radius:3px;">bingedda.vercel.app</code>) tant que le domaine custom n'est pas configuré. Aucun cookie, aucun bandeau RGPD requis.</p>`;
+    document.getElementById('modal-footer').innerHTML = `<button class="btn-primary" onclick="window.open('https://plausible.io','_blank')">Créer un compte Plausible →</button>`;
+  }
+  overlay.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+  document.getElementById('modal-footer').innerHTML = `
+    <button class="btn-secondary" onclick="closeModal()">Annuler</button>
+    <button class="btn-primary" onclick="saveModal()">Enregistrer</button>`;
+}
+function handleModalClick(e) {
+  if (e.target.id === 'modal-overlay') {
+    const modal = document.getElementById('modal');
+    if (modal) {
+      modal.classList.remove('shake');
+      void modal.offsetWidth;
+      modal.classList.add('shake');
+      setTimeout(() => modal.classList.remove('shake'), 400);
+    }
+  }
+}
+async function saveModal() {
+  // Si c'est un formulaire module → sauvegarder dans Supabase
+  const code = document.getElementById('mod-code')?.value.trim();
+  if (code) {
+    const isVideo   = document.getElementById('toggle-vid')?.classList.contains('active-vid');
+    const metiers   = [...document.querySelectorAll('.mod-metier-cb:checked')].map(cb => cb.value);
+    const payload   = {
+      code,
+      section:       document.getElementById('mod-section')?.value,
+      title:         document.getElementById('mod-title')?.value.trim(),
+      description:   document.getElementById('mod-desc')?.value.trim() || null,
+      duree_minutes: parseInt(document.getElementById('mod-dur')?.value) || 45,
+      niveau:        document.getElementById('mod-niveau')?.value,
+      dda_certifiant: document.getElementById('mod-dda')?.checked ?? true,
+      type:          isVideo ? 'video' : 'elearning',
+      produits:      metiers.length ? metiers : null,
+      published:     false,
+      content_html:  !isVideo ? (document.getElementById('mod-content')?.value || null) : null,
+      video_url:     isVideo  ? (document.getElementById('mod-video-url')?.value || null) : null,
+      thumbnail_url: isVideo
+        ? (document.getElementById('mod-thumb-url')?.value || null)
+        : (document.getElementById('mod-thumb-el')?.value  || null),
+    };
+
+    if (!payload.title) { alert('Le titre est obligatoire.'); return; }
+
+    const _sb = window._sbAdmin || window.supabase?.createClient('https://vrufldjydjrgcqwhmpnt.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZydWZsZGp5ZGpyZ2Nxd2htcG50Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5NTA3ODksImV4cCI6MjA5MjUyNjc4OX0.jW1CQ5yzJr4Ccac9-OI2RgVLXqFn-X0MjAxCkc9Xbfc', { auth: { storageKey: 'dda-coach-auth' } });
+    if (_sb) {
+      const { error } = await _sb.from('modules').upsert(payload, { onConflict: 'code' });
+      if (error) {
+        alert('Erreur Supabase : ' + error.message);
+        return;
+      }
+      // Recharger les modules
+      const { data: mods } = await _sb.from('modules').select('code, section, title, duree_minutes, niveau, published, type, thumbnail_url, video_url').order('sort_order');
+      if (mods) window._sbMods = mods;
+      renderModules(currentModFilter || 'all');
+      closeModal();
+      alert(`✓ Module "${payload.code}" ${payload.published ? 'publié' : 'sauvegardé en brouillon'}.`);
+      return;
+    }
+  }
+  closeModal();
+  alert('Enregistré — Connectez Supabase pour persister les données.');
+}
+
+// Actions inline (démos)
+async function viewSubscriber(id) { alert(`Fiche abonné ${id} — Connectez Supabase pour voir les données réelles.`); }
+async function sendEmail(id) { alert(`Envoyer email à l'abonné ${id} — Sélectionnez un template Brevo.`); }
+async function suspendSub(id) { if (confirm('Suspendre cet abonnement ?')) alert('Suspendu — GoCardless sera notifié.'); }
+async function togglePublish(code, btn) {
+  const isPub = btn.classList.contains('published');
+  const newState = !isPub;
+
+  if (sb) {
+    const { error } = await sb.from('modules').update({ published: newState }).eq('code', code);
+    if (error) { alert('Erreur : ' + error.message); return; }
+  }
+
+  btn.classList.toggle('published', newState);
+  btn.classList.toggle('draft', !newState);
+  btn.textContent = newState ? '● Publié' : '○ Brouillon';
+
+  // Mettre à jour le cache local
+  if (window._sbMods) {
+    const mod = window._sbMods.find(m => m.code === code);
+    if (mod) mod.published = newState;
+  }
+}
+async function editModule(code, type) {
+  openModal('new-module');
+  document.getElementById('modal-title').textContent = `Éditer ${code}`;
+
+  // Charger les données complètes du module depuis Supabase
+  const sbClient = window._sbAdmin || window._sbMods && (() => {
+    const k = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZydWZsZGp5ZGpyZ2Nxd2htcG50Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5NTA3ODksImV4cCI6MjA5MjUyNjc4OX0.jW1CQ5yzJr4Ccac9-OI2RgVLXqFn-X0MjAxCkc9Xbfc';
+    return window.supabase.createClient('https://vrufldjydjrgcqwhmpnt.supabase.co', k, { auth: { storageKey: 'dda-coach-auth' } });
+  })();
+
+  if (!sbClient) {
+    // Fallback : pré-remplir depuis le cache local
+    const cached = window._sbMods?.find(m => m.code === code);
+    if (cached) {
+      setTimeout(() => {
+        const el = id => document.getElementById(id);
+        if (el('mod-code'))         el('mod-code').value         = cached.code || '';
+        if (el('mod-title'))        el('mod-title').value        = cached.title || '';
+        if (el('mod-section'))      el('mod-section').value      = cached.section || '';
+        if (el('mod-dur'))          el('mod-dur').value          = cached.duree_minutes || 30;
+        if (el('mod-niveau'))       el('mod-niveau').value       = cached.niveau || 'debutant';
+        if (el('mod-dda'))          el('mod-dda').checked        = cached.dda_certifiant ?? true;
+        if (el('mod-thumb-el'))     el('mod-thumb-el').value     = cached.thumbnail_url || '';
+        if (el('mod-video-url'))    el('mod-video-url').value    = cached.video_url || '';
+        if (cached.type === 'video') switchModuleType('video');
+      }, 100);
+    }
+    return;
+  }
+
+  try {
+    const { data: mod } = await sbClient.from('modules')
+      .select('*')
+      .eq('code', code)
+      .single();
+
+    if (!mod) return;
+
+    setTimeout(() => {
+      const el = id => document.getElementById(id);
+      if (el('mod-code'))         el('mod-code').value         = mod.code || '';
+      if (el('mod-title'))        el('mod-title').value        = mod.title || '';
+      if (el('mod-section'))      el('mod-section').value      = mod.section || '';
+      if (el('mod-dur'))          el('mod-dur').value          = mod.duree_minutes || 30;
+      if (el('mod-niveau'))       el('mod-niveau').value       = mod.niveau || 'debutant';
+      if (el('mod-dda'))          el('mod-dda').checked        = mod.dda_certifiant ?? true;
+      if (el('mod-desc'))         el('mod-desc').value         = mod.description || '';
+      if (el('mod-thumb-el'))     el('mod-thumb-el').value     = mod.thumbnail_url || '';
+      if (el('mod-video-url'))    el('mod-video-url').value    = mod.video_url || '';
+      if (el('mod-thumb-url'))    el('mod-thumb-url').value    = mod.thumbnail_url || '';
+      if (mod.type === 'video')   switchModuleType('video');
+    }, 100);
+  } catch(e) {
+    console.warn('editModule error:', e);
+  }
+}
+async function deleteModule(code) {
+  if (!confirm(`Supprimer le module ${code} ? Cette action est irréversible.`)) return;
+
+  // Récupérer le youtube_video_id avant suppression
+  const { data: mod } = await sb.from('modules').select('youtube_video_id').eq('code', code).single();
+
+  const { error } = await sb.from('modules').delete().eq('code', code);
+  if (error) { alert('Erreur : ' + error.message); return; }
+
+  // Mettre à jour le cache local
+  if (window._sbMods) window._sbMods = window._sbMods.filter(m => m.code !== code);
+
+  // Mettre à jour _ytImportedIds si c'était un module YouTube
+  if (mod?.youtube_video_id) _ytImportedIds.delete(mod.youtube_video_id);
+
+  renderModules(currentModFilter || 'all');
+  toast && toast(`✓ Module ${code} supprimé.`);
+}
+function showPayload() { alert('Payload JSON GoCardless — Connexion Supabase requise pour lire les données réelles.'); }
+
+// ── UNSPLASH SEARCH ──
+const UNSPLASH_KEY = '64lhwVuo_MZe_eIS4C25jUORCn5jfZjPY80clhu9kbg';
+
+async function searchUnsplash() {
+  const query = document.getElementById('unsplash-query')?.value.trim();
+  if (!query) return;
+
+  const btn = document.querySelector('[onclick="searchUnsplash()"]');
+  if (btn) { btn.textContent = '⟳'; btn.disabled = true; }
+
+  try {
+    const res = await fetch(
+      `https://api.unsplash.com/search/photos?query=${encodeURIComponent(query)}&per_page=6&orientation=landscape`,
+      { headers: { Authorization: `Client-ID ${UNSPLASH_KEY}` } }
+    );
+    const data = await res.json();
+    const results = document.getElementById('unsplash-results');
+    if (!results) return;
+
+    if (!data.results?.length) {
+      results.style.display = 'block';
+      results.innerHTML = `<div style="grid-column:1/-1;font-size:12px;color:var(--muted);padding:10px;">Aucun résultat pour "${query}"</div>`;
+      return;
+    }
+
+    results.style.display = 'grid';
+    results.innerHTML = data.results.map(photo => `
+      <div onclick="selectUnsplashPhoto('${photo.urls.regular}', '${photo.urls.thumb}')"
+        style="cursor:pointer;border-radius:5px;overflow:hidden;position:relative;aspect-ratio:16/9;border:2px solid transparent;transition:border-color .15s;"
+        onmouseover="this.style.borderColor='var(--accent)'"
+        onmouseout="this.style.borderColor='transparent'">
+        <img src="${photo.urls.thumb}" alt="${photo.alt_description||''}"
+          style="width:100%;height:100%;object-fit:cover;">
+        <div style="position:absolute;bottom:0;left:0;right:0;padding:3px 5px;background:rgba(0,0,0,.5);font-size:9px;color:rgba(255,255,255,.7);">
+          ${photo.user.name}
+        </div>
+      </div>`).join('');
+
+  } catch (err) {
+    console.error('Unsplash error:', err);
+  } finally {
+    if (btn) { btn.textContent = '🔍 Chercher'; btn.disabled = false; }
+  }
+}
+
+function selectUnsplashPhoto(regularUrl, thumbUrl) {
+  const input   = document.getElementById('mod-thumb-el');
+  const preview = document.getElementById('thumb-preview-el');
+  const img     = document.getElementById('thumb-preview-el-img');
+  if (!input) return;
+  input.value = regularUrl;
+  preview.style.display = 'block';
+  img.src = thumbUrl;
+  // Highlight selected
+  document.querySelectorAll('#unsplash-results > div').forEach(d => {
+    d.style.borderColor = d.querySelector('img')?.src === thumbUrl ? 'var(--accent)' : 'transparent';
+  });
+}
+
+// ── AUTO-THUMBNAIL VIDÉO ──
+function autoFetchVideoThumb(url) {
+  const thumbInput   = document.getElementById('mod-thumb-url');
+  const thumbPreview = document.getElementById('video-thumb-preview');
+  const thumbImg     = document.getElementById('video-thumb-img');
+  if (!thumbInput) return;
+
+  // YouTube
+  const ytMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\s]+)/);
+  if (ytMatch) {
+    const videoId  = ytMatch[1];
+    const thumbUrl = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+    thumbInput.value = thumbUrl;
+    if (thumbPreview) { thumbPreview.style.display = 'block'; thumbImg.src = thumbUrl; }
+    return;
+  }
+
+  // Vimeo — nécessite un appel API
+  const viMatch = url.match(/vimeo\.com\/(\d+)/);
+  if (viMatch) {
+    fetch(`https://vimeo.com/api/v2/video/${viMatch[1]}.json`)
+      .then(r => r.json())
+      .then(data => {
+        const thumbUrl = data[0]?.thumbnail_large;
+        if (thumbUrl) {
+          thumbInput.value = thumbUrl;
+          if (thumbPreview) { thumbPreview.style.display = 'block'; thumbImg.src = thumbUrl; }
+        }
+      })
+      .catch(() => {});
+    return;
+  }
+
+  // Autres — vider le champ
+  thumbInput.value = '';
+  if (thumbPreview) thumbPreview.style.display = 'none';
+}
+function switchModuleType(type) {
+  const elBtn  = document.getElementById('toggle-el');
+  const vidBtn = document.getElementById('toggle-vid');
+  const elFields  = document.getElementById('fields-elearning');
+  const vidFields = document.getElementById('fields-video');
+  if (!elBtn) return;
+
+  if (type === 'elearning') {
+    elBtn.classList.add('active-el'); elBtn.classList.remove('active-vid');
+    vidBtn.classList.remove('active-el','active-vid');
+    elFields.style.display  = 'block';
+    vidFields.style.display = 'none';
+  } else {
+    vidBtn.classList.add('active-vid'); vidBtn.classList.remove('active-el');
+    elBtn.classList.remove('active-el','active-vid');
+    elFields.style.display  = 'none';
+    vidFields.style.display = 'block';
+  }
+}
+
+// ── EMBED URL PARSER ──
+function getEmbedUrl(url) {
+  if (!url) return null;
+  // YouTube
+  const ytMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\s]+)/);
+  if (ytMatch) return `https://www.youtube.com/embed/${ytMatch[1]}?rel=0&modestbranding=1`;
+  // Vimeo
+  const viMatch = url.match(/vimeo\.com\/(\d+)/);
+  if (viMatch) return `https://player.vimeo.com/video/${viMatch[1]}?title=0&byline=0`;
+  // Wistia
+  const wiMatch = url.match(/(?:wistia\.com|wi\.st)\/(?:medias|embed)\/([a-z0-9]+)/);
+  if (wiMatch) return `https://fast.wistia.net/embed/iframe/${wiMatch[1]}`;
+  return null;
+}
+
+function previewEmbedInModal(url) {
+  const preview = document.getElementById('modal-video-preview');
+  if (!preview) return;
+  const embedUrl = getEmbedUrl(url);
+  if (embedUrl) {
+    preview.style.display = 'block';
+    preview.innerHTML = `<iframe src="${embedUrl}" allowfullscreen></iframe>`;
+  } else {
+    preview.style.display = url ? 'block' : 'none';
+    preview.innerHTML = `<div class="video-preview-placeholder">${url ? '⚠ URL non reconnue — YouTube, Vimeo ou Wistia uniquement' : ''}</div>`;
+  }
+}
+
+function previewVideo(url, title) {
+  if (!url) { alert('URL vidéo non configurée pour ce module.'); return; }
+  const embedUrl = getEmbedUrl(url);
+  if (!embedUrl) { alert('URL non reconnue.'); return; }
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-body').innerHTML = `
+    <div class="video-preview" style="display:block;">
+      <iframe src="${embedUrl}" allowfullscreen></iframe>
+    </div>`;
+  document.getElementById('modal-footer').innerHTML = `<button class="btn-secondary" onclick="closeModal()">Fermer</button>`;
+  document.getElementById('modal-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+// Date courante
+document.getElementById('current-date').textContent =
+  new Date().toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+
+// ══════════════════════════════════════
+// MODULE YOUTUBE
+// ══════════════════════════════════════
+const YT_API_KEY = 'AIzaSyDsCy4HvEWilZ4YZD4gKtMPmX70KyN6IVo';
+let _ytChannels      = [];
+let _ytCurrentChannel = null;
+let _ytVideos         = [];
+let _ytNextPageToken  = null;
+let _ytImportedIds    = new Set();
+
+// ── CHARGER LES CHAÎNES ──
+async function renderYoutube() {
+  const grid = document.getElementById('yt-channels-grid');
+  if (!grid) return;
+  grid.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted);font-size:13px;grid-column:1/-1;">Chargement…</div>';
+
+  const { data: channels, error } = await sb.from('youtube_channels').select('*').order('created_at');
+  if (error) { grid.innerHTML = `<div style="color:var(--red);grid-column:1/-1;">Erreur : ${error.message}</div>`; return; }
+
+  _ytChannels = channels || [];
+  if (!_ytChannels.length) {
+    grid.innerHTML = `<div style="text-align:center;padding:60px 20px;color:var(--muted);font-size:13px;grid-column:1/-1;">
+      Aucune chaîne configurée.<br><br>
+      <button onclick="openModal('add-channel')" class="tbl-btn primary" style="margin-top:8px;">+ Ajouter une chaîne YouTube</button>
+    </div>`;
+    return;
+  }
+
+  grid.innerHTML = _ytChannels.map(ch => `
+    <div class="yt-channel-card ${ch.actif ? '' : 'inactive'}" onclick="openChannel('${ch.channel_id}', '${ch.channel_name.replace(/'/g,"\\'")}')">
+      ${ch.thumbnail_url
+        ? `<img class="yt-ch-thumb" src="${ch.thumbnail_url}" alt="${ch.channel_name}">`
+        : `<div class="yt-ch-thumb-placeholder">📺</div>`}
+      <div class="yt-ch-body">
+        <div class="yt-ch-name">${ch.channel_name}</div>
+        <div class="yt-ch-meta">${ch.actif ? '● Active' : '○ Inactive'}</div>
+      </div>
+      <div class="yt-ch-actions" onclick="event.stopPropagation()">
+        <button class="act-btn" onclick="toggleChannel('${ch.id}', ${ch.actif})">${ch.actif ? 'Désactiver' : 'Activer'}</button>
+        <button class="act-btn danger" onclick="deleteChannel('${ch.id}', '${ch.channel_name.replace(/'/g,"\\'")}')">Supprimer</button>
+      </div>
+    </div>`).join('');
+}
+
+// ── AJOUTER UNE CHAÎNE ──
+async function addYoutubeChannel(input) {
+  // Accepte URL complète ou @handle ou ID direct
+  let channelId = input.trim();
+  
+  // Extraire l'ID depuis une URL YouTube
+  const urlMatch = input.match(/youtube\.com\/(channel\/|@|c\/)([^\/\?]+)/);
+  if (urlMatch) channelId = urlMatch[2];
+  
+  // Si c'est un @handle, résoudre via API
+  if (channelId.startsWith('@') || !channelId.startsWith('UC')) {
+    const handle = channelId.replace('@', '');
+    const res = await fetch(
+      `https://www.googleapis.com/youtube/v3/channels?part=snippet&forHandle=${handle}&key=${YT_API_KEY}`
+    );
+    const data = await res.json();
+    if (!data.items?.length) {
+      // Essayer forUsername
+      const res2 = await fetch(
+        `https://www.googleapis.com/youtube/v3/channels?part=snippet&forUsername=${handle}&key=${YT_API_KEY}`
+      );
+      const data2 = await res2.json();
+      if (!data2.items?.length) throw new Error(`Chaîne "${handle}" introuvable`);
+      channelId = data2.items[0].id;
+      return { id: channelId, snippet: data2.items[0].snippet };
+    }
+    channelId = data.items[0].id;
+    return { id: channelId, snippet: data.items[0].snippet };
+  }
+
+  // ID direct UC...
+  const res = await fetch(
+    `https://www.googleapis.com/youtube/v3/channels?part=snippet&id=${channelId}&key=${YT_API_KEY}`
+  );
+  const data = await res.json();
+  if (!data.items?.length) throw new Error(`Chaîne ID "${channelId}" introuvable`);
+  return { id: channelId, snippet: data.items[0].snippet };
+}
+
+// ── OUVRIR UNE CHAÎNE ──
+async function openChannel(channelId, channelName) {
+  document.getElementById('yt-channels-grid').style.display = 'none';
+  const panel = document.getElementById('yt-videos-panel');
+  panel.style.display = 'block';
+  document.getElementById('yt-channel-title').textContent = channelName;
+  document.getElementById('yt-videos-grid').innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted);font-size:13px;grid-column:1/-1;">Chargement des vidéos…</div>';
+  document.getElementById('yt-video-count').textContent = '';
+
+  _ytCurrentChannel = channelId;
+  _ytVideos         = [];
+  _ytNextPageToken  = null;
+
+  // Charger les IDs déjà importés
+  const { data: imported } = await sb.from('modules').select('youtube_video_id').eq('youtube_channel_id', channelId);
+  _ytImportedIds = new Set((imported || []).map(m => m.youtube_video_id).filter(Boolean));
+
+  // Récupérer l'uploadPlaylistId de la chaîne
+  const chRes = await fetch(
+    `https://www.googleapis.com/youtube/v3/channels?part=contentDetails&id=${channelId}&key=${YT_API_KEY}`
+  );
+  const chData = await chRes.json();
+  if (!chData.items?.length) {
+    document.getElementById('yt-videos-grid').innerHTML = '<div style="color:var(--red);">Impossible de charger cette chaîne.</div>';
+    return;
+  }
+  const uploadPlaylistId = chData.items[0].contentDetails.relatedPlaylists.uploads;
+  _ytCurrentChannel = { id: channelId, playlistId: uploadPlaylistId, name: channelName };
+
+  await fetchVideosPage();
+}
+
+async function fetchVideosPage() {
+  const { playlistId } = _ytCurrentChannel;
+  let url = `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet,contentDetails&playlistId=${playlistId}&maxResults=50&key=${YT_API_KEY}`;
+  if (_ytNextPageToken) url += `&pageToken=${_ytNextPageToken}`;
+
+  const res  = await fetch(url);
+  const data = await res.json();
+
+  if (!data.items) { console.error('YT error:', data); return; }
+
+  // Récupérer les durées via videos.list
+  const videoIds = data.items.map(i => i.contentDetails.videoId).join(',');
+  const detailRes  = await fetch(
+    `https://www.googleapis.com/youtube/v3/videos?part=contentDetails,statistics&id=${videoIds}&key=${YT_API_KEY}`
+  );
+  const detailData = await detailRes.json();
+  const detailMap  = {};
+  (detailData.items || []).forEach(v => { detailMap[v.id] = v; });
+
+  const newVideos = data.items.map(item => {
+    const videoId = item.contentDetails.videoId;
+    const detail  = detailMap[videoId] || {};
+    const dur     = detail.contentDetails?.duration || 'PT0S';
+    const minutes = parseDuration(dur);
+    return {
+      videoId,
+      title:       item.snippet.title,
+      description: item.snippet.description,
+      thumbnail:   item.snippet.thumbnails?.medium?.url || item.snippet.thumbnails?.default?.url || '',
+      publishedAt: item.snippet.publishedAt,
+      channelName: item.snippet.channelTitle,
+      duration:    minutes,
+      tags:        []
+    };
+  });
+
+  _ytVideos = [..._ytVideos, ...newVideos];
+  _ytNextPageToken = data.nextPageToken || null;
+
+  document.getElementById('yt-video-count').textContent = `${_ytVideos.length} vidéo${_ytVideos.length > 1 ? 's' : ''}${_ytNextPageToken ? '+' : ''}`;
+  document.getElementById('yt-load-more').style.display = _ytNextPageToken ? 'block' : 'none';
+
+  renderVideosGrid();
+}
+
+async function loadMoreVideos() {
+  const btn = document.getElementById('yt-load-more').querySelector('button');
+  btn.textContent = 'Chargement…'; btn.disabled = true;
+  await fetchVideosPage();
+  btn.textContent = 'Charger plus de vidéos'; btn.disabled = false;
+}
+
+function renderVideosGrid() {
+  const sort      = document.getElementById('yt-sort').value;
+  const hideImported = document.getElementById('yt-hide-imported').checked;
+  let videos = [..._ytVideos];
+
+  if (sort === 'asc')   videos.sort((a,b) => new Date(a.publishedAt) - new Date(b.publishedAt));
+  if (sort === 'desc')  videos.sort((a,b) => new Date(b.publishedAt) - new Date(a.publishedAt));
+  if (sort === 'title') videos.sort((a,b) => a.title.localeCompare(b.title, 'fr'));
+
+  if (hideImported) videos = videos.filter(v => !_ytImportedIds.has(v.videoId));
+
+  const grid = document.getElementById('yt-videos-grid');
+  if (!videos.length) {
+    grid.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted);font-size:13px;grid-column:1/-1;">Aucune vidéo à afficher.</div>';
+    return;
+  }
+
+  grid.innerHTML = videos.map(v => {
+    const imported = _ytImportedIds.has(v.videoId);
+    const date     = new Date(v.publishedAt).toLocaleDateString('fr-FR', { day:'2-digit', month:'short', year:'numeric' });
+    const idx      = _ytVideos.findIndex(x => x.videoId === v.videoId);
+    return `
+    <div class="yt-video-card ${imported ? 'imported' : ''}" data-video-id="${v.videoId}">
+      ${imported ? '<div class="yt-imported-badge">✓ Importé</div>' : ''}
+      <div style="position:relative;">
+        <img class="yt-vid-thumb" src="${v.thumbnail}" alt="" loading="lazy">
+        <div class="yt-vid-overlay" onclick="openImportModal(${idx})">
+          <div class="yt-vid-play">▶</div>
+        </div>
+      </div>
+      <div class="yt-vid-body">
+        <div class="yt-vid-title">${v.title}</div>
+        <div class="yt-vid-meta">
+          <span>${date}</span>
+          <span>${v.duration ? v.duration + ' min' : '—'}</span>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function sortVideos()    { renderVideosGrid(); }
+function filterImported(){ renderVideosGrid(); }
+
+function closeVideosPanel() {
+  document.getElementById('yt-videos-panel').style.display = 'none';
+  document.getElementById('yt-channels-grid').style.display = 'grid';
+  _ytCurrentChannel = null;
+  _ytVideos = [];
+}
+
+// ── PARSER DURÉE ISO 8601 ──
+function parseDuration(iso) {
+  const m = iso.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
+  if (!m) return 0;
+  return (parseInt(m[1]||0) * 60) + parseInt(m[2]||0) + Math.round(parseInt(m[3]||0) / 60);
+}
+
+// ── MODAL IMPORT VIDÉO ──
+function openImportModal(idx) {
+  const v = _ytVideos[idx];
+  if (!v) { console.error('Video not found at index', idx); return; }
+
+  const title   = document.getElementById('modal-title');
+  const body    = document.getElementById('modal-body');
+  const footer  = document.getElementById('modal-footer');
+
+  title.textContent = 'Importer en module DDA';
+  body.innerHTML = `
+    <div style="display:flex;gap:12px;margin-bottom:16px;">
+      <img src="${v.thumbnail}" style="width:120px;border-radius:5px;object-fit:cover;flex-shrink:0;">
+      <div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">YouTube · ${v.channelName}</div>
+        <div style="font-size:13px;font-weight:600;color:var(--white);line-height:1.4;">${v.title}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:4px;">${v.duration ? v.duration + ' min' : '—'}</div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Titre du module <span style="color:var(--accent2)">*</span></label>
+      <input class="form-input" id="yt-mod-title" value="${v.title.replace(/"/g,'&quot;').substring(0,100)}">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Section <span style="color:var(--accent2)">*</span></label>
+        <select class="form-input" id="yt-mod-section">
+          <option value="">— Choisir une section —</option>
+          <optgroup label="Réglementaire">
+            <option value="tc">Tronc Commun</option>
+            <option value="reg">Réglementaire</option>
+          </optgroup>
+          <optgroup label="Technique">
+            <option value="tp">Technique Produit</option>
+            <option value="rc">Réglementation Complémentaire</option>
+            <option value="pe">Pratiques &amp; Expertises</option>
+            <option value="aa">Assurance Avancée</option>
+          </optgroup>
+          <optgroup label="Commercial">
+            <option value="tv">Techniques de Vente</option>
+            <option value="dc">Développement Commercial</option>
+            <option value="mc">Management Commercial</option>
+            <option value="cs">Compétences Soft</option>
+          </optgroup>
+          <optgroup label="Stratégie">
+            <option value="bm">Benchmark</option>
+            <option value="go">Gestion &amp; Organisation</option>
+          </optgroup>
+          <optgroup label="Contenus spéciaux">
+            <option value="veille">Veille Hebdomadaire</option>
+            <option value="outils">Outils</option>
+          </optgroup>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Niveau</label>
+        <select class="form-input" id="yt-mod-niveau">
+          <option value="debutant">Débutant</option>
+          <option value="confirme">Confirmé</option>
+          <option value="expert">Expert</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Durée DDA (minutes)</label>
+      <input class="form-input" id="yt-mod-dur" type="number" value="${v.duration || 30}" min="1">
+      <div style="font-size:11px;color:var(--muted);margin-top:4px;">Durée comptabilisée dans les 15h annuelles.</div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Description</label>
+      <textarea class="form-input" id="yt-mod-desc" style="min-height:70px;">${(v.description||'').substring(0,300).replace(/</g,'&lt;')}</textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Métiers ciblés</label>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;padding:10px;background:var(--surface2);border:1.5px solid var(--border2);border-radius:var(--r);">
+        ${[
+          ['courtier','Courtier IAS'],
+          ['commercial','Commercial'],
+          ['manager','Manager'],
+          ['gestionnaire','Gestionnaire'],
+          ['assistant','Assistant'],
+          ['teleconseiller','Téléconseiller'],
+          ['agent','Agent général'],
+          ['mutualiste','Mutualiste']
+        ].map(([val,lbl]) => `
+          <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text);cursor:pointer;">
+            <input type="checkbox" class="yt-mod-metier-cb" value="${val}"
+              style="accent-color:var(--accent);width:14px;height:14px;">
+            ${lbl}
+          </label>`).join('')}
+      </div>
+    </div>
+    <div class="form-group">
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+        <input type="checkbox" id="yt-mod-dda" checked style="accent-color:var(--accent);width:14px;height:14px;">
+        <span class="form-label" style="margin:0;">Module DDA certifiant</span>
+      </label>
+    </div>
+    <input type="hidden" id="yt-mod-video-id" value="${v.videoId}">
+    <input type="hidden" id="yt-mod-thumb"    value="${v.thumbnail}">
+    <input type="hidden" id="yt-mod-channel-id" value="${_ytCurrentChannel?.id || ''}">
+  `;
+
+  footer.innerHTML = `
+    <button class="btn-secondary" onclick="closeModal()">Annuler</button>
+    <button class="btn-primary" onclick="saveYoutubeModule()">▶ Importer le module</button>
+  `;
+
+  document.getElementById('modal-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+async function saveYoutubeModule() {
+  const title     = document.getElementById('yt-mod-title').value.trim();
+  const section   = document.getElementById('yt-mod-section').value;
+  const niveau    = document.getElementById('yt-mod-niveau').value;
+  const dur       = parseInt(document.getElementById('yt-mod-dur').value) || 30;
+  const desc      = document.getElementById('yt-mod-desc').value.trim();
+  const dda       = document.getElementById('yt-mod-dda').checked;
+  const metiers   = [...document.querySelectorAll('.yt-mod-metier-cb:checked')].map(cb => cb.value);
+  const videoId   = document.getElementById('yt-mod-video-id').value;
+  const thumb     = document.getElementById('yt-mod-thumb').value;
+  const channelId = document.getElementById('yt-mod-channel-id').value;
+
+  if (!title)   { alert('Le titre est obligatoire.'); return; }
+  if (!section) { alert('Veuillez choisir une section.'); return; }
+
+  // Générer un code unique VID-XXX
+  // Générer un code unique en vérifiant l'absence de collision
+  const { data: existingCodes } = await sb.from('modules').select('code').like('code', 'VID-%');
+  const usedNums = new Set((existingCodes || []).map(m => parseInt(m.code.replace('VID-', ''))));
+  let vidNum = 1;
+  while (usedNums.has(vidNum)) vidNum++;
+  const code = `VID-${String(vidNum).padStart(3, '0')}`;
+
+  const videoUrl = `https://www.youtube.com/watch?v=${videoId}`;
+
+  const { error } = await sb.from('modules').insert({
+    code,
+    section,
+    title,
+    description:        desc || null,
+    duree_minutes:      dur,
+    niveau,
+    dda_certifiant:     dda,
+    type:               'video',
+    published:          false,
+    produits:           metiers.length ? metiers : null,
+    video_url:          videoUrl,
+    thumbnail_url:      thumb,
+    youtube_video_id:   videoId,
+    youtube_channel_id: channelId,
+    sort_order:         9999
+  });
+
+  if (error) { alert('Erreur Supabase : ' + error.message); return; }
+
+  // Recharger le cache modules pour l'onglet Modules
+  const { data: mods } = await sb.from('modules')
+    .select('code, section, title, duree_minutes, niveau, published, type, video_url, thumbnail_url')
+    .order('created_at', { ascending: false });
+  if (mods) window._sbMods = mods;
+
+  // Mettre à jour la liste locale
+  _ytImportedIds.add(videoId);
+  closeModal();
+  renderVideosGrid();
+  alert(`✓ Module "${title}" créé en brouillon (code ${code}). Publiez-le depuis l'onglet Modules.`);
+}
+
+// ── TOGGLE / SUPPRIMER CHAÎNE ──
+async function toggleChannel(id, currentActif) {
+  await sb.from('youtube_channels').update({ actif: !currentActif }).eq('id', id);
+  renderYoutube();
+}
+
+async function deleteChannel(id, name) {
+  if (!confirm(`Supprimer la chaîne "${name}" ?\n\nLes modules déjà importés depuis cette chaîne seront conservés.`)) return;
+  await sb.from('youtube_channels').delete().eq('id', id);
+  renderYoutube();
+}
+
+// ── MODAL AJOUTER CHAÎNE ──
+// Géré dans openModal() existant
+const _origOpenModal = openModal;
+openModal = async function(type) {
+  if (type === 'add-channel') {
+    const title  = document.getElementById('modal-title');
+    const body   = document.getElementById('modal-body');
+    const footer = document.getElementById('modal-footer');
+    title.textContent = 'Ajouter une chaîne YouTube';
+    body.innerHTML = `
+      <div class="form-group">
+        <label class="form-label">URL ou @handle de la chaîne <span style="color:var(--accent2)">*</span></label>
+        <input class="form-input" id="yt-ch-input" placeholder="@NomDeLaChaine ou https://youtube.com/@..." autocomplete="off">
+        <div style="font-size:11px;color:var(--muted);margin-top:4px;">Exemples : @AcprAcf, UCxxxxxx, https://youtube.com/@AcprAcf</div>
+      </div>
+      <div id="yt-ch-preview" style="display:none;padding:12px;background:var(--surface2);border-radius:var(--r);border:1px solid var(--border2);margin-top:8px;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <img id="yt-ch-prev-img" src="" style="width:44px;height:44px;border-radius:50%;object-fit:cover;">
+          <div>
+            <div id="yt-ch-prev-name" style="font-size:13px;font-weight:600;color:var(--white);"></div>
+            <div id="yt-ch-prev-desc" style="font-size:11px;color:var(--muted);"></div>
+          </div>
+        </div>
+      </div>
+      <div id="yt-ch-error" style="display:none;color:var(--red);font-size:12px;margin-top:8px;"></div>
+    `;
+    footer.innerHTML = `
+      <button class="btn-secondary" onclick="closeModal()">Annuler</button>
+      <button class="btn-primary" id="yt-ch-verify-btn" onclick="verifyAndSaveChannel()">Vérifier et ajouter</button>
+    `;
+    document.getElementById('modal-overlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+    return;
+  }
+  return _origOpenModal(type);
+};
+
+let _ytChannelResolved = null;
+
+async function verifyAndSaveChannel() {
+  const input = document.getElementById('yt-ch-input').value.trim();
+  const btn   = document.getElementById('yt-ch-verify-btn');
+  const errEl = document.getElementById('yt-ch-error');
+  const prev  = document.getElementById('yt-ch-preview');
+  errEl.style.display = 'none';
+
+  if (!input) { errEl.textContent = 'Champ obligatoire.'; errEl.style.display = 'block'; return; }
+
+  if (_ytChannelResolved) {
+    // Deuxième clic → sauvegarder
+    const { error } = await sb.from('youtube_channels').insert({
+      channel_id:    _ytChannelResolved.id,
+      channel_name:  _ytChannelResolved.snippet.title,
+      thumbnail_url: _ytChannelResolved.snippet.thumbnails?.medium?.url || null,
+      description:   _ytChannelResolved.snippet.description?.substring(0,300) || null,
+      actif:         true
+    });
+    if (error) {
+      errEl.textContent = error.code === '23505' ? 'Cette chaîne est déjà ajoutée.' : error.message;
+      errEl.style.display = 'block';
+      return;
+    }
+    _ytChannelResolved = null;
+    closeModal();
+    renderYoutube();
+    return;
+  }
+
+  btn.textContent = 'Vérification…'; btn.disabled = true;
+  try {
+    const result = await addYoutubeChannel(input);
+    _ytChannelResolved = result;
+    document.getElementById('yt-ch-prev-img').src  = result.snippet.thumbnails?.medium?.url || '';
+    document.getElementById('yt-ch-prev-name').textContent = result.snippet.title;
+    document.getElementById('yt-ch-prev-desc').textContent = result.snippet.description?.substring(0,80) + '…' || '';
+    prev.style.display = 'flex';
+    btn.textContent = '✓ Confirmer l\'ajout';
+    btn.disabled = false;
+  } catch(err) {
+    errEl.textContent = err.message;
+    errEl.style.display = 'block';
+    btn.textContent = 'Vérifier et ajouter';
+    btn.disabled = false;
+  }
+}
+
+// ── INIT ──
+async function initAdmin() {
+  const dot   = document.getElementById('sb-dot');
+  const label = document.getElementById('sb-label');
+
+  const ok = await loadSupabaseData();
+
+  if (ok) {
+    dot.style.background   = 'var(--green)';
+    label.textContent      = 'Supabase connecté';
+    label.style.color      = 'var(--green)';
+  } else {
+    dot.style.background   = 'var(--orange)';
+    label.textContent      = 'Mode démo';
+    label.style.color      = 'var(--orange)';
+    Object.assign(DEMO.kpis, { mrr:4373, mrr_prev:3749, active:175, active_prev:148, arr:52476, churn:2.3, churn_prev:3.1 });
+  }
+
+  renderDashboard();
+}
+
+// ══════════════════════════════════════
+// VEILLE HEBDOMADAIRE
+// ══════════════════════════════════════
+// UNSPLASH_KEY déjà déclaré plus haut dans le fichier
+let _vAllItems    = [];
+let _vFiltItems   = [];
+let _vCurrentWeek = 'all';
+let _vCurrentStatus = 'all';
+let _vPubModules  = [];
+let _vGenerateData = {};
+let _vCurrentTab  = 'items';
+
+async function initVeilleView() {
+  if (_vAllItems.length === 0) {
+    await Promise.all([vLoadItems(), vLoadPublishedModules()]);
+  } else {
+    vApplyFilters();
+    vRenderPublishedModules();
+  }
+}
+
+async function vLoadItems() {
+  const { data, error } = await sb.from('veille_items').select('*').order('score_pertinence', { ascending: false });
+  if (error) { console.error('veille_items:', error); return; }
+  _vAllItems = data || [];
+  vBuildWeekFilters();
+  vUpdateKPIs();
+  vApplyFilters();
+}
+
+async function vLoadPublishedModules() {
+  const { data, error } = await sb
+    .from('modules')
+    .select('id, code, title, description, thumbnail_url, published, published_at, created_at, veille_modules_meta(semaine, items_count, thumbnail_query)')
+    .eq('type', 'veille')
+    .order('created_at', { ascending: false });
+  if (error) { console.error('veille modules:', error); return; }
+  _vPubModules = data || [];
+  document.getElementById('v-kpi-published').textContent = _vPubModules.length;
+  vRenderPublishedModules();
+}
+
+function switchVeilleTab(tab) {
+  _vCurrentTab = tab;
+  document.getElementById('vtab-panel-items').style.display   = tab === 'items'   ? 'block' : 'none';
+  document.getElementById('vtab-panel-modules').style.display = tab === 'modules' ? 'block' : 'none';
+  document.getElementById('vtab-items').classList.toggle('active',   tab === 'items');
+  document.getElementById('vtab-modules').classList.toggle('active', tab === 'modules');
+}
+
+function vBuildWeekFilters() {
+  const weeks = [...new Set(_vAllItems.map(i => i.semaine))].sort().reverse();
+  const container = document.getElementById('v-week-filters');
+  container.innerHTML = `<button class="ef-btn ${_vCurrentWeek==='all'?'active':''}" onclick="vFilterByWeek('all',this)">Toutes les semaines</button>`;
+  weeks.forEach(w => {
+    const btn = document.createElement('button');
+    btn.className = `ef-btn ${_vCurrentWeek===w?'active':''}`;
+    btn.textContent = vFormatWeek(w);
+    btn.onclick = () => vFilterByWeek(w, btn);
+    container.appendChild(btn);
+  });
+  // Auto-sélectionner la semaine la plus récente
+  if (_vCurrentWeek === 'all' && weeks.length > 0) {
+    const allBtns = container.querySelectorAll('.ef-btn');
+    if (allBtns[1]) vFilterByWeek(weeks[0], allBtns[1]);
+  }
+  const cur = vGetISOWeek();
+  const curItems = _vAllItems.filter(i => i.semaine === cur);
+  document.getElementById('v-kpi-week').textContent      = curItems.length;
+  document.getElementById('v-kpi-week-label').textContent = vFormatWeek(cur);
+}
+
+function vFilterByWeek(week, btn) {
+  _vCurrentWeek = week;
+  document.querySelectorAll('#v-week-filters .ef-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  vApplyFilters();
+}
+
+function vFilterByStatus(status, btn) {
+  _vCurrentStatus = status;
+  document.querySelectorAll('#vtab-panel-items .table-actions .ef-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  vApplyFilters();
+}
+
+function vApplyFilters() {
+  _vFiltItems = _vAllItems.filter(i => {
+    const weekOk   = _vCurrentWeek === 'all' || i.semaine === _vCurrentWeek;
+    const statusOk = _vCurrentStatus === 'all' || i.statut === _vCurrentStatus;
+    return weekOk && statusOk;
+  });
+  vRenderItems();
+  vUpdateGenerateButton();
+}
+
+function vUpdateKPIs() {
+  document.getElementById('v-kpi-pending').textContent  = _vAllItems.filter(i => i.statut === 'pending').length;
+  document.getElementById('v-kpi-selected').textContent = _vAllItems.filter(i => i.statut === 'selected').length;
+}
+
+function vUpdateGenerateButton() {
+  const selectedCount = _vAllItems.filter(i => i.statut === 'selected').length;
+  document.getElementById('v-btn-generate').disabled = selectedCount === 0;
+}
+
+function vRenderItems() {
+  const el = document.getElementById('v-items-list');
+  document.getElementById('v-items-count').textContent = `${_vFiltItems.length} item${_vFiltItems.length > 1 ? 's' : ''}`;
+  if (_vFiltItems.length === 0) {
+    el.innerHTML = `<div class="empty-state">
+      <div class="es-icon">📭</div>
+      <div class="es-title">Aucun item pour ce filtre</div>
+      <div class="es-sub">Le cron tourne chaque lundi à 6h.<br>Déclenchement manuel possible depuis Vercel > Crons.</div>
+    </div>`;
+    return;
+  }
+  el.innerHTML = _vFiltItems.map(item => {
+    const score      = item.score_pertinence || 0;
+    const scoreColor = score >= 70 ? 'var(--green)' : score >= 40 ? 'var(--gold)' : 'var(--muted)';
+    const isSelected = item.statut === 'selected';
+    const isRejected = item.statut === 'rejected';
+    return `
+    <div class="item-row" id="v-item-${item.id}" style="${isRejected ? 'opacity:.45;' : ''}">
+      <input type="checkbox" class="item-checkbox" ${isSelected ? 'checked' : ''} ${isRejected ? 'disabled' : ''}
+        onchange="vToggleCheckbox('${item.id}', this.checked)">
+      <div class="item-body">
+        <div class="item-title" title="${vStripHtml(item.titre)}">${vStripHtml(item.titre)}</div>
+        <div class="item-resume">${vEsc(item.resume || '—')}</div>
+        <div class="item-meta">
+          <a class="item-link" href="${vEsc(vCleanUrl(item.url))}" target="_blank" rel="noopener">↗ Source</a>
+          <span class="td-mono">${vFormatWeek(item.semaine)}</span>
+          <div class="score-bar">
+            <div class="score-track"><div class="score-fill" style="width:${score}%;background:${scoreColor};"></div></div>
+            <span style="font-size:10px;color:${scoreColor};font-family:'DM Mono',monospace;">${score}</span>
+          </div>
+        </div>
+      </div>
+      <div class="item-actions">
+        ${!isRejected ? `
+          <button class="${isSelected ? 'act-btn-selected' : 'act-btn-select'}" onclick="vSetStatus('${item.id}','${isSelected ? 'pending' : 'selected'}')">
+            ${isSelected ? '✓ Sélectionné' : '+ Sélectionner'}
+          </button>
+          <button class="act-btn-reject" onclick="vSetStatus('${item.id}','rejected')">✕</button>
+        ` : `
+          <button class="act-btn-restore" onclick="vSetStatus('${item.id}','pending')">↺ Restaurer</button>
+        `}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function vToggleCheckbox(id, checked) { await vSetStatus(id, checked ? 'selected' : 'pending'); }
+
+async function vSetStatus(id, newStatus) {
+  const { error } = await sb.from('veille_items').update({ statut: newStatus }).eq('id', id);
+  if (error) { alert('Erreur : ' + error.message); return; }
+  const idx = _vAllItems.findIndex(i => i.id === id);
+  if (idx !== -1) _vAllItems[idx].statut = newStatus;
+  vApplyFilters(); vUpdateKPIs();
+}
+
+async function vSelectAll() {
+  const pending = _vFiltItems.filter(i => i.statut === 'pending');
+  for (const item of pending) {
+    await sb.from('veille_items').update({ statut: 'selected' }).eq('id', item.id);
+    const idx = _vAllItems.findIndex(i => i.id === item.id);
+    if (idx !== -1) _vAllItems[idx].statut = 'selected';
+  }
+  vApplyFilters(); vUpdateKPIs();
+}
+
+async function vRejectAll() {
+  if (!confirm('Rejeter tous les items en attente de ce filtre ?')) return;
+  const pending = _vFiltItems.filter(i => i.statut === 'pending');
+  for (const item of pending) {
+    await sb.from('veille_items').update({ statut: 'rejected' }).eq('id', item.id);
+    const idx = _vAllItems.findIndex(i => i.id === item.id);
+    if (idx !== -1) _vAllItems[idx].statut = 'rejected';
+  }
+  vApplyFilters(); vUpdateKPIs();
+}
+
+// ── GÉNÉRATION MODULE ──
+async function openVeilleGenerateModal() {
+  const week = vGetISOWeek();
+  const selectedItems = _vAllItems.filter(i => i.statut === 'selected');
+  if (selectedItems.length === 0) { alert('Aucun item sélectionné.'); return; }
+  _vGenerateData = { week, items: selectedItems, thumbnailUrl: null, thumbnailQuery: null };
+  const weekLabel = vFormatWeek(week);
+  document.getElementById('v-modal-title').textContent = `Générer le module ${weekLabel}`;
+  document.getElementById('v-modal-body').innerHTML = `
+    <div class="form-group">
+      <label class="form-label">Titre du module <span style="color:var(--accent2)">*</span></label>
+      <input class="form-input" id="vgen-title" value="Veille Hebdo — ${vEsc(weekLabel)}">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Description</label>
+      <textarea class="form-input" style="min-height:70px;" id="vgen-desc">Sélection de ${selectedItems.length} actualité${selectedItems.length > 1 ? 's' : ''} réglementaires et sectorielles de la semaine.</textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Thumbnail Unsplash</label>
+      <div style="display:flex;gap:8px;align-items:flex-end;">
+        <input class="form-input" id="vgen-thumb-query" placeholder="ex: insurance regulation law" style="flex:1;" value="insurance regulation">
+        <button class="tbl-btn primary" onclick="vFetchUnsplash()" style="padding:9px 14px;white-space:nowrap;">Chercher</button>
+      </div>
+      <div id="vgen-thumb-preview" class="veille-thumb-preview" style="margin-top:10px;"><span>Entrez un mot-clé et cliquez Chercher</span></div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Items sélectionnés (${selectedItems.length})</label>
+      <div style="background:var(--surface2);border:1px solid var(--border2);border-radius:var(--r);padding:12px;max-height:200px;overflow-y:auto;">
+        ${selectedItems.map(i => `
+          <div style="padding:7px 0;border-bottom:1px solid var(--border);display:flex;gap:10px;align-items:flex-start;">
+            <div style="flex:1;min-width:0;">
+              <div style="font-size:12px;font-weight:600;color:var(--white);margin-bottom:2px;">${vEsc(i.titre)}</div>
+            </div>
+            <a href="${vEsc(i.url)}" target="_blank" rel="noopener" style="font-size:10px;color:var(--accent2);white-space:nowrap;flex-shrink:0;">↗</a>
+          </div>`).join('')}
+      </div>
+    </div>
+  `;
+  document.getElementById('v-modal-confirm').disabled = false;
+  document.getElementById('v-modal-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+async function vFetchUnsplash() {
+  const query   = document.getElementById('vgen-thumb-query').value.trim();
+  const preview = document.getElementById('vgen-thumb-preview');
+  if (!query) return;
+  preview.innerHTML = '<span>Recherche…</span>';
+  try {
+    const res  = await fetch(`https://api.unsplash.com/photos/random?query=${encodeURIComponent(query)}&orientation=landscape&client_id=${UNSPLASH_KEY}`);
+    if (!res.ok) throw new Error('Unsplash ' + res.status);
+    const data = await res.json();
+    _vGenerateData.thumbnailUrl   = data.urls.regular;
+    _vGenerateData.thumbnailQuery = query;
+    preview.innerHTML = `<img src="${data.urls.regular}" alt="${vEsc(query)}">`;
+  } catch(e) {
+    preview.innerHTML = `<span style="color:var(--red)">Erreur Unsplash : ${e.message}</span>`;
+  }
+}
+
+async function vPublishModule() {
+  const title = document.getElementById('vgen-title').value.trim();
+  const desc  = document.getElementById('vgen-desc').value.trim();
+  if (!title) { alert('Le titre est obligatoire.'); return; }
+  const btn = document.getElementById('v-modal-confirm');
+  btn.disabled = true; btn.textContent = 'Publication…';
+  const { week, items, thumbnailUrl, thumbnailQuery } = _vGenerateData;
+  const [year, wNum] = week.split('-W');
+  const code = `VEILLE-${year}-W${wNum}`;
+  const contentHtml = vBuildContentHtml(items);
+  try {
+    const { data: mod, error: e1 } = await sb.from('modules').insert({
+      code, section:'veille', title, description: desc || null,
+      content_html: contentHtml, duree_minutes: 30,
+      dda_certifiant: false, type: 'veille',
+      published: true, published_at: new Date().toISOString(),
+      thumbnail_url: thumbnailUrl || null, sort_order: 9999,
+    }).select('id').single();
+    if (e1) throw e1;
+    const { error: e2 } = await sb.from('veille_modules_meta').insert({
+      module_id: mod.id, semaine: week,
+      thumbnail_url: thumbnailUrl || null, thumbnail_query: thumbnailQuery || null,
+      items_count: items.length,
+    });
+    if (e2) throw e2;
+    const { error: e3 } = await sb.from('veille_modules_items').insert(
+      items.map((item, i) => ({ module_id: mod.id, item_id: item.id, ordre: i }))
+    );
+    if (e3) throw e3;
+    closeVeilleModal();
+    await Promise.all([vLoadItems(), vLoadPublishedModules()]);
+    switchVeilleTab('modules');
+  } catch(e) {
+    alert('Erreur : ' + e.message);
+    btn.disabled = false; btn.textContent = 'Publier au catalogue';
+  }
+}
+
+function vStripHtml(str) {
+  if (!str) return '';
+  return str.replace(/<[^>]*>/g, '').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'").trim();
+}
+
+function vCleanUrl(url) {
+  if (!url) return '#';
+  try {
+    // Décoder &amp; en & avant tout traitement
+    const decoded = url.replace(/&amp;/g, '&');
+    const u = new URL(decoded);
+    if (u.hostname === 'www.google.com' && u.searchParams.has('url')) {
+      return decodeURIComponent(u.searchParams.get('url'));
+    }
+  } catch(e) {}
+  return url;
+}
+
+function vBuildContentHtml(items) {
+  const rows = items.map(i => `
+    <div style="padding:14px 0;border-bottom:1px solid #1a2640;">
+      <div style="font-size:15px;font-weight:600;color:#f0f4ff;margin-bottom:6px;">
+        <a href="${vEsc(vCleanUrl(i.url))}" target="_blank" rel="noopener" style="color:#f0f4ff;text-decoration:none;">${vEsc(vStripHtml(i.titre))}</a>
+      </div>
+      <div style="font-size:13px;color:#c8d4e8;line-height:1.6;margin-bottom:8px;">${vEsc(i.resume || '')}</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+        <a href="${vEsc(i.url)}" target="_blank" rel="noopener" style="font-size:11px;color:#6b9fff;">↗ Lire l'article</a>
+      </div>
+    </div>`).join('');
+  return `<div style="font-family:'DM Sans',sans-serif;max-width:720px;">${rows}</div>`;
+}
+
+function vRenderPublishedModules() {
+  const el = document.getElementById('v-published-grid');
+  if (!_vPubModules.length) {
+    el.innerHTML = `<div class="empty-state" style="grid-column:1/-1;">
+      <div class="es-icon">📰</div>
+      <div class="es-title">Aucun module veille publié</div>
+      <div class="es-sub">Sélectionnez des items et générez votre premier module.</div>
+    </div>`;
+    return;
+  }
+  el.innerHTML = _vPubModules.map(m => {
+    const meta  = m.veille_modules_meta;
+    const week  = meta?.semaine ? vFormatWeek(meta.semaine) : '—';
+    const count = meta?.items_count || 0;
+    return `
+    <div class="veille-mod-card">
+      ${m.thumbnail_url
+        ? `<img class="veille-mod-thumb" src="${vEsc(m.thumbnail_url)}" alt="${vEsc(m.title)}" loading="lazy">`
+        : `<div class="veille-mod-thumb-ph">📰</div>`}
+      <div class="veille-mod-body">
+        <div class="veille-mod-week">${vEsc(m.code)}</div>
+        <div class="veille-mod-title">${vEsc(m.title)}</div>
+        <div class="mac-meta">
+          <span class="mac-tag">${week}</span>
+          <span class="mac-tag">${count} article${count > 1 ? 's' : ''}</span>
+          <span class="badge ${m.published ? 'badge-published' : 'badge-draft'}">${m.published ? '● Publié' : '○ Brouillon'}</span>
+        </div>
+      </div>
+      <div class="veille-mod-footer">
+        <button class="tbl-btn" style="flex:1;text-align:center;" onclick="vTogglePublish('${m.id}',${m.published})">
+          ${m.published ? 'Dépublier' : 'Publier'}
+        </button>
+        <button class="tbl-btn" style="color:var(--muted);" onclick="vDeleteModule('${m.id}','${vEsc(m.title)}')">✕</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function vTogglePublish(id, current) {
+  const { error } = await sb.from('modules').update({
+    published: !current, published_at: !current ? new Date().toISOString() : null,
+  }).eq('id', id);
+  if (error) { alert('Erreur : ' + error.message); return; }
+  await vLoadPublishedModules();
+}
+
+async function vDeleteModule(id, title) {
+  if (!confirm(`Supprimer le module "${title}" ?\nLes items de veille associés seront conservés.`)) return;
+  const { error } = await sb.from('modules').delete().eq('id', id);
+  if (error) { alert('Erreur : ' + error.message); return; }
+  await vLoadPublishedModules();
+}
+
+function closeVeilleModal() {
+  document.getElementById('v-modal-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+// ── UTILS VEILLE ──
+function vGetISOWeek() {
+  const now = new Date(), year = now.getUTCFullYear();
+  const jan4 = new Date(Date.UTC(year, 0, 4));
+  const start = new Date(jan4);
+  start.setUTCDate(jan4.getUTCDate() - ((jan4.getUTCDay() + 6) % 7));
+  const week = Math.floor((now - start) / (7 * 24 * 3600 * 1000)) + 1;
+  return `${year}-W${String(week).padStart(2,'0')}`;
+}
+function vFormatWeek(w) {
+  if (!w) return '—';
+  const [year, wNum] = w.split('-W');
+  return `Semaine ${parseInt(wNum)} · ${year}`;
+}
+function vEsc(str) {
+  return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+initAdmin();
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    closeModal();
+    closeVeilleModal();
+  }
+});
+</script>
+</body>
+</html>
