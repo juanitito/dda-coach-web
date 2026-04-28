@@ -1,5 +1,5 @@
 // api/cron/veille-hebdo.js
-// Déclenché chaque lundi à 6h00 UTC via vercel.json
+// Déclenché chaque lundi à 5h00 UTC via vercel.json (cron "0 5 * * 1")
 // Runtime : Node.js (maxDuration 60s, plafond Hobby) — Edge limité à 25s ne suffit pas
 
 export const config = { maxDuration: 60 };
@@ -139,13 +139,26 @@ export default async function handler(req, res) {
   const remaining = allItems.slice(MAX_ITEMS_CLAUDE);
   const finalItems = [...enriched, ...remaining];
 
-  // 3. Insertion Supabase (seuil pertinence >= 40)
+  // 3. Insertion Supabase (seuil pertinence >= 40) — batch unique au lieu de
+  // 150 requêtes en série. Sur des sources lentes, le mode série dépassait
+  // facilement les maxDuration:60 et noyait les vraies erreurs en 200.
   const supabaseUrl = process.env.SUPABASE_URL;
   const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   const filteredItems = finalItems.filter(i => (i.score_pertinence ?? 50) >= 40);
   results.filtered_out = finalItems.length - filteredItems.length;
 
-  for (const item of filteredItems) {
+  if (filteredItems.length > 0) {
+    const payload = filteredItems.map(item => ({
+      semaine:          item.semaine,
+      source:           item.source,
+      source_label:     item.source_label,
+      titre:            item.titre,
+      url:              item.url,
+      resume:           item.resume    || null,
+      categorie:        item.categorie || null,
+      score_pertinence: item.score_pertinence ?? 50,
+      statut:           'pending',
+    }));
     const dbRes = await fetch(`${supabaseUrl}/rest/v1/veille_items?on_conflict=url`, {
       method: 'POST',
       headers: {
@@ -154,28 +167,21 @@ export default async function handler(req, res) {
         Authorization:  `Bearer ${supabaseKey}`,
         Prefer:         'resolution=merge-duplicates,return=minimal',
       },
-      body: JSON.stringify({
-        semaine:          item.semaine,
-        source:           item.source,
-        source_label:     item.source_label,
-        titre:            item.titre,
-        url:              item.url,
-        resume:           item.resume    || null,
-        categorie:        item.categorie || null,
-        score_pertinence: item.score_pertinence ?? 50,
-        statut:           'pending',
-      }),
+      body: JSON.stringify(payload),
     });
-
-    if (dbRes.status === 201)      results.inserted++;
-    else if (dbRes.status === 200) results.duplicates++;
-    else {
+    if (!dbRes.ok) {
       const err = await dbRes.text();
-      results.errors.push({ url: item.url, status: dbRes.status, error: err });
+      results.errors.push({ stage: 'batch_insert', status: dbRes.status, error: err });
+    } else {
+      // En batch on perd la distinction insert vs duplicate ; on agrège.
+      results.processed = filteredItems.length;
     }
   }
 
-  return res.status(200).json(results);
+  // Surface les erreurs : un monitoring qui ping le cron doit voir les
+  // échecs partiels (avant : on retournait toujours 200 → silent fail).
+  const status = results.errors.length > 0 ? 500 : 200;
+  return res.status(status).json(results);
 }
 
 // ============================================================

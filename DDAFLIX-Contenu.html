@@ -9,6 +9,7 @@
 <title>BingeDDA · Votre espace formation</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3.2.4/dist/purify.min.js"></script>
 <script>
 const SUPABASE_URL = 'https://vrufldjydjrgcqwhmpnt.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZydWZsZGp5ZGpyZ2Nxd2htcG50Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5NTA3ODksImV4cCI6MjA5MjUyNjc4OX0.jW1CQ5yzJr4Ccac9-OI2RgVLXqFn-X0MjAxCkc9Xbfc';
@@ -929,19 +930,27 @@ async function loadFromSupabase() {
   if (!sb || !window._user) return;
 
   try {
-    // 1. Charger les modules depuis Supabase
+    // 1. Charger les modules depuis Supabase. content_html et quiz_data sont
+    // chargés à la demande (cf. ensureModuleContent) — à 129 modules ils
+    // alourdissaient inutilement chaque page-load.
     const { data: modules, error: modError } = await sb
       .from('modules')
-      .select('code, section, title, description, duree_minutes, niveau, dda_certifiant, produits, thumbnail_url, type, content_html, quiz_data, video_url, sort_order, published, created_at, veille_modules_meta(semaine, items_count)')
+      .select('id, code, section, title, description, duree_minutes, niveau, dda_certifiant, produits, thumbnail_url, type, video_url, sort_order, published, created_at, veille_modules_meta(semaine, items_count)')
       .eq('published', true)
       .order('sort_order');
+
+    // Mapping module_id -> code, construit dans la même passe pour éviter
+    // un second round-trip dédié à ce mapping.
+    const idToCode = {};
 
     if (!modError && modules) {
       // Convertir au format attendu par le shell
       modules.forEach(m => {
+        idToCode[m.id] = m.code;
         // Durée : convertir minutes en string "Xmin"
         const durStr = m.duree_minutes ? `${m.duree_minutes}min` : '30min';
         MODS[m.code] = {
+          id:        m.id,
           sec:       m.section,
           title:     m.title,
           dur:       durStr,
@@ -949,8 +958,9 @@ async function loadFromSupabase() {
           lvl:       m.niveau || 'debutant',
           types:     m.produits || [],
           desc:      m.description || '',
-          content:   m.content_html || null,
-          quiz_data: m.quiz_data    || null,
+          content:   null, // lazy-loaded
+          quiz_data: null, // lazy-loaded
+          _contentLoaded: false,
           video_url:  m.video_url    || null,
           sort_order: m.sort_order   || 0,
           created_at: m.created_at   || null,
@@ -971,14 +981,7 @@ async function loadFromSupabase() {
       .eq('user_id', userId);
 
     if (!progError && progress) {
-      // Reconstruire mDone à partir des données Supabase
-      // On a besoin du mapping module_id -> code
-      const { data: modIds } = await sb
-        .from('modules')
-        .select('id, code');
-      
-      const idToCode = {};
-      if (modIds) modIds.forEach(m => { idToCode[m.id] = m.code; });
+      // idToCode déjà construit lors du chargement des modules ci-dessus.
 
       // Total secondes pour le timer
       let totalSeconds = 0;
@@ -1108,22 +1111,29 @@ async function saveProgressToSupabase(code, secondsToAdd, quizPassed, quizScore)
     const modSeconds = (modData?.duree_minutes || 0) * 60;
 
     // Vérifier si ce module était déjà validé (pour ne pas double-compter)
+    // et savoir si une row existe déjà (pour ne pas écraser started_at).
     const { data: existingProg } = await sb.from('progress')
-      .select('quiz_passed')
+      .select('quiz_passed, started_at')
       .eq('user_id', userId)
       .eq('module_id', mod.id)
       .maybeSingle();
     const wasAlreadyPassed = existingProg?.quiz_passed === true;
 
-    const { error } = await sb.from('progress').upsert({
+    // started_at uniquement à la création de la row. Sinon les stats
+    // type "temps médian entre démarrage et complétion" sont fausses.
+    const upsertPayload = {
       user_id:         userId,
       module_id:       mod.id,
       seconds_spent:   modSeconds,
       quiz_passed:     quizPassed || false,
       quiz_best_score: quizScore || 0,
       completed_at:    quizPassed ? new Date().toISOString() : null,
-      started_at:      new Date().toISOString()
-    }, { onConflict: 'user_id,module_id', ignoreDuplicates: false });
+    };
+    if (!existingProg) {
+      upsertPayload.started_at = new Date().toISOString();
+    }
+
+    const { error } = await sb.from('progress').upsert(upsertPayload, { onConflict: 'user_id,module_id', ignoreDuplicates: false });
 
     if (error) console.warn('Erreur save progress:', error);
 
@@ -1959,8 +1969,39 @@ const OUTIL_URLS = {
   'OUTIL-CALCULATRICE': '/outils/emprunt',
 };
 
-function openModal(code) {
+// Sanitize le content_html des modules avant innerHTML. Défense en profondeur :
+// si un admin compromis insérait <script> ou un onerror, DOMPurify le strip.
+function safeHtml(html) {
+  if (!html) return '';
+  if (typeof DOMPurify !== 'undefined') return DOMPurify.sanitize(html);
+  return html; // fallback si la CDN n'a pas chargé — pas pire que l'état d'avant
+}
+
+// Lazy-load du contenu lourd (content_html, quiz_data) à l'ouverture du
+// module. Évite de charger ces colonnes pour les 129 modules au boot.
+async function ensureModuleContent(code) {
   const mod = MODS[code];
+  if (!mod || mod._contentLoaded) return mod;
+  const sb = window._sb;
+  if (!sb) { mod._contentLoaded = true; return mod; }
+  try {
+    const { data } = await sb.from('modules')
+      .select('content_html, quiz_data')
+      .eq('code', code)
+      .single();
+    if (data) {
+      mod.content   = data.content_html || null;
+      mod.quiz_data = data.quiz_data    || null;
+    }
+  } catch (e) {
+    console.warn('Lazy-load module content error:', e);
+  }
+  mod._contentLoaded = true;
+  return mod;
+}
+
+async function openModal(code) {
+  const mod = await ensureModuleContent(code);
   if (!mod) return;
   // Les outils redirigent vers leur page dédiée
   if (mod.type === 'outil') {
@@ -2038,7 +2079,7 @@ function openModal(code) {
       <div class="sep"></div>
       <div class="modal-meta-item">📰 ${mod.items_count || 0} article${(mod.items_count||0) > 1 ? 's' : ''}</div>`;
     body.innerHTML += mod.content
-      ? `<div class="modal-content-area" style="font-size:14px;line-height:1.7;">${mod.content}</div>`
+      ? `<div class="modal-content-area" style="font-size:14px;line-height:1.7;">${safeHtml(mod.content)}</div>`
       : '<p style="color:var(--muted);text-align:center;padding:40px;">Contenu en cours de chargement…</p>';
     document.getElementById('modalOverlay').classList.add('open');
     document.body.style.overflow = 'hidden';
@@ -2060,7 +2101,7 @@ function openModal(code) {
       </div>`;
     }
   } else if (mod.content) {
-    body.innerHTML += `<div class="modal-content-area">${mod.content}</div>`;
+    body.innerHTML += `<div class="modal-content-area">${safeHtml(mod.content)}</div>`;
   } else {
     body.innerHTML += `<div style="text-align:center;padding:48px 20px;color:var(--muted)"><div style="font-size:56px;margin-bottom:14px">📄</div><p>Contenu de ce module à venir prochainement.</p></div>`;
   }
