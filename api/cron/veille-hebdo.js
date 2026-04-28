@@ -1,8 +1,8 @@
 // api/cron/veille-hebdo.js
 // Déclenché chaque lundi à 6h00 UTC via vercel.json
-// Runtime : edge
+// Runtime : Node.js (maxDuration 60s, plafond Hobby) — Edge limité à 25s ne suffit pas
 
-export const config = { runtime: 'edge' };
+export const config = { maxDuration: 60 };
 
 const FETCH_TIMEOUT_MS = 6000;  // 6s max par source RSS
 const MAX_ITEMS_CLAUDE = 40;    // max items envoyés à Claude par run (Sonnet)
