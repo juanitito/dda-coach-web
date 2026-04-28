@@ -875,7 +875,7 @@ tbody td{padding:12px 20px;font-size:13px;color:var(--text);}
       <button class="ef-btn" onclick="filterModules('elearning',this)">📄 E-learning</button>
       <button class="ef-btn" onclick="filterModules('video',this)">▶ Vidéo</button>
       <button class="ef-btn" onclick="filterModules('veille',this)">📡 Veille</button>
-      <button class="ef-btn" onclick="filterModules('outil',this)">⚙ Outils</button>
+      <button class="ef-btn" onclick="filterModules('outils',this)">⚙ Outils</button>
     </div>
     <div style="display:flex;gap:8px;margin-bottom:16px;align-items:center;">
       <input type="text" id="module-search" placeholder="🔍 Rechercher…" oninput="renderModules(currentModFilter||'all')"
@@ -1872,8 +1872,21 @@ function renderPayments() {
 // ══════════════════════════════════════
 // MODULES
 // ══════════════════════════════════════
-const SECTION_LABELS = {tc:'Tronc Commun',reg:'Réglementaire',tp:'Technique Produit',tv:'Techniques de Vente'};
-const SECTION_COLORS = {tc:'#3d7fff',reg:'#e05c8a',tp:'#2dd4bf',tv:'#a78bfa'};
+const SECTION_LABELS = {
+  tc:'Tronc Commun',           reg:'Réglementaire',
+  tp:'Technique Produit',      rc:'Réglementation Complémentaire',
+  pe:'Pratiques & Expertises', aa:'Assurance Avancée',
+  tv:'Techniques de Vente',    dc:'Développement Commercial',
+  mc:'Management Commercial',  cs:'Compétences Soft',
+  bm:'Benchmark',              go:'Gestion & Organisation',
+  veille:'Veille',             outils:'Outils',
+};
+const SECTION_COLORS = {
+  tc:'#3d7fff', reg:'#e05c8a', tp:'#2dd4bf', rc:'#60a5fa',
+  pe:'#38bdf8', aa:'#c084fc',  tv:'#a78bfa', dc:'#34d399',
+  mc:'#fb923c', cs:'#fbbf24',  bm:'#f59e0b', go:'#94a3b8',
+  veille:'#2dd4bf', outils:'#c8a84b',
+};
 let currentModFilter = 'all';
 
 function filterModules(typeFilter, btn) {
@@ -1924,7 +1937,7 @@ function renderModules(sec) {
         <div class="mac-code">${m.code}</div>
         <div style="display:flex;align-items:center;gap:6px;">
           <span class="mod-type-badge ${isVideo ? 'mtb-video' : 'mtb-elearning'}">${isVideo ? '▶ Vidéo' : '📄 E-learning'}</span>
-          <span style="font-size:10px;color:${SECTION_COLORS[m.section]};font-weight:700;">${SECTION_LABELS[m.section]}</span>
+          <span style="font-size:10px;color:${SECTION_COLORS[m.section]||'var(--muted)'};font-weight:700;">${SECTION_LABELS[m.section]||m.section||'—'}</span>
         </div>
       </div>
       <div class="mac-title">${m.title}</div>
