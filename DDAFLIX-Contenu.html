@@ -692,7 +692,7 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text)
       <option value="">Type</option>
       <option value="elearning">📄 E-learning</option>
       <option value="video">▶ Vidéo</option>
-      <option value="outils">🔧 Outils</option>
+      <option value="outil">🔧 Outils</option>
       <option value="veille">📡 Veille</option>
     </select>
     <select class="filter-select" id="filterSort" onchange="onFilterChange()">
@@ -1012,7 +1012,7 @@ async function loadFromSupabase() {
             .in('id', validatedIds);
           let recalc = 0;
           (validatedMods || []).forEach(m => {
-            if (m.type === 'outils') return;
+            if (m.type === 'outil') return;
             recalc += m.duree_minutes || 0;
           });
           if (recalc > 0) {
@@ -1129,7 +1129,7 @@ async function saveProgressToSupabase(code, secondsToAdd, quizPassed, quizScore)
 
     // Incrémenter dda_minutes_total dans profiles si nouveau quiz réussi
     // (pas outils, pas déjà validé)
-    const isOutil = (MODS[code]?.type || 'elearning') === 'outils';
+    const isOutil = (MODS[code]?.type || 'elearning') === 'outil';
     if (quizPassed && !wasAlreadyPassed && !isOutil) {
       const minsToAdd = modData?.duree_minutes || 0;
       if (minsToAdd > 0) {
@@ -1567,7 +1567,7 @@ function applyFilters() {
 
 function getModTypeIcon(code) {
   const type = MODS[code]?.type || MOD_TYPE[code] || 'elearning';
-  const labels = { elearning:'E-learning', video:'Video', outils:'Outils', veille:'Veille' };
+  const labels = { elearning:'E-learning', video:'Video', outil:'Outils', veille:'Veille' };
   return labels[type] || 'E-learning';
 }
 
@@ -1587,7 +1587,7 @@ function renderCatalogue() {
     const meta  = MOD_META[code] || {};
     const types = mod.types?.length ? mod.types : (meta.types || []);
     const prods = mod.prods?.length ? mod.prods : (meta.prods || []);
-    const isUniversal = mod.type === 'outils' || mod.type === 'veille';
+    const isUniversal = mod.type === 'outil' || mod.type === 'veille';
     // Vidéos sans types/prods définis → visibles pour tous les métiers/produits
     const hasNoTypes = !types.length;
     const hasNoProds = !prods.length;
@@ -1681,7 +1681,7 @@ function buildCard(grid, mod, sec) {
       ${done ? '<div class="mod-card-progress"><div class="mod-card-progress-fill" style="width:100%"></div></div>' : ''}
     </div>`;
   // Variante outil
-  if (mod.type === 'outils') {
+  if (mod.type === 'outil') {
     const thumbUrl = mod.thumb || (code === 'OUTIL-COMPARATEUR' ? 'https://images.unsplash.com/photo-1589330694653-ded6df03f754?w=600&q=75' : 'https://images.unsplash.com/photo-1631511258193-252ab3da6b8b?w=600&q=75');
     card.innerHTML = `
       <div class="mod-card-thumb">
@@ -1963,7 +1963,7 @@ function openModal(code) {
   const mod = MODS[code];
   if (!mod) return;
   // Les outils redirigent vers leur page dédiée
-  if (mod.type === 'outils') {
+  if (mod.type === 'outil') {
     const url = OUTIL_URLS[code];
     if (url) window.location.href = url;
     return;
@@ -2007,7 +2007,7 @@ function openModal(code) {
   }
 
   // Variante outil
-  if (mod.type === 'outils') {
+  if (mod.type === 'outil') {
     const thumbUrl = mod.thumb || (code === 'OUTIL-COMPARATEUR' ? 'https://images.unsplash.com/photo-1589330694653-ded6df03f754?w=600&q=75' : 'https://images.unsplash.com/photo-1631511258193-252ab3da6b8b?w=600&q=75');
     card.innerHTML = `
       <div class="mod-card-thumb">
