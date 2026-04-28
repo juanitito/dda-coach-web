@@ -18,6 +18,40 @@ const LF_CLIENT_SECRET = process.env.LEGIFRANCE_CLIENT_SECRET;
 // SOURCES
 // ============================================================
 
+const GALERT_USER_ID = '15350856753362926494';
+const GALERT_FEED_IDS = [
+  '9165188408137547198',
+  '9150811095837532829',
+  '5621329156925239624',
+  '15421384119269762260',
+  '4283530991600927213',
+  '2620124716397577525',
+  '515028178138472746',
+  '10772468089943263050',
+  '12208372053856358753',
+  '7130175805859425644',
+  '15054059966457578796',
+  '3615451721715666237',
+  '10560826816637102300',
+  '260170253894965895',
+  '13140767607460021696',
+  '14023106918058336167',
+  '13335856215233101673',
+  '17005582107813007766',
+  '17743453367879111428',
+  '9275251244920854082',
+  '14212361113564714308',
+  '13559508812816058290',
+  '7432016483663118806',
+  '12027949116479620195',
+  '15001582308566950767',
+  '7947216403921138614',
+  '13743543431718821334',
+  '13559508812816056452',
+  '12027949116479619116',
+  '15692666047793124040',
+];
+
 const SOURCES = [
 
   // -- AMF : toutes actualités (RSS confirmé) ----------------
@@ -39,245 +73,13 @@ const SOURCES = [
   },
 
   // -- Google Alerts : 30 flux assurance ---------------------
-  {
-    id: 'galert-01',
+  ...GALERT_FEED_IDS.map((feedId, i) => ({
+    id:    `galert-${String(i + 1).padStart(2, '0')}`,
     label: 'Google Alerts',
     async fetch() {
-      return fetchRSS('https://www.google.com/alerts/feeds/15350856753362926494/9165188408137547198');
+      return fetchRSS(`https://www.google.com/alerts/feeds/${GALERT_USER_ID}/${feedId}`);
     },
-  },
-
-  {
-    id: 'galert-02',
-    label: 'Google Alerts',
-    async fetch() {
-      return fetchRSS('https://www.google.com/alerts/feeds/15350856753362926494/9150811095837532829');
-    },
-  },
-
-  {
-    id: 'galert-03',
-    label: 'Google Alerts',
-    async fetch() {
-      return fetchRSS('https://www.google.com/alerts/feeds/15350856753362926494/5621329156925239624');
-    },
-  },
-
-  {
-    id: 'galert-04',
-    label: 'Google Alerts',
-    async fetch() {
-      return fetchRSS('https://www.google.com/alerts/feeds/15350856753362926494/15421384119269762260');
-    },
-  },
-
-  {
-    id: 'galert-05',
-    label: 'Google Alerts',
-    async fetch() {
-      return fetchRSS('https://www.google.com/alerts/feeds/15350856753362926494/4283530991600927213');
-    },
-  },
-
-  {
-    id: 'galert-06',
-    label: 'Google Alerts',
-    async fetch() {
-      return fetchRSS('https://www.google.com/alerts/feeds/15350856753362926494/2620124716397577525');
-    },
-  },
-
-  {
-    id: 'galert-07',
-    label: 'Google Alerts',
-    async fetch() {
-      return fetchRSS('https://www.google.com/alerts/feeds/15350856753362926494/515028178138472746');
-    },
-  },
-
-  {
-    id: 'galert-08',
-    label: 'Google Alerts',
-    async fetch() {
-      return fetchRSS('https://www.google.com/alerts/feeds/15350856753362926494/10772468089943263050');
-    },
-  },
-
-  {
-    id: 'galert-09',
-    label: 'Google Alerts',
-    async fetch() {
-      return fetchRSS('https://www.google.com/alerts/feeds/15350856753362926494/12208372053856358753');
-    },
-  },
-
-  {
-    id: 'galert-10',
-    label: 'Google Alerts',
-    async fetch() {
-      return fetchRSS('https://www.google.com/alerts/feeds/15350856753362926494/7130175805859425644');
-    },
-  },
-
-  {
-    id: 'galert-11',
-    label: 'Google Alerts',
-    async fetch() {
-      return fetchRSS('https://www.google.com/alerts/feeds/15350856753362926494/15054059966457578796');
-    },
-  },
-
-  {
-    id: 'galert-12',
-    label: 'Google Alerts',
-    async fetch() {
-      return fetchRSS('https://www.google.com/alerts/feeds/15350856753362926494/3615451721715666237');
-    },
-  },
-
-  {
-    id: 'galert-13',
-    label: 'Google Alerts',
-    async fetch() {
-      return fetchRSS('https://www.google.com/alerts/feeds/15350856753362926494/10560826816637102300');
-    },
-  },
-
-  {
-    id: 'galert-14',
-    label: 'Google Alerts',
-    async fetch() {
-      return fetchRSS('https://www.google.com/alerts/feeds/15350856753362926494/260170253894965895');
-    },
-  },
-
-  {
-    id: 'galert-15',
-    label: 'Google Alerts',
-    async fetch() {
-      return fetchRSS('https://www.google.com/alerts/feeds/15350856753362926494/13140767607460021696');
-    },
-  },
-
-  {
-    id: 'galert-16',
-    label: 'Google Alerts',
-    async fetch() {
-      return fetchRSS('https://www.google.com/alerts/feeds/15350856753362926494/14023106918058336167');
-    },
-  },
-
-  {
-    id: 'galert-17',
-    label: 'Google Alerts',
-    async fetch() {
-      return fetchRSS('https://www.google.com/alerts/feeds/15350856753362926494/13335856215233101673');
-    },
-  },
-
-  {
-    id: 'galert-18',
-    label: 'Google Alerts',
-    async fetch() {
-      return fetchRSS('https://www.google.com/alerts/feeds/15350856753362926494/17005582107813007766');
-    },
-  },
-
-  {
-    id: 'galert-19',
-    label: 'Google Alerts',
-    async fetch() {
-      return fetchRSS('https://www.google.com/alerts/feeds/15350856753362926494/17743453367879111428');
-    },
-  },
-
-  {
-    id: 'galert-20',
-    label: 'Google Alerts',
-    async fetch() {
-      return fetchRSS('https://www.google.com/alerts/feeds/15350856753362926494/9275251244920854082');
-    },
-  },
-
-  {
-    id: 'galert-21',
-    label: 'Google Alerts',
-    async fetch() {
-      return fetchRSS('https://www.google.com/alerts/feeds/15350856753362926494/14212361113564714308');
-    },
-  },
-
-  {
-    id: 'galert-22',
-    label: 'Google Alerts',
-    async fetch() {
-      return fetchRSS('https://www.google.com/alerts/feeds/15350856753362926494/13559508812816058290');
-    },
-  },
-
-  {
-    id: 'galert-23',
-    label: 'Google Alerts',
-    async fetch() {
-      return fetchRSS('https://www.google.com/alerts/feeds/15350856753362926494/7432016483663118806');
-    },
-  },
-
-  {
-    id: 'galert-24',
-    label: 'Google Alerts',
-    async fetch() {
-      return fetchRSS('https://www.google.com/alerts/feeds/15350856753362926494/12027949116479620195');
-    },
-  },
-
-  {
-    id: 'galert-25',
-    label: 'Google Alerts',
-    async fetch() {
-      return fetchRSS('https://www.google.com/alerts/feeds/15350856753362926494/15001582308566950767');
-    },
-  },
-
-  {
-    id: 'galert-26',
-    label: 'Google Alerts',
-    async fetch() {
-      return fetchRSS('https://www.google.com/alerts/feeds/15350856753362926494/7947216403921138614');
-    },
-  },
-
-  {
-    id: 'galert-27',
-    label: 'Google Alerts',
-    async fetch() {
-      return fetchRSS('https://www.google.com/alerts/feeds/15350856753362926494/13743543431718821334');
-    },
-  },
-
-  {
-    id: 'galert-28',
-    label: 'Google Alerts',
-    async fetch() {
-      return fetchRSS('https://www.google.com/alerts/feeds/15350856753362926494/13559508812816056452');
-    },
-  },
-
-  {
-    id: 'galert-29',
-    label: 'Google Alerts',
-    async fetch() {
-      return fetchRSS('https://www.google.com/alerts/feeds/15350856753362926494/12027949116479619116');
-    },
-  },
-
-  {
-    id: 'galert-30',
-    label: 'Google Alerts',
-    async fetch() {
-      return fetchRSS('https://www.google.com/alerts/feeds/15350856753362926494/15692666047793124040');
-    },
-  },
+  })),
 
 ];
 
