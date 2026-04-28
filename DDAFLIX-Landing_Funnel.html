@@ -1592,7 +1592,15 @@ async function openFunnel(mode) {
       const { data: profile } = await sb.from('profiles')
         .select('metier, adresse').eq('id', session.user.id).single();
 
-      if (sub?.status === 'active') {
+      // Status d'abonnement en flow normal : seuls 'active' et 'pending' sont
+      // traités automatiquement. Les autres ('cancelled', 'suspended', 'past_due')
+      // ne doivent pas relancer un mandat GoCardless en écrasant l'historique :
+      // on bloque avec un message clair pour que l'utilisateur contacte le support.
+      const flowStatuses = ['active', 'pending'];
+      if (sub && !flowStatuses.includes(sub.status)) {
+        showError('register-error', 'Votre abonnement est dans un état particulier (' + sub.status + '). Contactez le support pour réactiver votre accès.');
+        goStep(1, true);
+      } else if (sub?.status === 'active') {
         // Déjà abonné → aller directement à la plateforme
         window.location.href = '/formation';
         return;
@@ -1686,6 +1694,8 @@ function validateStep(n) {
     if (!prenom || !nom || !email) { alert('Veuillez remplir tous les champs obligatoires.'); return false; }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { alert('Adresse e-mail invalide.'); return false; }
     if (mdp.length < 8) { alert('Le mot de passe doit contenir au moins 8 caractères.'); return false; }
+    if (!/[A-Z]/.test(mdp)) { alert('Le mot de passe doit contenir au moins 1 majuscule.'); return false; }
+    if (!/\d/.test(mdp)) { alert('Le mot de passe doit contenir au moins 1 chiffre.'); return false; }
     if (mdp !== mdp2) { alert('Les mots de passe ne correspondent pas.'); return false; }
   }
   if (n === 2) {
@@ -1814,6 +1824,13 @@ async function registerStep1() {
       throw error;
     }
 
+    // Garde-fou : si Supabase Auth réactive la confirmation email un jour,
+    // signUp renverra user sans session → l'étape 2 throw "Session expirée".
+    // On préfère un message clair côté étape 1.
+    if (!data.session) {
+      showError('register-error', 'Votre inscription est en attente de confirmation par email. Cliquez sur le lien reçu, puis revenez sur cette page.');
+      return;
+    }
     window._regUserId = data.user?.id;
     goStep(2, true);
   } catch (err) {
@@ -1825,6 +1842,11 @@ async function registerStep1() {
 
 // ── ÉTAPE 2 : PROFIL STRUCTURE ──
 async function registerStep2() {
+  // prenom/nom : si l'utilisateur est revenu à l'étape 2 via un signInWithPassword
+  // (email déjà inscrit), le trigger handle_new_user n'a pas tourné pour cette
+  // session — on persiste donc explicitement les valeurs saisies à l'étape 1.
+  const prenom  = document.getElementById('f-prenom').value.trim();
+  const nom     = document.getElementById('f-nom').value.trim();
   const rs      = document.getElementById('f-rs').value.trim();
   const siret   = document.getElementById('f-siret').value.replace(/\s/g,'');
   const orias   = document.getElementById('f-orias').value.replace(/\s/g,'');
@@ -1844,14 +1866,17 @@ async function registerStep2() {
     if (!session) throw new Error('Session expirée — veuillez recommencer depuis l\'étape 1.');
 
     // UPDATE (pas upsert) — le profil existe déjà grâce au trigger handle_new_user
-    const { error } = await sb.from('profiles').update({
+    const updates = {
       raison_sociale: rs,
       siret:          siret || null,
       orias:          orias || null,
       metier,
       adresse:        adresseFull,
-      telephone:      tel || null
-    }).eq('id', session.user.id);
+      telephone:      tel || null,
+    };
+    if (prenom) updates.prenom = prenom;
+    if (nom)    updates.nom    = nom;
+    const { error } = await sb.from('profiles').update(updates).eq('id', session.user.id);
 
     if (error) throw error;
     window._regUserId = session.user.id;
