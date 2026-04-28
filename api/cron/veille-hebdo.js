@@ -311,7 +311,7 @@ async function fetchRSS(feedUrl) {
       null;
 
     if (!titre || !url) continue;
-    const cleanUrl = unwrapUrl(url);
+    const cleanUrl = url.trim();
     if (!cleanUrl.startsWith('http')) continue;
 
     // Extraire la description/résumé source si disponible
@@ -350,23 +350,6 @@ function stripTags(str) {
     .replace(/<[^>]+>/g, '')
     .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"')
     .trim();
-}
-
-// Décode les entités HTML d'une URL et déballe les redirections Google Alerts
-// (https://www.google.com/url?...&url=<vraie URL>&...) pour stocker la cible réelle.
-function unwrapUrl(rawUrl) {
-  if (!rawUrl) return '';
-  const decoded = String(rawUrl)
-    .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
-    .replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&apos;/g, "'")
-    .trim();
-  if (decoded.startsWith('https://www.google.com/url?')) {
-    try {
-      const real = new URL(decoded).searchParams.get('url');
-      if (real && real.startsWith('http')) return real;
-    } catch { /* fallback sur la valeur décodée */ }
-  }
-  return decoded;
 }
 
 // ============================================================
