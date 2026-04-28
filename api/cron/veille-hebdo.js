@@ -1,8 +1,8 @@
 // api/cron/veille-hebdo.js
 // Déclenché chaque lundi à 6h00 UTC via vercel.json
-// Runtime : edge
+// Runtime : Node.js (maxDuration 60s, plafond Hobby) — Edge limité à 25s ne suffit pas
 
-export const config = { runtime: 'edge' };
+export const config = { maxDuration: 60 };
 
 const FETCH_TIMEOUT_MS = 6000;  // 6s max par source RSS
 const MAX_ITEMS_CLAUDE = 40;    // max items envoyés à Claude par run (Sonnet)
@@ -87,11 +87,11 @@ const SOURCES = [
 // HANDLER PRINCIPAL
 // ============================================================
 
-export default async function handler(req) {
+export default async function handler(req, res) {
 
-  const authHeader = req.headers.get('authorization');
+  const authHeader = req.headers.authorization;
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-    return json({ error: 'Unauthorized' }, 401);
+    return res.status(401).json({ error: 'Unauthorized' });
   }
 
   const semaine = getISOWeek();
@@ -129,7 +129,7 @@ export default async function handler(req) {
   }
 
   if (allItems.length === 0) {
-    return json({ ...results, message: 'Aucun item collecté' }, 200);
+    return res.status(200).json({ ...results, message: 'Aucun item collecté' });
   }
 
   // 2. Enrichissement Claude (limité à MAX_ITEMS_CLAUDE)
@@ -146,7 +146,7 @@ export default async function handler(req) {
   results.filtered_out = finalItems.length - filteredItems.length;
 
   for (const item of filteredItems) {
-    const res = await fetch(`${supabaseUrl}/rest/v1/veille_items?on_conflict=url`, {
+    const dbRes = await fetch(`${supabaseUrl}/rest/v1/veille_items?on_conflict=url`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -167,15 +167,15 @@ export default async function handler(req) {
       }),
     });
 
-    if (res.status === 201)      results.inserted++;
-    else if (res.status === 200) results.duplicates++;
+    if (dbRes.status === 201)      results.inserted++;
+    else if (dbRes.status === 200) results.duplicates++;
     else {
-      const err = await res.text();
-      results.errors.push({ url: item.url, status: res.status, error: err });
+      const err = await dbRes.text();
+      results.errors.push({ url: item.url, status: dbRes.status, error: err });
     }
   }
 
-  return json(results, 200);
+  return res.status(200).json(results);
 }
 
 // ============================================================
@@ -311,7 +311,7 @@ async function fetchRSS(feedUrl) {
       null;
 
     if (!titre || !url) continue;
-    const cleanUrl = url.trim();
+    const cleanUrl = unwrapUrl(url);
     if (!cleanUrl.startsWith('http')) continue;
 
     // Extraire la description/résumé source si disponible
@@ -350,6 +350,23 @@ function stripTags(str) {
     .replace(/<[^>]+>/g, '')
     .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"')
     .trim();
+}
+
+// Décode les entités HTML d'une URL et déballe les redirections Google Alerts
+// (https://www.google.com/url?...&url=<vraie URL>&...) pour stocker la cible réelle.
+function unwrapUrl(rawUrl) {
+  if (!rawUrl) return '';
+  const decoded = String(rawUrl)
+    .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&apos;/g, "'")
+    .trim();
+  if (decoded.startsWith('https://www.google.com/url?')) {
+    try {
+      const real = new URL(decoded).searchParams.get('url');
+      if (real && real.startsWith('http')) return real;
+    } catch { /* fallback sur la valeur décodée */ }
+  }
+  return decoded;
 }
 
 // ============================================================
@@ -431,11 +448,4 @@ function getISOWeek() {
   start.setUTCDate(jan4.getUTCDate() - ((jan4.getUTCDay() + 6) % 7));
   const week  = Math.floor((now - start) / (7 * 24 * 3600 * 1000)) + 1;
   return `${year}-W${String(week).padStart(2, '0')}`;
-}
-
-function json(data, status = 200) {
-  return new Response(JSON.stringify(data), {
-    status,
-    headers: { 'Content-Type': 'application/json' },
-  });
 }
