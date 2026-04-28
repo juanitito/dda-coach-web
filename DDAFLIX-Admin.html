@@ -1446,6 +1446,10 @@ const SUPABASE_URL = 'https://vrufldjydjrgcqwhmpnt.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZydWZsZGp5ZGpyZ2Nxd2htcG50Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5NTA3ODksImV4cCI6MjA5MjUyNjc4OX0.jW1CQ5yzJr4Ccac9-OI2RgVLXqFn-X0MjAxCkc9Xbfc';
 const sb = window._sbAdmin; // réutilise le client créé par le guard
 
+// Colonnes chargées dans window._sbMods (liste des modules pour l'onglet Modules).
+// Une seule source de vérité utilisée par les 4 points de chargement.
+const MODULES_LIST_FIELDS = 'code,section,title,duree_minutes,niveau,published,type,video_url,thumbnail_url,created_at';
+
 // ══════════════════════════════════════
 // CHARGEMENT DONNÉES SUPABASE
 // ══════════════════════════════════════
@@ -1471,7 +1475,7 @@ async function loadSupabaseData() {
     // Modules
     const { data: mods } = await sb
       .from('modules')
-      .select('code, section, title, duree_minutes, niveau, published, type, video_url, thumbnail_url, created_at')
+      .select(MODULES_LIST_FIELDS)
       .order('created_at', { ascending: false });
     // Stats progression
     const { data: learningStats } = await sb.from('v_learning_stats').select('*').single();
@@ -1661,7 +1665,7 @@ function renderView(name) {
       } catch { return _SKEY; }
     };
     getToken().then(token => {
-      fetch(`${_SURL}/rest/v1/modules?select=code,section,title,duree_minutes,niveau,published,type,thumbnail_url,video_url,created_at&order=sort_order`, {
+      fetch(`${_SURL}/rest/v1/modules?select=${MODULES_LIST_FIELDS}&order=sort_order`, {
         headers: { apikey: _SKEY, Authorization: `Bearer ${token}` }
       }).then(r => r.json()).then(data => {
         if (Array.isArray(data)) window._sbMods = data;
@@ -2391,7 +2395,7 @@ async function saveModal() {
         return;
       }
       // Recharger les modules
-      const { data: mods } = await _sb.from('modules').select('code, section, title, duree_minutes, niveau, published, type, thumbnail_url, video_url, created_at').order('sort_order');
+      const { data: mods } = await _sb.from('modules').select(MODULES_LIST_FIELDS).order('sort_order');
       if (mods) window._sbMods = mods;
       renderModules(currentModFilter || 'all');
       closeModal();
@@ -3049,7 +3053,7 @@ async function saveYoutubeModule() {
 
   // Recharger le cache modules pour l'onglet Modules
   const { data: mods } = await sb.from('modules')
-    .select('code, section, title, duree_minutes, niveau, published, type, video_url, thumbnail_url, created_at')
+    .select(MODULES_LIST_FIELDS)
     .order('created_at', { ascending: false });
   if (mods) window._sbMods = mods;
 
