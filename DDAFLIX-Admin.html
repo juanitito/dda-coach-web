@@ -3434,7 +3434,13 @@ async function vPublishModule() {
   btn.disabled = true; btn.textContent = 'Publication…';
   const { week, items, thumbnailUrl, thumbnailQuery } = _vGenerateData;
   const [year, wNum] = week.split('-W');
-  const code = `VEILLE-${year}-W${wNum}`;
+  const baseCode = `VEILLE-${year}-W${wNum}`;
+  // Suffixe -2, -3… si un module existe déjà pour cette semaine.
+  const { data: existing } = await sb.from('modules').select('code').like('code', `${baseCode}%`);
+  const taken = new Set((existing || []).map(m => m.code));
+  let code = baseCode;
+  let n = 2;
+  while (taken.has(code)) { code = `${baseCode}-${n++}`; }
   const contentHtml = vBuildContentHtml(items);
   try {
     const { data: mod, error: e1 } = await sb.from('modules').insert({
