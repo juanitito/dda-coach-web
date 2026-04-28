@@ -1761,8 +1761,8 @@ function renderDashboard() {
 
   document.getElementById('recent-tbody').innerHTML = recentSubs.map(s => `
     <tr>
-      <td><div class="td-name">${s.prenom} ${s.nom}</div><div class="td-email">${s.email}</div></td>
-      <td>${s.metier}</td>
+      <td><div class="td-name">${vEsc(s.prenom)} ${vEsc(s.nom)}</div><div class="td-email">${vEsc(s.email)}</div></td>
+      <td>${vEsc(s.metier)}</td>
       <td>${statusBadge(s.status)}</td>
       <td class="td-mono">${formatDate(s.started)}</td>
       <td class="td-mono">${s.period_end === '—' ? '—' : formatDate(s.period_end)}</td>
@@ -1806,9 +1806,9 @@ function renderSubPage() {
       ? `<span style="color:var(--green);font-weight:700">✓ ${s.progress}h</span>`
       : `<span style="color:${s.progress >= 10 ? 'var(--gold)' : 'var(--muted)'}">${s.progress}h / 15h</span>`;
     return `<tr>
-      <td><div class="td-name">${s.prenom} ${s.nom}</div><div class="td-email">${s.email}</div></td>
-      <td class="td-mono">${s.orias}</td>
-      <td>${s.metier}</td>
+      <td><div class="td-name">${vEsc(s.prenom)} ${vEsc(s.nom)}</div><div class="td-email">${vEsc(s.email)}</div></td>
+      <td class="td-mono">${vEsc(s.orias)}</td>
+      <td>${vEsc(s.metier)}</td>
       <td>${statusBadge(s.status)}</td>
       <td class="td-mono">${formatDate(s.started)}</td>
       <td class="td-mono">${s.period_end === '—' ? '—' : formatDate(s.period_end)}</td>
@@ -1862,14 +1862,14 @@ function renderPayments() {
   document.getElementById('pay-pending').textContent  = pending.length;
   document.getElementById('payments-tbody').innerHTML = pays.map(p => `
     <tr>
-      <td class="td-mono">${p.invoice}</td>
-      <td>${p.nom}</td>
+      <td class="td-mono">${vEsc(p.invoice)}</td>
+      <td>${vEsc(p.nom)}</td>
       <td>${Number(p.ht).toFixed(2)} €</td>
       <td>${Number(p.tva).toFixed(2)} €</td>
       <td style="font-weight:600;color:var(--white)">${Number(p.ttc).toFixed(2)} €</td>
       <td>${paymentBadge(p.status)}</td>
       <td class="td-mono">${p.date}</td>
-      <td class="td-mono" style="font-size:11px;color:var(--muted)">${p.gc_id}</td>
+      <td class="td-mono" style="font-size:11px;color:var(--muted)">${vEsc(p.gc_id)}</td>
     </tr>`).join('');
 }
 
@@ -1939,13 +1939,13 @@ function renderModules(sec) {
     <div class="mod-admin-card">
       ${thumbHtml}
       <div class="mac-header">
-        <div class="mac-code">${m.code}</div>
+        <div class="mac-code">${vEsc(m.code)}</div>
         <div style="display:flex;align-items:center;gap:6px;">
           <span class="mod-type-badge ${isVideo ? 'mtb-video' : 'mtb-elearning'}">${isVideo ? '▶ Vidéo' : '📄 E-learning'}</span>
-          <span style="font-size:10px;color:${SECTION_COLORS[m.section]||'var(--muted)'};font-weight:700;">${SECTION_LABELS[m.section]||m.section||'—'}</span>
+          <span style="font-size:10px;color:${SECTION_COLORS[m.section]||'var(--muted)'};font-weight:700;">${SECTION_LABELS[m.section]||vEsc(m.section)||'—'}</span>
         </div>
       </div>
-      <div class="mac-title">${m.title}</div>
+      <div class="mac-title">${vEsc(m.title)}</div>
       <div class="mac-meta">
         <span class="mac-tag">⏱ ${m.dur} min</span>
         <span class="mac-tag">${m.niveau}</span>
@@ -1988,8 +1988,8 @@ function renderProgress() {
     const score = topM ? (m.avg_score || 0) : m.score;
     const section = m.section || (m.sec || 'tc');
     return `<tr>
-      <td><span class="td-mono">${m.code}</span> <span style="color:var(--white)">${m.title}</span></td>
-      <td><span style="color:${SECTION_COLORS[section]||'var(--muted)'}">${SECTION_LABELS[section]||section}</span></td>
+      <td><span class="td-mono">${vEsc(m.code)}</span> <span style="color:var(--white)">${vEsc(m.title)}</span></td>
+      <td><span style="color:${SECTION_COLORS[section]||'var(--muted)'}">${SECTION_LABELS[section]||vEsc(section)}</span></td>
       <td>${m.starts || m.completions || 0}</td>
       <td>${m.completions || 0}</td>
       <td><span style="color:${rate>=70?'var(--green)':'var(--muted)'};font-weight:600">${rate}%</span></td>
@@ -2029,12 +2029,12 @@ function renderEmails(type, emails) {
   document.getElementById('emails-tbody').innerHTML = source.map(e => `
     <tr>
       <td class="td-mono">${e.date}</td>
-      <td>${e.to}</td>
-      <td><span class="mac-tag" style="font-size:11px;font-family:'DM Mono',monospace">${e.template}</span></td>
+      <td>${vEsc(e.to)}</td>
+      <td><span class="mac-tag" style="font-size:11px;font-family:'DM Mono',monospace">${vEsc(e.template)}</span></td>
       <td>${e.status === 'sent' ? '<span class="badge badge-active">✓ Envoyé</span>'
            : e.status === 'opened' ? '<span class="badge" style="background:rgba(61,127,255,.12);color:var(--accent2);">◎ Ouvert</span>'
            : '<span class="badge badge-cancelled">⚠ Échec</span>'}</td>
-      <td class="td-mono" style="font-size:10px;color:var(--muted)">${e.id}</td>
+      <td class="td-mono" style="font-size:10px;color:var(--muted)">${vEsc(e.id)}</td>
     </tr>`).join('');
 }
 
@@ -2053,8 +2053,8 @@ function renderWebhooks() {
   document.getElementById('webhooks-tbody').innerHTML = source.map(w => `
     <tr>
       <td class="td-mono">${w.received}</td>
-      <td><span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--accent2)">${w.type}</span></td>
-      <td class="td-mono">${w.resource}</td>
+      <td><span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--accent2)">${vEsc(w.type)}</span></td>
+      <td class="td-mono">${vEsc(w.resource)}</td>
       <td>${w.processed ? '<span class="badge badge-active">✓ Traité</span>' : '<span class="badge badge-pending">⏳ En attente</span>'}</td>
       <td><button class="act-btn" onclick="showPayload()">Voir JSON</button></td>
     </tr>`).join('');

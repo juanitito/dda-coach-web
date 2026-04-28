@@ -414,6 +414,15 @@ body {
   .hero { padding: 88px 1rem 32px; }
 }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3.2.4/dist/purify.min.js"></script>
+<script>
+const SUPABASE_URL = 'https://vrufldjydjrgcqwhmpnt.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZydWZsZGp5ZGpyZ2Nxd2htcG50Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5NTA3ODksImV4cCI6MjA5MjUyNjc4OX0.jW1CQ5yzJr4Ccac9-OI2RgVLXqFn-X0MjAxCkc9Xbfc';
+window._sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+  auth: { storageKey: 'dda-coach-auth', persistSession: true, autoRefreshToken: true }
+});
+</script>
 </head>
 <body>
 
@@ -867,9 +876,20 @@ async function startAnalysis() {
     const contentA = buildContentBlock(fileDataA, fileTypeA);
     const contentB = buildContentBlock(fileDataB, fileTypeB);
 
+    // Auth requise (l'endpoint /api/compare exige un JWT depuis le hardening
+    // sécurité — sinon n'importe qui pouvait drainer la clé Anthropic).
+    const { data: { session } } = await window._sb.auth.getSession();
+    if (!session) {
+      alert('Vous devez être connecté pour utiliser le comparateur.');
+      window.location.href = '/';
+      return;
+    }
     const response = await fetch('/api/compare', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + session.access_token,
+      },
       body: JSON.stringify({
         model: 'claude-haiku-4-5-20251001',
         max_tokens: 4000,
@@ -999,8 +1019,14 @@ function renderResults(data, nameA, nameB, grid) {
   document.getElementById('thA').textContent = nameA;
   document.getElementById('thB').textContent = nameB;
 
-  // Verdict
-  document.getElementById('verdictText').innerHTML = data.verdict;
+  // Verdict — sortie LLM, sanitize avant innerHTML pour neutraliser une éventuelle
+  // prompt injection qui produirait du HTML actif. Fallback textContent si DOMPurify down.
+  const verdictEl = document.getElementById('verdictText');
+  if (typeof DOMPurify !== 'undefined') {
+    verdictEl.innerHTML = DOMPurify.sanitize(data.verdict || '');
+  } else {
+    verdictEl.textContent = data.verdict || '';
+  }
 
   // Scores
   const isBetter = data.scoreA >= data.scoreB;
