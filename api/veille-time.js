@@ -53,12 +53,13 @@ export default async function handler(req) {
     const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
     const modRes = await fetch(
-      `${SUPABASE_URL}/rest/v1/modules?code=eq.${encodeURIComponent(module_code)}&select=id&limit=1`,
+      `${SUPABASE_URL}/rest/v1/modules?code=eq.${encodeURIComponent(module_code)}&select=id,duree_minutes&limit=1`,
       { headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` } }
     );
     const mods = await modRes.json();
     if (!mods?.length) return json({ error: 'Module not found' }, 404);
     const module_id = mods[0].id;
+    const duree_minutes = mods[0].duree_minutes || 0;
 
     const progRes = await fetch(
       `${SUPABASE_URL}/rest/v1/progress?user_id=eq.${user_id}&module_id=eq.${module_id}&select=seconds_spent,quiz_passed&limit=1`,
@@ -98,6 +99,29 @@ export default async function handler(req) {
     if (!upsertRes.ok) {
       const errText = await upsertRes.text();
       return json({ error: 'Upsert failed', detail: errText }, upsertRes.status);
+    }
+
+    // À la validation (passage de quiz_passed false → true), créditer le
+    // total DDA de l'utilisateur. Aligné sur ce que fait saveProgressToSupabase
+    // côté Contenu.html pour les e-learning, mais ici on le fait côté serveur
+    // car la validation veille passe par cet endpoint, pas par le client.
+    if (validated && !prev?.quiz_passed && duree_minutes > 0) {
+      const profRes = await fetch(
+        `${SUPABASE_URL}/rest/v1/profiles?id=eq.${user_id}&select=dda_minutes_total`,
+        { headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` } }
+      );
+      const profs = await profRes.json();
+      const currentMins = profs?.[0]?.dda_minutes_total || 0;
+      await fetch(`${SUPABASE_URL}/rest/v1/profiles?id=eq.${user_id}`, {
+        method: 'PATCH',
+        headers: {
+          apikey: serviceKey,
+          Authorization: `Bearer ${serviceKey}`,
+          'Content-Type': 'application/json',
+          Prefer: 'return=minimal',
+        },
+        body: JSON.stringify({ dda_minutes_total: currentMins + duree_minutes }),
+      });
     }
 
     return json({ ok: true, seconds_spent: newSecs, validated });
