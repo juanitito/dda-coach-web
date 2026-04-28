@@ -42,7 +42,8 @@ export default async function handler(req) {
     if (!module_code || !increment) {
       return json({ error: 'Missing fields' }, 400);
     }
-    // Garde-fou : increment cohérent avec VEILLE_STEP côté front (600s/tick).
+    // Garde-fou : le front utilise VEILLE_STEP=60 (un tick par minute).
+    // On tolère jusqu'à 600s/appel pour absorber le throttling de tab inactif.
     const inc = Number.parseInt(increment, 10);
     if (!Number.isFinite(inc) || inc <= 0 || inc > 600) {
       return json({ error: 'Invalid increment' }, 400);

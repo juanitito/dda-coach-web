@@ -2261,7 +2261,11 @@ function closeModalDirect() {
 let _veilleTimer   = null;
 let _veilleSeconds = 0;
 const VEILLE_MAX  = 1800;
-const VEILLE_STEP = 600;
+// 60s = 1 tick par minute. La progression côté serveur est synchronisée
+// chaque minute, ce qui rend le feature robuste à la fermeture de modale,
+// au throttling de tab inactif, au reload — au lieu de tout perdre toutes
+// les 10 minutes. Total à valider : 30 ticks = 30 minutes.
+const VEILLE_STEP = 60;
 
 function startVeilleTimer(code, mod) {
   stopVeilleTimer();
