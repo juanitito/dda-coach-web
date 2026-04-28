@@ -1661,7 +1661,7 @@ function renderView(name) {
       } catch { return _SKEY; }
     };
     getToken().then(token => {
-      fetch(`${_SURL}/rest/v1/modules?select=code,section,title,duree_minutes,niveau,published,type,thumbnail_url,video_url&order=sort_order`, {
+      fetch(`${_SURL}/rest/v1/modules?select=code,section,title,duree_minutes,niveau,published,type,thumbnail_url,video_url,created_at&order=sort_order`, {
         headers: { apikey: _SKEY, Authorization: `Bearer ${token}` }
       }).then(r => r.json()).then(data => {
         if (Array.isArray(data)) window._sbMods = data;
@@ -1911,13 +1911,14 @@ function renderModules(sec) {
         completions: 0,
         score:       0,
         thumbnail:   m.thumbnail_url || null,
-        video_url:   m.video_url     || null
+        video_url:   m.video_url     || null,
+        created_at:  m.created_at    || null
       }))
     : DEMO.modules;
 
   let mods = sec === 'all' ? source : source.filter(m => (m.type || 'elearning') === sec);
   if (searchVal) mods = mods.filter(m => m.title.toLowerCase().includes(searchVal) || m.code.toLowerCase().includes(searchVal));
-  if (sortVal === 'recent') mods = [...mods].reverse();
+  if (sortVal === 'recent') mods = [...mods].sort((a,b) => new Date(b.created_at||0) - new Date(a.created_at||0));
   else if (sortVal === 'az') mods = [...mods].sort((a,b) => a.title.localeCompare(b.title, 'fr'));
   document.getElementById('module-grid').innerHTML = mods.map(m => {
     const isVideo = m.type === 'video';
@@ -2390,7 +2391,7 @@ async function saveModal() {
         return;
       }
       // Recharger les modules
-      const { data: mods } = await _sb.from('modules').select('code, section, title, duree_minutes, niveau, published, type, thumbnail_url, video_url').order('sort_order');
+      const { data: mods } = await _sb.from('modules').select('code, section, title, duree_minutes, niveau, published, type, thumbnail_url, video_url, created_at').order('sort_order');
       if (mods) window._sbMods = mods;
       renderModules(currentModFilter || 'all');
       closeModal();

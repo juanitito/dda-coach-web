@@ -932,7 +932,7 @@ async function loadFromSupabase() {
     // 1. Charger les modules depuis Supabase
     const { data: modules, error: modError } = await sb
       .from('modules')
-      .select('code, section, title, description, duree_minutes, niveau, dda_certifiant, produits, thumbnail_url, type, content_html, quiz_data, video_url, sort_order, published, veille_modules_meta(semaine, items_count)')
+      .select('code, section, title, description, duree_minutes, niveau, dda_certifiant, produits, thumbnail_url, type, content_html, quiz_data, video_url, sort_order, published, created_at, veille_modules_meta(semaine, items_count)')
       .eq('published', true)
       .order('sort_order');
 
@@ -953,6 +953,7 @@ async function loadFromSupabase() {
           quiz_data: m.quiz_data    || null,
           video_url:  m.video_url    || null,
           sort_order: m.sort_order   || 0,
+          created_at: m.created_at   || null,
           type:       m.type         || 'elearning',
           thumb:     m.thumbnail_url || null,
           semaine:    m.veille_modules_meta?.semaine    || null,
@@ -1605,8 +1606,8 @@ function renderCatalogue() {
   if (filterSort) {
     Object.keys(sections).forEach(sec => {
       if (filterSort === 'title')  sections[sec].sort((a,b) => a.title.localeCompare(b.title, 'fr'));
-      if (filterSort === 'recent') sections[sec].sort((a,b) => (b.sort_order||0) - (a.sort_order||0));
-      if (filterSort === 'ancien') sections[sec].sort((a,b) => (a.sort_order||0) - (b.sort_order||0));
+      if (filterSort === 'recent') sections[sec].sort((a,b) => new Date(b.created_at||0) - new Date(a.created_at||0));
+      if (filterSort === 'ancien') sections[sec].sort((a,b) => new Date(a.created_at||0) - new Date(b.created_at||0));
     });
   }
 
