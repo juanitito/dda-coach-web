@@ -4,3 +4,9 @@
 # pas de raison de versionner — c'est généré par `supabase link`.
 supabase/.temp/
 supabase/.branches/
+
+# Node / Playwright
+node_modules/
+playwright-report/
+test-results/
+.playwright/
