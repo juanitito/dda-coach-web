@@ -1282,7 +1282,7 @@ convention que vous avez passée avec elle.
         <div class="form-title">Connexion</div>
         <div class="form-sub">Accédez à votre espace BingeDDA.</div>
       </div>
-      <div class="form-body">
+      <form class="form-body" id="login-form" onsubmit="event.preventDefault(); handleLogin();">
         <div class="form-group">
           <label class="form-label">Adresse e-mail</label>
           <input class="form-input" id="l-email" type="email" placeholder="jean.dupont@cabinet.fr" autocomplete="email">
@@ -1294,10 +1294,10 @@ convention que vous avez passée avec elle.
         <div style="text-align:right;margin-top:-10px;margin-bottom:18px;">
           <span style="font-size:12px;color:var(--accent2);cursor:pointer;" onclick="resetPassword()">Mot de passe oublié ?</span>
         </div>
-        <button class="form-btn" id="btn-login" onclick="handleLogin()">Se connecter →</button>
+        <button class="form-btn" id="btn-login" type="submit">Se connecter →</button>
         <div id="login-error" style="display:none;margin-top:10px;padding:10px 14px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);border-radius:6px;font-size:12px;color:#f87171;"></div>
-        <button class="form-btn-ghost" onclick="switchToRegister()">Pas encore de compte ? S'inscrire</button>
-      </div>
+        <button class="form-btn-ghost" type="button" onclick="switchToRegister()">Pas encore de compte ? S'inscrire</button>
+      </form>
     </div><!-- /funnel-login -->
 
   </div><!-- /modal -->
@@ -1578,6 +1578,7 @@ async function openFunnel(mode) {
   if (mode === 'login') {
     document.getElementById('funnel-register').style.display = 'none';
     document.getElementById('funnel-login').style.display = 'block';
+    focusFirstInput('funnel-login');
   } else {
     document.getElementById('funnel-register').style.display = 'block';
     document.getElementById('funnel-login').style.display = 'none';
@@ -1649,12 +1650,26 @@ function handleOverlayClick(e) {
 function switchToLogin() {
   document.getElementById('funnel-register').style.display = 'none';
   document.getElementById('funnel-login').style.display = 'block';
+  focusFirstInput('funnel-login');
 }
 
 function switchToRegister() {
   document.getElementById('funnel-register').style.display = 'block';
   document.getElementById('funnel-login').style.display = 'none';
   goStep(1, true);
+}
+
+// Auto-focus du premier input visible & non-disabled d'un container.
+// Utilisé à l'ouverture du modal et à chaque changement d'étape pour
+// éviter à l'utilisateur de cliquer dans le 1er champ.
+function focusFirstInput(containerId) {
+  const root = document.getElementById(containerId);
+  if (!root) return;
+  // Délai 0 pour laisser le browser appliquer display/active class avant focus.
+  setTimeout(() => {
+    const el = root.querySelector('input:not([type=hidden]):not([disabled]), select:not([disabled]), textarea:not([disabled])');
+    if (el) el.focus();
+  }, 0);
 }
 
 // ── STEPS ──
@@ -1682,6 +1697,9 @@ function goStep(n, force) {
   if (n === 3) updateMandatPreview();
   // On step 4: populate confirmation
   if (n === 4) populateConfirmation();
+  // Auto-focus le premier input de l'étape (sauf step 4 qui est purement
+  // une confirmation sans champ).
+  if (n !== 4) focusFirstInput('fv-' + n);
 }
 
 function validateStep(n) {
