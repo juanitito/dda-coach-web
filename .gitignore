@@ -1,1 +1,6 @@
 .vercel
+
+# Supabase CLI local state (link cache, DB versions). Pas de secret mais
+# pas de raison de versionner — c'est généré par `supabase link`.
+supabase/.temp/
+supabase/.branches/
