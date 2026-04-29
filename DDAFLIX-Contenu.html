@@ -1067,22 +1067,24 @@ async function loadFromSupabase() {
 async function saveProgressToSupabase(code, secondsToAdd, quizPassed, quizScore) {
   const sb = window._sb;
   if (!sb || !window._user) {
-    // Fallback localStorage
     localStorage.setItem('ddaDone', JSON.stringify(mDone));
-    return;
+    return null;
   }
-
   try {
     const { data, error } = await sb.rpc('record_quiz_attempt', {
       p_module_code: code,
       p_quiz_score:  quizScore || 0,
     });
-    if (error) console.warn('Erreur save progress:', error);
-    // Source de vérité = data côté serveur. Si first_pass=true, dda_minutes_total
-    // a déjà été crédité par la RPC.
+    if (error) {
+      console.warn('Erreur save progress:', error);
+      return null;
+    }
+    // Source de vérité = data côté serveur. Le caller met à jour timerTotal
+    // depuis data.dda_minutes_total — le client ne calcule plus localement.
+    return data;
   } catch (err) {
     console.warn('Erreur Supabase save progress:', err);
-    localStorage.setItem('ddaDone', JSON.stringify(mDone));
+    return null;
   }
 }
 
@@ -2103,7 +2105,7 @@ function ansQ(code, qi, sel, correct, total) {
   }, 1300);
 }
 
-function showQuizResults(code, total) {
+async function showQuizResults(code, total) {
   let ok = 0;
   for (let i = 0; i < total; i++) if (qSt[`${code}-${i}-ok`]) ok++;
   const pct = Math.round((ok/total)*100), passed = pct >= 70;
@@ -2114,25 +2116,25 @@ function showQuizResults(code, total) {
   document.getElementById(`sc-${code}`).textContent  = pct + '%';
   document.getElementById(`rl-${code}`).textContent  = passed ? '✅ Quiz réussi !' : '⚠️ À retravailler';
   document.getElementById(`rs-${code}`).textContent  = `${ok} / ${total} bonnes réponses · ${passed ? 'Attestation DDA disponible' : 'Score minimum requis : 70%'}`;
+  if (passed) markDone(code);
+
+  // Le serveur (RPC) est source de vérité pour quiz_passed et dda_minutes_total.
+  // On récupère la valeur retournée et on synchronise timerTotal — plus de
+  // calcul local qui pouvait diverger (cf. bug "17h au compteur").
+  const result = await saveProgressToSupabase(code, null, passed, pct);
+  if (result && typeof result.dda_minutes_total === 'number') {
+    timerTotal = result.dda_minutes_total * 60;
+    // Cache de fast-init au prochain page-load. Jamais incrémenté localement,
+    // toujours réécrit depuis la valeur serveur — donc impossible de dériver.
+    localStorage.setItem('ddaTimer3', timerTotal);
+  }
+  timerRender();
   if (passed) {
-    markDone(code);
-    const mod = MODS[code];
-    if (mod) {
-      const mins = parseInt(mod.dur) || 0;
-      timerTotal += mins * 60;
-      localStorage.setItem('ddaTimer3', timerTotal); // cache local
-      // Sauvegarder progression complète en Supabase
-      saveProgressToSupabase(code, timerTotal, true, pct);
-      timerRender();
-      const timerEl = document.getElementById('ddaTimer');
-      const badge   = document.getElementById('topTimerBadge');
-      if (timerEl) timerEl.classList.add('visible');
-      if (badge)   badge.style.display = 'flex';
-      if (timerTotal >= 15 * 3600) showAnnualCertificate();
-    }
-  } else {
-    // Sauvegarder tentative échouée
-    saveProgressToSupabase(code, timerTotal, false, pct);
+    const timerEl = document.getElementById('ddaTimer');
+    const badge   = document.getElementById('topTimerBadge');
+    if (timerEl) timerEl.classList.add('visible');
+    if (badge)   badge.style.display = 'flex';
+    if (timerTotal >= 15 * 3600) showAnnualCertificate();
   }
   toast(passed ? `🏆 Quiz réussi ! (${pct}%) — ${parseInt((MODS[code]||{}).dur)||0} min crédités` : `💪 Score : ${pct}% · Réessayez pour atteindre 70%`);
 }
