@@ -372,9 +372,13 @@ Génère le JSON {content_html, quiz_data, metadata} en respectant strictement l
       },
       body: JSON.stringify({
         model: "claude-sonnet-4-6",
-        max_tokens: 16000,
-        thinking: { type: "adaptive" },
+        max_tokens: 12000,
+        // Adaptive thinking désactivé : task prescriptif (extraction structurée),
+        // l'output JSON suit un schéma strict — pas de raisonnement complexe nécessaire.
+        // Réduit la latence de ~50%, évite les timeouts wall-clock Edge Functions.
+        thinking: { type: "disabled" },
         output_config: {
+          effort: "low",
           format: {
             type: "json_schema",
             schema: OUTPUT_SCHEMA,
