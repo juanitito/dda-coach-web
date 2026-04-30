@@ -466,6 +466,41 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text)
 .quiz-result-label { font-size:16px; color:var(--text); margin-bottom:6px; }
 .quiz-result-sub { font-size:13px; color:var(--muted); margin-bottom:24px; }
 
+/* ========== CORRECTION TOGGLE (cas pratiques, exercices) ========== */
+.correction-toggle {
+  margin-top: 10px;
+  padding: 10px 14px;
+  background: rgba(61,127,255,0.08);
+  border: 1px solid rgba(61,127,255,0.25);
+  border-radius: 6px;
+}
+.correction-toggle summary {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent2);
+  cursor: pointer;
+  user-select: none;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.correction-toggle summary::-webkit-details-marker { display: none; }
+.correction-toggle summary::before {
+  content: '▶';
+  display: inline-block;
+  font-size: 9px;
+  transition: transform 0.2s ease;
+}
+.correction-toggle[open] summary::before { transform: rotate(90deg); }
+.correction-toggle .correction-content {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(61,127,255,0.2);
+  font-size: 13px;
+  line-height: 1.7;
+}
+
 /* ========== TIMER ========== */
 /* ── MON COMPTE ── */
 .account-section{background:var(--surface);border:1px solid var(--border2);border-radius:var(--r);padding:20px 24px;margin-bottom:16px;}
@@ -1831,10 +1866,53 @@ const OUTIL_URLS = {
 
 // Sanitize le content_html des modules avant innerHTML. Défense en profondeur :
 // si un admin compromis insérait <script> ou un onerror, DOMPurify le strip.
+// Iframe YouTube autorisé pour la callout vidéo de référence (whitelist src).
 function safeHtml(html) {
   if (!html) return '';
-  if (typeof DOMPurify !== 'undefined') return DOMPurify.sanitize(html);
-  return html; // fallback si la CDN n'a pas chargé — pas pire que l'état d'avant
+  if (typeof DOMPurify !== 'undefined') {
+    return DOMPurify.sanitize(html, {
+      ADD_TAGS: ['iframe'],
+      ADD_ATTR: ['allow', 'allowfullscreen', 'frameborder', 'src'],
+    });
+  }
+  return html; // fallback si la CDN n'a pas chargé
+}
+
+// Hook one-shot : refuse les iframes dont src n'est pas un embed YouTube
+if (typeof DOMPurify !== 'undefined' && !window._dompurifyHookInstalled) {
+  DOMPurify.addHook('uponSanitizeAttribute', (node, evt) => {
+    if (node.nodeName === 'IFRAME' && evt.attrName === 'src') {
+      const ok = /^https:\/\/(www\.)?youtube\.com\/embed\/[\w-]+/.test(evt.attrValue || '');
+      if (!ok) evt.keepAttr = false;
+    }
+  });
+  window._dompurifyHookInstalled = true;
+}
+
+// Cache les corrections (Réponses au cas pratique, Réponses à l'exercice, Correction…)
+// derrière un <details> "Voir la correction" cliquable.
+// Ciblé sur les tables thématiques (⚡ CAS PRATIQUE, 📋 Exercice, ✏ EXERCICE INTERMÉDIAIRE).
+function wrapCorrections(rootEl) {
+  if (!rootEl) return;
+  rootEl.querySelectorAll('table').forEach(table => {
+    const th = table.querySelector('th');
+    if (!th) return;
+    if (!/^[⚡📋✏✅]/u.test((th.textContent || '').trim())) return;
+    table.querySelectorAll('td').forEach(td => {
+      const html = td.innerHTML;
+      // Match le bloc "Réponses : ..." ou "Correction : ..." jusqu'à la fin de la cellule
+      const m = html.match(/((?:<br\s*\/?>\s*){0,3})(R[ée]ponses?\s*(?:au cas pratique|à l['’]exercice|aux exercices)?\s*:[\s\S]*?|Correction\s*:[\s\S]*?)$/i);
+      if (!m) return;
+      const before = html.slice(0, m.index);
+      const breaks = m[1] || '';
+      const correction = m[2];
+      td.innerHTML = before + breaks +
+        '<details class="correction-toggle">' +
+          '<summary>📖 Voir la correction</summary>' +
+          '<div class="correction-content">' + correction + '</div>' +
+        '</details>';
+    });
+  });
 }
 
 // Lazy-load du contenu lourd (content_html, quiz_data) à l'ouverture du
@@ -1944,6 +2022,7 @@ async function openModal(code) {
     body.innerHTML += mod.content
       ? `<div class="modal-content-area" style="font-size:14px;line-height:1.7;">${safeHtml(mod.content)}</div>`
       : '<p style="color:var(--muted);text-align:center;padding:40px;">Contenu en cours de chargement…</p>';
+    wrapCorrections(body.querySelector('.modal-content-area'));
     document.getElementById('modalOverlay').classList.add('open');
     document.body.style.overflow = 'hidden';
     startVeilleTimer(code, mod);
@@ -1968,6 +2047,8 @@ async function openModal(code) {
   } else {
     body.innerHTML += `<div style="text-align:center;padding:48px 20px;color:var(--muted)"><div style="font-size:56px;margin-bottom:14px">📄</div><p>Contenu de ce module à venir prochainement.</p></div>`;
   }
+  // Cache les corrections derrière des <details> sur les tables thématiques
+  wrapCorrections(body.querySelector('.modal-content-area'));
   // Quiz : depuis MODS (chargé de Supabase) ou fallback QUIZZES hardcodé
   const quizData = MODS[code]?.quiz_data || QUIZZES[code];
   if (quizData) body.innerHTML += buildQuiz(code, quizData);

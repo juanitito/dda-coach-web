@@ -2577,13 +2577,19 @@ async function uploadDocxImageToStorage(_sb, draftId, idx, imgArrayBuffer, mimeT
   const ext = (mimeType || '').split('/').pop() || 'png';
   const safeExt = ['png','jpg','jpeg','webp','gif','svg+xml'].includes(ext) ? ext.replace('+xml','') : 'png';
   const path = `draft-${draftId}/${idx}.${safeExt}`;
-  const { error } = await _sb.storage
+  const blob = new Blob([imgArrayBuffer], { type: mimeType });
+  console.log(`[import-docx] Uploading image ${idx} (${blob.size} bytes, ${mimeType}) → ${path}`);
+  const { data, error } = await _sb.storage
     .from('module-assets')
-    .upload(path, new Blob([imgArrayBuffer], { type: mimeType }), {
+    .upload(path, blob, {
       contentType: mimeType,
       upsert: true,
     });
-  if (error) throw new Error(`Upload image ${idx} : ${error.message}`);
+  if (error) {
+    console.error(`[import-docx] Upload image ${idx} FAILED:`, error);
+    throw new Error(`Upload image ${idx} (${path}) — ${error.message || error.statusCode || JSON.stringify(error)}`);
+  }
+  console.log(`[import-docx] Upload image ${idx} OK:`, data);
   const { data: pub } = _sb.storage.from('module-assets').getPublicUrl(path);
   return pub.publicUrl;
 }
@@ -2605,7 +2611,9 @@ async function importFromDocx(file) {
   }
 
   const draftId = crypto.randomUUID().slice(0, 8);
-  let imgIdx = 0;
+  let imgUploadCount = 0; // compte les uploads RÉUSSIS uniquement
+  let imgUploadAttempts = 0;
+  const imgUploadErrors = [];
 
   try {
     setImportStatus('⌛ Lecture du .docx + extraction des images…', 'var(--accent2)');
@@ -2620,14 +2628,28 @@ async function importFromDocx(file) {
           "p[style-name='Titre2'] => h2",
         ],
         convertImage: window.mammoth.images.imgElement(async (image) => {
-          imgIdx += 1;
-          setImportStatus(`⌛ Upload image ${imgIdx} sur Storage…`, 'var(--accent2)');
-          const buffer = await image.read('arraybuffer');
-          const url = await uploadDocxImageToStorage(_sb, draftId, imgIdx, buffer, image.contentType || 'image/png');
-          return { src: url };
+          const idx = ++imgUploadAttempts;
+          setImportStatus(`⌛ Upload image ${idx} sur Storage…`, 'var(--accent2)');
+          try {
+            const buffer = await image.read('arraybuffer');
+            const url = await uploadDocxImageToStorage(_sb, draftId, idx, buffer, image.contentType || 'image/png');
+            imgUploadCount += 1;
+            return { src: url };
+          } catch (uploadErr) {
+            // mammoth swallow les erreurs des callbacks → on les capture explicitement
+            imgUploadErrors.push(`Image ${idx}: ${uploadErr.message}`);
+            console.error(`[import-docx] Image ${idx} upload error captured:`, uploadErr);
+            return { src: '' }; // placeholder — on bloquera plus tard
+          }
         }),
       }
     );
+
+    // Échec si une seule image n'a pas été uploadée — bloquer l'import plutôt que continuer avec un module incomplet
+    if (imgUploadErrors.length > 0) {
+      throw new Error(`${imgUploadErrors.length} image(s) n'ont pas pu être uploadée(s) sur Storage :\n` + imgUploadErrors.join('\n'));
+    }
+    const imgIdx = imgUploadCount; // alias pour le reste du code
 
     const htmlContent = result.value;
     if (result.messages?.length) {
