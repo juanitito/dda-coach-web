@@ -9,6 +9,7 @@
 <title>BingeDDA · Administration</title>
 <meta name="robots" content="noindex, nofollow">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mammoth@1.10.0/mammoth.browser.min.js"></script>
 <script>
 // ── ADMIN AUTH GUARD ──
 document.documentElement.style.visibility = 'hidden';
@@ -2116,10 +2117,28 @@ function openModal(type) {
   if (type === 'new-module') {
     title.textContent = 'Nouveau module';
     body.innerHTML = `
-      <!-- Type toggle -->
+      <!-- Type toggle (Vidéo retirée : les modules vidéo sont créés via l'onglet Import YouTube) -->
       <div class="type-toggle" id="type-toggle">
         <button class="type-toggle-btn active-el" id="toggle-el" onclick="switchModuleType('elearning')">📄 E-learning</button>
-        <button class="type-toggle-btn" id="toggle-vid" onclick="switchModuleType('video')">▶ Vidéo</button>
+      </div>
+
+      <!-- IMPORT DEPUIS WORD (en tête : pré-remplit tous les champs en dessous) -->
+      <div class="form-group" style="background:rgba(61,127,255,.08);border:1px solid rgba(61,127,255,.25);border-radius:var(--r);padding:14px;">
+        <label class="form-label" style="color:var(--accent2);">📄 Importer depuis un fichier Word (.docx)</label>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:10px;line-height:1.5;">
+          Sélectionnez un .docx structuré (PARTIE 1 contenu / PARTIE 2 vidéo / PARTIE 3 quiz). Les images sont uploadées sur Supabase Storage, le texte est restructuré par IA, le quiz est extrait. Tous les champs ci-dessous seront pré-remplis.
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <input type="file" id="docx-import-file" accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            style="display:none;" onchange="importFromDocx(this.files[0])">
+          <button type="button" id="docx-import-btn" onclick="document.getElementById('docx-import-file').click()" style="
+            background:var(--accent);color:#fff;border:none;border-radius:var(--r);
+            padding:10px 18px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;
+            cursor:pointer;transition:all .2s;white-space:nowrap;
+          ">Choisir un fichier .docx</button>
+          <div id="docx-import-filename" style="font-size:12px;color:var(--text);"></div>
+        </div>
+        <div id="docx-import-status" style="margin-top:10px;font-size:12px;line-height:1.6;"></div>
       </div>
 
       <!-- Code + Durée -->
@@ -2249,6 +2268,12 @@ function openModal(type) {
           <label class="form-label">Contenu HTML</label>
           <textarea class="form-input" id="mod-content" style="min-height:120px;font-family:'DM Mono',monospace;font-size:11px;" placeholder="Collez le HTML du module ici…"></textarea>
           <div style="font-size:11px;color:var(--muted);margin-top:4px;">Stocké dans <code style="background:var(--surface2);padding:1px 5px;border-radius:3px;">content_html</code> dans Supabase.</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Quiz JSON (10 questions)</label>
+          <textarea class="form-input" id="mod-quiz-json" style="min-height:120px;font-family:'DM Mono',monospace;font-size:11px;" placeholder='[{"q":"…","exp":"…","opts":["A","B","C","D"],"correct":0}, … 10 entrées]'></textarea>
+          <div style="font-size:11px;color:var(--muted);margin-top:4px;">Auto-rempli par l'import .docx. Stocké dans <code style="background:var(--surface2);padding:1px 5px;border-radius:3px;">quiz_data</code> (jsonb).</div>
         </div>
       </div>
 
@@ -2385,6 +2410,27 @@ async function saveModal() {
         : (document.getElementById('mod-thumb-el')?.value  || null),
     };
 
+    // Quiz JSON (e-learning uniquement) — validation + parse avant insert
+    if (!isVideo) {
+      const quizRaw = document.getElementById('mod-quiz-json')?.value?.trim();
+      if (quizRaw) {
+        try {
+          const quizParsed = JSON.parse(quizRaw);
+          if (!Array.isArray(quizParsed)) throw new Error('quiz_data doit être un tableau');
+          if (quizParsed.length !== 10) throw new Error(`quiz_data doit contenir 10 questions (actuellement ${quizParsed.length})`);
+          for (const [i, q] of quizParsed.entries()) {
+            if (!q.q || !q.exp || !Array.isArray(q.opts) || q.opts.length !== 4 || typeof q.correct !== 'number') {
+              throw new Error(`Question ${i+1} : format invalide (q, exp, opts[4], correct attendus)`);
+            }
+          }
+          payload.quiz_data = quizParsed;
+        } catch (err) {
+          alert('Quiz JSON invalide : ' + err.message);
+          return;
+        }
+      }
+    }
+
     if (!payload.title) { alert('Le titre est obligatoire.'); return; }
 
     const _sb = window._sbAdmin || window.supabase?.createClient('https://vrufldjydjrgcqwhmpnt.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZydWZsZGp5ZGpyZ2Nxd2htcG50Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5NTA3ODksImV4cCI6MjA5MjUyNjc4OX0.jW1CQ5yzJr4Ccac9-OI2RgVLXqFn-X0MjAxCkc9Xbfc', { auth: { storageKey: 'dda-coach-auth' } });
@@ -2480,6 +2526,8 @@ async function editModule(code, type) {
       if (el('mod-thumb-el'))     el('mod-thumb-el').value     = mod.thumbnail_url || '';
       if (el('mod-video-url'))    el('mod-video-url').value    = mod.video_url || '';
       if (el('mod-thumb-url'))    el('mod-thumb-url').value    = mod.thumbnail_url || '';
+      if (el('mod-content'))      el('mod-content').value      = mod.content_html || '';
+      if (el('mod-quiz-json'))    el('mod-quiz-json').value    = mod.quiz_data ? JSON.stringify(mod.quiz_data, null, 2) : '';
       if (mod.type === 'video')   switchModuleType('video');
     }, 100);
   } catch(e) {
@@ -2505,6 +2553,166 @@ async function deleteModule(code) {
   toast && toast(`✓ Module ${code} supprimé.`);
 }
 function showPayload() { alert('Payload JSON GoCardless — Connexion Supabase requise pour lire les données réelles.'); }
+
+// ── IMPORT DEPUIS WORD (.docx) ──
+// Pipeline : mammoth.js parse le .docx → upload des images vers Supabase Storage
+// → appel Edge Function import-module-from-text → fill du formulaire
+
+function setImportStatus(text, color = 'var(--muted)') {
+  const el = document.getElementById('docx-import-status');
+  if (el) el.innerHTML = text ? `<div style="color:${color};">${text}</div>` : '';
+}
+
+function setImportButtonState(disabled, label) {
+  const btn = document.getElementById('docx-import-btn');
+  if (!btn) return;
+  btn.disabled = disabled;
+  btn.style.opacity = disabled ? '0.6' : '1';
+  btn.style.cursor = disabled ? 'wait' : 'pointer';
+  if (label) btn.textContent = label;
+}
+
+async function uploadDocxImageToStorage(_sb, draftId, idx, imgArrayBuffer, mimeType) {
+  const ext = (mimeType || '').split('/').pop() || 'png';
+  const safeExt = ['png','jpg','jpeg','webp','gif','svg+xml'].includes(ext) ? ext.replace('+xml','') : 'png';
+  const path = `draft-${draftId}/${idx}.${safeExt}`;
+  const blob = new Blob([imgArrayBuffer], { type: mimeType });
+  console.log(`[import-docx] Uploading image ${idx} (${blob.size} bytes, ${mimeType}) → ${path}`);
+  const { data, error } = await _sb.storage
+    .from('module-assets')
+    .upload(path, blob, {
+      contentType: mimeType,
+      upsert: true,
+    });
+  if (error) {
+    console.error(`[import-docx] Upload image ${idx} FAILED:`, error);
+    throw new Error(`Upload image ${idx} (${path}) — ${error.message || error.statusCode || JSON.stringify(error)}`);
+  }
+  console.log(`[import-docx] Upload image ${idx} OK:`, data);
+  const { data: pub } = _sb.storage.from('module-assets').getPublicUrl(path);
+  return pub.publicUrl;
+}
+
+async function importFromDocx(file) {
+  if (!file) return;
+  if (!file.name.toLowerCase().endsWith('.docx')) {
+    alert('Veuillez sélectionner un fichier .docx (Word).');
+    return;
+  }
+  document.getElementById('docx-import-filename').textContent = file.name;
+  setImportButtonState(true, '⌛ Import en cours…');
+
+  const _sb = window._sbAdmin;
+  if (!_sb) {
+    setImportStatus('❌ Client Supabase non initialisé.', 'var(--red)');
+    setImportButtonState(false, 'Choisir un fichier .docx');
+    return;
+  }
+
+  const draftId = crypto.randomUUID().slice(0, 8);
+  let imgUploadCount = 0; // compte les uploads RÉUSSIS uniquement
+  let imgUploadAttempts = 0;
+  const imgUploadErrors = [];
+
+  try {
+    setImportStatus('⌛ Lecture du .docx + extraction des images…', 'var(--accent2)');
+    const arrayBuffer = await file.arrayBuffer();
+
+    // mammoth converter avec handler async pour les images : upload immédiat → URL Storage
+    const result = await window.mammoth.convertToHtml(
+      { arrayBuffer },
+      {
+        styleMap: [
+          "p[style-name='Titre1'] => h1",
+          "p[style-name='Titre2'] => h2",
+        ],
+        convertImage: window.mammoth.images.imgElement(async (image) => {
+          const idx = ++imgUploadAttempts;
+          setImportStatus(`⌛ Upload image ${idx} sur Storage…`, 'var(--accent2)');
+          try {
+            // image.read() sans argument → ArrayBuffer (browser) ; "arraybuffer" n'est PAS valide.
+            const buffer = await image.read();
+            const url = await uploadDocxImageToStorage(_sb, draftId, idx, buffer, image.contentType || 'image/png');
+            imgUploadCount += 1;
+            return { src: url };
+          } catch (uploadErr) {
+            // mammoth swallow les erreurs des callbacks → on les capture explicitement
+            imgUploadErrors.push(`Image ${idx}: ${uploadErr.message}`);
+            console.error(`[import-docx] Image ${idx} upload error captured:`, uploadErr);
+            return { src: '' }; // placeholder — on bloquera plus tard
+          }
+        }),
+      }
+    );
+
+    // Échec si une seule image n'a pas été uploadée — bloquer l'import plutôt que continuer avec un module incomplet
+    if (imgUploadErrors.length > 0) {
+      throw new Error(`${imgUploadErrors.length} image(s) n'ont pas pu être uploadée(s) sur Storage :\n` + imgUploadErrors.join('\n'));
+    }
+    const imgIdx = imgUploadCount; // alias pour le reste du code
+
+    const htmlContent = result.value;
+    if (result.messages?.length) {
+      console.log('mammoth messages:', result.messages);
+    }
+
+    // Hints depuis le form si l'admin les a déjà saisis (sinon l'IA les extrait du Word)
+    const titleHint = document.getElementById('mod-title')?.value?.trim() || undefined;
+    const sectionHint = document.getElementById('mod-section')?.value || undefined;
+
+    setImportStatus(`⌛ Restructuration IA en cours (${imgIdx} image${imgIdx > 1 ? 's' : ''} uploadée${imgIdx > 1 ? 's' : ''})…`, 'var(--accent2)');
+
+    const { data, error } = await _sb.functions.invoke('import-module-from-text', {
+      body: { html_content: htmlContent, title_hint: titleHint, section_hint: sectionHint },
+    });
+
+    if (error) throw new Error(`Edge Function : ${error.message || error}`);
+    if (!data?.content_html || !Array.isArray(data?.quiz_data) || !data?.metadata) {
+      throw new Error('Réponse invalide : content_html, quiz_data ou metadata manquant');
+    }
+
+    // Pré-remplit les champs CONTENU
+    document.getElementById('mod-content').value = data.content_html;
+    document.getElementById('mod-quiz-json').value = JSON.stringify(data.quiz_data, null, 2);
+
+    // Pré-remplit les champs METADATA (extraits par l'IA du tableau de tête du Word)
+    const m = data.metadata;
+    const setVal = (id, v) => { const el = document.getElementById(id); if (el && v != null && v !== '') el.value = v; };
+    const setChk = (id, v) => { const el = document.getElementById(id); if (el && typeof v === 'boolean') el.checked = v; };
+    setVal('mod-code',    m.code);
+    setVal('mod-title',   m.title);
+    setVal('mod-section', m.section);
+    setVal('mod-niveau',  m.niveau);
+    setVal('mod-dur',     m.duree_minutes);
+    setVal('mod-desc',    m.description);
+    setChk('mod-dda',     m.dda_certifiant);
+    // Pré-remplit la query Unsplash avec le titre extrait, pour faciliter la recherche d'image
+    if (m.title && document.getElementById('unsplash-query') && !document.getElementById('unsplash-query').value) {
+      document.getElementById('unsplash-query').value = m.title;
+    }
+    // Métiers : cocher uniquement ceux qui sont dans la liste retournée
+    if (Array.isArray(m.metiers)) {
+      const wanted = new Set(m.metiers);
+      document.querySelectorAll('.mod-metier-cb').forEach(cb => {
+        cb.checked = wanted.has(cb.value);
+      });
+    }
+
+    const usage = data.usage || {};
+    const cacheStatus = usage.cache_read > 0 ? `cache hit (${usage.cache_read} tokens lus)` : `cache écrit (${usage.cache_write} tokens)`;
+    const videoStatus = data.reference_video_url ? `vidéo détectée : ${data.reference_video_url}` : 'pas de vidéo détectée';
+
+    setImportStatus(
+      `✅ Import terminé · code <strong>${m.code || '?'}</strong> · ${data.quiz_data.length} questions · ${imgIdx} image${imgIdx > 1 ? 's' : ''} · ${videoStatus} · ${cacheStatus}`,
+      'var(--green)'
+    );
+    setImportButtonState(false, '✓ Importer un autre .docx');
+  } catch (err) {
+    console.error('Import .docx error:', err);
+    setImportStatus(`❌ Erreur : ${err.message}`, 'var(--red)');
+    setImportButtonState(false, 'Réessayer');
+  }
+}
 
 // ── UNSPLASH SEARCH ──
 const UNSPLASH_KEY = '64lhwVuo_MZe_eIS4C25jUORCn5jfZjPY80clhu9kbg';

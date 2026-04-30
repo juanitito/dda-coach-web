@@ -466,6 +466,72 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text)
 .quiz-result-label { font-size:16px; color:var(--text); margin-bottom:6px; }
 .quiz-result-sub { font-size:13px; color:var(--muted); margin-bottom:24px; }
 
+/* ========== IMAGES DANS LE CONTENU MODULE — centrées par défaut ========== */
+.rc img {
+  display: block;
+  margin: 16px auto;
+  max-width: 100%;
+  height: auto;
+  border-radius: 6px;
+}
+
+/* ========== EXERCICES À 3 COLONNES (Situation/Votre réponse/Correction) ========== */
+/* Pattern Word : on retire "Votre réponse" et on toggle la correction. */
+.exo-correction-toggle-wrapper {
+  margin: 8px 0 10px;
+  text-align: right;
+}
+.exo-correction-btn {
+  background: rgba(61,127,255,0.12);
+  border: 1px solid rgba(61,127,255,0.25);
+  color: var(--accent2);
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: 'DM Sans', sans-serif;
+  transition: all .2s;
+}
+.exo-correction-btn:hover { background: rgba(61,127,255,0.2); }
+.exo-with-correction .exo-correction-cell { display: none; }
+.exo-with-correction.show-corrections .exo-correction-cell { display: table-cell; }
+
+/* ========== CORRECTION TOGGLE (cas pratiques, exercices simples) ========== */
+.correction-toggle {
+  margin-top: 10px;
+  padding: 10px 14px;
+  background: rgba(61,127,255,0.08);
+  border: 1px solid rgba(61,127,255,0.25);
+  border-radius: 6px;
+}
+.correction-toggle summary {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent2);
+  cursor: pointer;
+  user-select: none;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.correction-toggle summary::-webkit-details-marker { display: none; }
+.correction-toggle summary::before {
+  content: '▶';
+  display: inline-block;
+  font-size: 9px;
+  transition: transform 0.2s ease;
+}
+.correction-toggle[open] summary::before { transform: rotate(90deg); }
+.correction-toggle .correction-content {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(61,127,255,0.2);
+  font-size: 13px;
+  line-height: 1.7;
+}
+
 /* ========== TIMER ========== */
 /* ── MON COMPTE ── */
 .account-section{background:var(--surface);border:1px solid var(--border2);border-radius:var(--r);padding:20px 24px;margin-bottom:16px;}
@@ -1831,10 +1897,144 @@ const OUTIL_URLS = {
 
 // Sanitize le content_html des modules avant innerHTML. Défense en profondeur :
 // si un admin compromis insérait <script> ou un onerror, DOMPurify le strip.
+// Iframe YouTube autorisé pour la callout vidéo de référence (whitelist src).
 function safeHtml(html) {
   if (!html) return '';
-  if (typeof DOMPurify !== 'undefined') return DOMPurify.sanitize(html);
-  return html; // fallback si la CDN n'a pas chargé — pas pire que l'état d'avant
+  if (typeof DOMPurify !== 'undefined') {
+    return DOMPurify.sanitize(html, {
+      ADD_TAGS: ['iframe'],
+      ADD_ATTR: ['allow', 'allowfullscreen', 'frameborder', 'src'],
+    });
+  }
+  return html; // fallback si la CDN n'a pas chargé
+}
+
+// Hook one-shot : refuse les iframes dont src n'est pas un embed YouTube
+if (typeof DOMPurify !== 'undefined' && !window._dompurifyHookInstalled) {
+  DOMPurify.addHook('uponSanitizeAttribute', (node, evt) => {
+    if (node.nodeName === 'IFRAME' && evt.attrName === 'src') {
+      const ok = /^https:\/\/(www\.)?youtube\.com\/embed\/[\w-]+/.test(evt.attrValue || '');
+      if (!ok) evt.keepAttr = false;
+    }
+  });
+  window._dompurifyHookInstalled = true;
+}
+
+// Cache les corrections (Réponses au cas pratique, Réponses à l'exercice, Correction…)
+// derrière un <details> "Voir la correction" cliquable.
+// Ciblé sur les tables thématiques (⚡ CAS PRATIQUE, 📋 Exercice, ✏ EXERCICE INTERMÉDIAIRE).
+//
+// Deux patterns gérés :
+//   A. Cellule unique avec "Réponses : ..." en fin → wrap dans <details>
+//   B. Sous-table 3 colonnes "Situation | Votre réponse | Correction" → retire
+//      "Votre réponse", masque "Correction" derrière un bouton toggle
+function wrapCorrections(rootEl) {
+  if (!rootEl) return;
+
+  // === Pattern B : sous-tables d'exercices avec colonnes Situation/Votre réponse/Correction ===
+  // À traiter AVANT pattern A pour que A ne touche pas aux cellules déjà transformées.
+  rootEl.querySelectorAll('table table').forEach(subTable => {
+    const headerRow = subTable.querySelector('tr');
+    if (!headerRow) return;
+    const ths = Array.from(headerRow.children).filter(c => c.tagName === 'TH');
+    if (ths.length < 2) return;
+
+    const headerTexts = ths.map(h => (h.textContent || '').trim().toLowerCase());
+    // À supprimer : la colonne où l'apprenant est censé écrire sa réponse
+    // ("Votre réponse", "Votre correction"). NE JAMAIS matcher "Formulation
+    // incorrecte" qui est la colonne SOURCE/PROMPT à conserver.
+    const idxVotreReponse = headerTexts.findIndex(t =>
+      /^votre\s+(r[ée]ponse|correction)$/i.test(t.trim())
+    );
+    const idxCorrection = headerTexts.findIndex(t =>
+      /^correction(\s+propos[ée]e?)?$/i.test(t.trim())
+    );
+    if (idxVotreReponse < 0 && idxCorrection < 0) return;
+
+    // Supprime la colonne "Votre réponse" — on parcourt les rows directement
+    if (idxVotreReponse >= 0) {
+      subTable.querySelectorAll('tr').forEach(tr => {
+        const cells = Array.from(tr.children);
+        if (cells[idxVotreReponse]) cells[idxVotreReponse].remove();
+      });
+    }
+
+    // Marque la colonne "Correction" pour masquage CSS + toggle
+    if (idxCorrection >= 0) {
+      // Recalcule l'index réel après suppression de Votre réponse
+      let realIdx = idxCorrection;
+      if (idxVotreReponse >= 0 && idxVotreReponse < idxCorrection) realIdx -= 1;
+
+      subTable.classList.add('exo-with-correction');
+      subTable.querySelectorAll('tr').forEach(tr => {
+        const cells = Array.from(tr.children);
+        if (cells[realIdx]) cells[realIdx].classList.add('exo-correction-cell');
+      });
+
+      // Insère un bouton toggle juste avant la sous-table
+      const wrapper = document.createElement('div');
+      wrapper.className = 'exo-correction-toggle-wrapper';
+      wrapper.innerHTML = '<button type="button" class="exo-correction-btn" onclick="toggleExoCorrections(this)">📖 Voir les corrections</button>';
+      subTable.parentNode.insertBefore(wrapper, subTable);
+    }
+  });
+
+  // === Pattern A : cellule de table thématique (⚡📋✏✅) qui contient la correction ===
+  // 3 sous-cas :
+  //   A1. cellule entière qui DÉMARRE par <strong>Correction... ou <strong>✅ Correction...
+  //       (typique quand l'IA met la correction dans une <tr> séparée)
+  //   A2. cellule entière qui DÉMARRE par <strong>Réponses... (idem, plus rare)
+  //   A3. cellule qui CONTIENT en suffixe "Réponses :" ou "Correction :" (situation
+  //       + correction concaténées dans la même cellule, ancien format)
+  rootEl.querySelectorAll('table').forEach(table => {
+    // Récupère le marker (1ère cellule TH ou TD) pour détecter les tables thématiques
+    const firstCell = table.querySelector('th, td');
+    if (!firstCell) return;
+    if (!/[⚡📋✏✅🗣📚🔍]/u.test((firstCell.textContent || '').trim().slice(0, 40))) return;
+
+    table.querySelectorAll('td').forEach(td => {
+      // Pattern A ne traite que les cellules de 1er niveau de la table thématique.
+      // Si td.closest('table') n'est pas notre table, c'est un TD de sous-table.
+      if (td.closest('table') !== table) return;
+      // Skip la 1ère cellule (titre de la table)
+      if (td === firstCell) return;
+      // Skip si déjà wrappée
+      if (td.querySelector(':scope > details.correction-toggle')) return;
+
+      const html = td.innerHTML;
+
+      // A1/A2 : la cellule EST une cellule de correction (commence par <strong>...Correction|Réponses)
+      if (/^\s*(?:<p>\s*)?<strong>\s*(?:[✅📖🔍]\s*)*(Correction|R[ée]ponses?)/i.test(html)) {
+        td.innerHTML =
+          '<details class="correction-toggle">' +
+            '<summary>📖 Voir la correction</summary>' +
+            '<div class="correction-content">' + html + '</div>' +
+          '</details>';
+        return;
+      }
+
+      // A3 : suffixe "Réponses : ..." ou "Correction : ..." dans la même cellule
+      const m = html.match(/((?:<br\s*\/?>\s*){0,3})(R[ée]ponses?\s*(?:au cas pratique|à l['’]exercice|aux exercices)?\s*:[\s\S]*?|Correction\s*:[\s\S]*?)$/i);
+      if (!m) return;
+      const before = html.slice(0, m.index);
+      const breaks = m[1] || '';
+      const correction = m[2];
+      td.innerHTML = before + breaks +
+        '<details class="correction-toggle">' +
+          '<summary>📖 Voir la correction</summary>' +
+          '<div class="correction-content">' + correction + '</div>' +
+        '</details>';
+    });
+  });
+}
+
+// Toggle les corrections d'une sous-table d'exercice (handler global du bouton)
+function toggleExoCorrections(btn) {
+  const wrapper = btn.closest('.exo-correction-toggle-wrapper');
+  const subTable = wrapper && wrapper.nextElementSibling;
+  if (!subTable) return;
+  const shown = subTable.classList.toggle('show-corrections');
+  btn.textContent = shown ? '🔒 Masquer les corrections' : '📖 Voir les corrections';
 }
 
 // Lazy-load du contenu lourd (content_html, quiz_data) à l'ouverture du
@@ -1944,6 +2144,7 @@ async function openModal(code) {
     body.innerHTML += mod.content
       ? `<div class="modal-content-area" style="font-size:14px;line-height:1.7;">${safeHtml(mod.content)}</div>`
       : '<p style="color:var(--muted);text-align:center;padding:40px;">Contenu en cours de chargement…</p>';
+    wrapCorrections(body.querySelector('.modal-content-area'));
     document.getElementById('modalOverlay').classList.add('open');
     document.body.style.overflow = 'hidden';
     startVeilleTimer(code, mod);
@@ -1968,6 +2169,8 @@ async function openModal(code) {
   } else {
     body.innerHTML += `<div style="text-align:center;padding:48px 20px;color:var(--muted)"><div style="font-size:56px;margin-bottom:14px">📄</div><p>Contenu de ce module à venir prochainement.</p></div>`;
   }
+  // Cache les corrections derrière des <details> sur les tables thématiques
+  wrapCorrections(body.querySelector('.modal-content-area'));
   // Quiz : depuis MODS (chargé de Supabase) ou fallback QUIZZES hardcodé
   const quizData = MODS[code]?.quiz_data || QUIZZES[code];
   if (quizData) body.innerHTML += buildQuiz(code, quizData);
