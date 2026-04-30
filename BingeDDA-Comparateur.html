@@ -65,12 +65,14 @@ body {
   color: var(--teal); text-transform: uppercase;
 }
 .topbar-back {
-  font-size: 0.82rem; color: var(--muted);
-  cursor: pointer; transition: color 0.2s;
-  display: flex; align-items: center; gap: 6px;
-  background: none; border: none; font-family: inherit;
+  background: rgba(61,127,255,.12); border: 1px solid rgba(61,127,255,.25);
+  border-radius: 6px; padding: 8px 16px;
+  cursor: pointer; transition: all .2s;
+  font-size: 13px; font-weight: 600; color: var(--accent2);
+  font-family: 'DM Sans', sans-serif;
+  display: inline-flex; align-items: center; gap: 6px;
 }
-.topbar-back:hover { color: var(--white); }
+.topbar-back:hover { background: rgba(61,127,255,.2); border-color: rgba(61,127,255,.4); }
 
 /* ── HERO ── */
 .hero {
