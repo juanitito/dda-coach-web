@@ -2634,36 +2634,50 @@ async function importFromDocx(file) {
       console.log('mammoth messages:', result.messages);
     }
 
-    // Récupère titre + section actuels du form (l'admin doit les renseigner avant l'import)
-    const title = document.getElementById('mod-title')?.value?.trim();
-    const section = document.getElementById('mod-section')?.value;
-    if (!title) {
-      setImportStatus('⚠ Renseignez le titre du module avant l\'import.', 'var(--gold2)');
-      setImportButtonState(false, 'Choisir un fichier .docx');
-      return;
-    }
+    // Hints depuis le form si l'admin les a déjà saisis (sinon l'IA les extrait du Word)
+    const titleHint = document.getElementById('mod-title')?.value?.trim() || undefined;
+    const sectionHint = document.getElementById('mod-section')?.value || undefined;
 
     setImportStatus(`⌛ Restructuration IA en cours (${imgIdx} image${imgIdx > 1 ? 's' : ''} uploadée${imgIdx > 1 ? 's' : ''})…`, 'var(--accent2)');
 
     const { data, error } = await _sb.functions.invoke('import-module-from-text', {
-      body: { html_content: htmlContent, title, section },
+      body: { html_content: htmlContent, title_hint: titleHint, section_hint: sectionHint },
     });
 
     if (error) throw new Error(`Edge Function : ${error.message || error}`);
-    if (!data?.content_html || !Array.isArray(data?.quiz_data)) {
-      throw new Error('Réponse invalide : content_html ou quiz_data manquant');
+    if (!data?.content_html || !Array.isArray(data?.quiz_data) || !data?.metadata) {
+      throw new Error('Réponse invalide : content_html, quiz_data ou metadata manquant');
     }
 
-    // Pré-remplit les champs
+    // Pré-remplit les champs CONTENU
     document.getElementById('mod-content').value = data.content_html;
     document.getElementById('mod-quiz-json').value = JSON.stringify(data.quiz_data, null, 2);
+
+    // Pré-remplit les champs METADATA (extraits par l'IA du tableau de tête du Word)
+    const m = data.metadata;
+    const setVal = (id, v) => { const el = document.getElementById(id); if (el && v != null && v !== '') el.value = v; };
+    const setChk = (id, v) => { const el = document.getElementById(id); if (el && typeof v === 'boolean') el.checked = v; };
+    setVal('mod-code',    m.code);
+    setVal('mod-title',   m.title);
+    setVal('mod-section', m.section);
+    setVal('mod-niveau',  m.niveau);
+    setVal('mod-dur',     m.duree_minutes);
+    setVal('mod-desc',    m.description);
+    setChk('mod-dda',     m.dda_certifiant);
+    // Métiers : cocher uniquement ceux qui sont dans la liste retournée
+    if (Array.isArray(m.metiers)) {
+      const wanted = new Set(m.metiers);
+      document.querySelectorAll('.mod-metier-cb').forEach(cb => {
+        cb.checked = wanted.has(cb.value);
+      });
+    }
 
     const usage = data.usage || {};
     const cacheStatus = usage.cache_read > 0 ? `cache hit (${usage.cache_read} tokens lus)` : `cache écrit (${usage.cache_write} tokens)`;
     const videoStatus = data.reference_video_url ? `vidéo détectée : ${data.reference_video_url}` : 'pas de vidéo détectée';
 
     setImportStatus(
-      `✅ Import terminé · ${data.quiz_data.length} questions · ${imgIdx} image${imgIdx > 1 ? 's' : ''} · ${videoStatus} · ${cacheStatus}`,
+      `✅ Import terminé · code <strong>${m.code || '?'}</strong> · ${data.quiz_data.length} questions · ${imgIdx} image${imgIdx > 1 ? 's' : ''} · ${videoStatus} · ${cacheStatus}`,
       'var(--green)'
     );
     setImportButtonState(false, '✓ Importer un autre .docx');

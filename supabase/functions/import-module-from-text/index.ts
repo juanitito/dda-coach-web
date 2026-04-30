@@ -31,7 +31,7 @@ const SYSTEM_PROMPT = `Tu es expert en formation DDA (Directive Distribution d'A
 
 # OBJECTIF
 
-Sortie strictement en JSON {content_html, quiz_data}. Aucun texte hors JSON.
+Sortie strictement en JSON {content_html, quiz_data, metadata}. Aucun texte hors JSON.
 
 # RÈGLES DE PARSING DE L'ENTRÉE
 
@@ -43,10 +43,10 @@ Le HTML d'entrée vient de mammoth.js qui convertit Word vers HTML :
 
 Tu rencontreras typiquement cette structure d'entrée :
 
-1. **Tête de document** (à IGNORER dans content_html — alimente d'autres colonnes DB) :
-   - Tableau "FORMATION DDA : ..." (titre, déjà fourni en variable)
-   - Tableau métadonnées "Niveau / Durée / Format / Seuil quiz"
-   - Tableau "Objectifs pédagogiques" (à RÉCUPÉRER pour la callout objectives)
+1. **Tête de document** (à IGNORER dans content_html, mais à EXTRAIRE pour le champ \`metadata\`) :
+   - 1er tableau : 3 lignes — "FORMATION DDA : {public ciblé}" / "MODULE {code}" / "{titre du module}". Extraire \`code\` (ex: "AA-03"), \`title\` (la 3ème ligne, le vrai titre pédagogique). \`public ciblé\` aide à déduire \`metiers\`.
+   - 2ème tableau : "Niveau{X} | Durée{N} min | Format... | Seuil quiz{P}". Extraire \`niveau\` (debutant/confirme/expert) et \`duree_minutes\` (entier).
+   - 3ème tableau : "Objectifs pédagogiques" → RÉCUPÉRER pour la callout objectives dans content_html.
    - Ligne "Mis à jour : ... | Public : ... | Référentiel : ..." → IGNORE
 
 2. **PARTIE 1 — Contenu pédagogique** (titre h1) :
@@ -166,15 +166,28 @@ Si le Word ne contient PAS de quiz prédéfini, alors invente 10 questions cohé
 
 # VARIABLES DU USER MESSAGE
 
-- \`title\` : titre du module (déjà fourni à part, NE PAS le répéter en h1 dans content_html)
-- \`section\` : code de section (informatif seulement, à ne pas afficher)
-- \`html_content\` : HTML brut extrait du Word
+- \`title_hint\` (optionnel) : titre du module si l'admin l'a déjà saisi côté UI. Si présent, vérifie qu'il colle au titre extrait du Word ; si absent, extrait le titre du 1er tableau (3ème ligne).
+- \`section_hint\` (optionnel) : section si l'admin l'a déjà choisie. Sinon, déduis du préfixe du code module.
+- \`html_content\` : HTML brut extrait du Word — source principale d'extraction
 - \`reference_video_url\` (optionnel) : URL embed YouTube à intégrer via callout video, ou absent si pas de vidéo dans le doc
+
+# METADATA (champ \`metadata\` du JSON de sortie)
+
+À extraire des 2 premiers tableaux du Word :
+
+- \`code\` : code du module (ex "AA-03", "TC-05", "VID-02"). Toujours format \`{2-3 lettres MAJ}-{2-3 chiffres}\` éventuellement suivi d'un suffixe.
+- \`title\` : titre pédagogique (3ème ligne du 1er tableau, JAMAIS "FORMATION DDA : ...")
+- \`section\` : déduite du préfixe \`code\`. Codes valides : \`tc\` (Tronc Commun), \`reg\` (Réglementaire), \`tp\` (Technique Produit), \`rc\` (Réglementation Complémentaire), \`pe\` (Pratiques & Expertises), \`aa\` (Assurance Avancée), \`tv\` (Techniques de Vente), \`dc\` (Développement Commercial), \`mc\` (Management Commercial), \`cs\` (Compétences Soft), \`bm\` (Benchmark), \`go\` (Gestion & Organisation), \`veille\`, \`outils\`. Mapping : préfixe code en minuscule (ex "AA-03" → "aa", "TC-01" → "tc"). Si préfixe inconnu, retourner \`null\`.
+- \`niveau\` : extrait du 2ème tableau. Valeurs admises : \`debutant\`, \`confirme\`, \`expert\` (toujours en minuscule sans accent). Mapping depuis le Word : "Débutant"→"debutant", "Confirmé"→"confirme", "Expert"→"expert".
+- \`duree_minutes\` : entier, extrait de "Durée{N} min". Si "30 min" → 30.
+- \`metiers\` : tableau de codes métiers déduits du "FORMATION DDA : {public ciblé}" et du contexte général du module. Codes valides : \`courtier\`, \`commercial\`, \`manager\`, \`gestionnaire\`, \`assistant\`, \`teleconseiller\`, \`agent\`, \`mutualiste\`. Mapping libellé → code : "ASSISTANT ADMINISTRATIF"/"assistante administrative"→["assistant"], "COURTIER" / "courtier IAS"→["courtier"], "COMMERCIAL"→["commercial"], "MANAGER"→["manager"], "GESTIONNAIRE"→["gestionnaire"], "TÉLÉCONSEILLER"/"téléconseiller"→["teleconseiller"], "AGENT GÉNÉRAL"→["agent"], "MUTUALISTE"→["mutualiste"]. Si module générique sans cible explicite, renvoyer \`null\` ou tableau vide.
+- \`dda_certifiant\` : booléen, true par défaut. Mettre à false uniquement si le Word indique explicitement "non certifiant" ou pour les modules \`veille\` (qui ne comptent pas).
+- \`description\` : courte phrase descriptive (1-2 phrases) issue de la mise en situation ou des objectifs, max 200 caractères. Sera affichée dans le catalogue.
 
 # À NE PAS METTRE DANS content_html
 
-- Le titre du module (h1) — il est en colonne DB séparée
-- Métadonnées (Niveau, Durée, Format, Seuil quiz) — colonnes DB séparées
+- Le titre du module (h1) — il est en \`metadata.title\`
+- Métadonnées (Niveau, Durée, Format, Seuil quiz) — \`metadata.niveau\`, \`metadata.duree_minutes\`
 - "Mis à jour : ... | Public : ... | Référentiel : ..." — non utile au lecteur final
 - Les en-têtes "PARTIE 1", "PARTIE 2", "PARTIE 3" du Word — la structure h2.rc-section / callout video / quiz_data les rend implicites
 - Les 10 tableaux "Question N / 10" — vont dans quiz_data uniquement
@@ -233,8 +246,24 @@ const OUTPUT_SCHEMA = {
         additionalProperties: false,
       },
     },
+    metadata: {
+      type: "object",
+      description: "Métadonnées extraites des 2 premiers tableaux du Word, à utiliser pour pré-remplir les colonnes DB (code, title, section, niveau, duree_minutes, metiers, dda_certifiant, description)",
+      properties: {
+        code:           { type: "string",  description: "Code module au format LETTRES-CHIFFRES (ex: AA-03)" },
+        title:          { type: "string",  description: "Titre pédagogique (jamais 'FORMATION DDA : ...')" },
+        section:        { type: ["string", "null"], description: "Code section déduit du préfixe code (tc/reg/tp/rc/pe/aa/tv/dc/mc/cs/bm/go/veille/outils) ou null si inconnu" },
+        niveau:         { type: "string",  description: "debutant | confirme | expert (toujours en minuscule sans accent)" },
+        duree_minutes:  { type: "integer", description: "Durée du module en minutes (ex: 30)" },
+        metiers:        { type: ["array", "null"], items: { type: "string" }, description: "Codes métiers ciblés depuis la liste fixe, ou null si module générique" },
+        dda_certifiant: { type: "boolean", description: "true par défaut, false si Word indique 'non certifiant' ou pour modules veille" },
+        description:    { type: "string",  description: "Phrase descriptive courte (≤ 200 chars) pour le catalogue" },
+      },
+      required: ["code", "title", "section", "niveau", "duree_minutes", "metiers", "dda_certifiant", "description"],
+      additionalProperties: false,
+    },
   },
-  required: ["content_html", "quiz_data"],
+  required: ["content_html", "quiz_data", "metadata"],
   additionalProperties: false,
 };
 
@@ -304,24 +333,24 @@ serve(async (req) => {
     return jsonError(403, "Admin role required");
   }
 
-  let body: { html_content?: string; title?: string; section?: string };
+  let body: { html_content?: string; title_hint?: string; section_hint?: string };
   try {
     body = await req.json();
   } catch {
     return jsonError(400, "Invalid JSON body");
   }
 
-  const { html_content, title, section } = body;
-  if (!html_content || !title || !section) {
-    return jsonError(400, "Missing required fields: html_content, title, section");
+  const { html_content, title_hint, section_hint } = body;
+  if (!html_content) {
+    return jsonError(400, "Missing required field: html_content");
   }
 
   const reference_video_url = extractReferenceVideoUrl(html_content);
 
   const userPrompt = `Module à structurer pour BingeDDA.
 
-TITRE : ${title}
-SECTION : ${section}
+${title_hint    ? `TITRE (indicatif, à confirmer depuis le Word) : ${title_hint}`     : "TITRE : à extraire depuis le 1er tableau du Word (3ème ligne)"}
+${section_hint  ? `SECTION (indicatif, à confirmer depuis le code) : ${section_hint}` : "SECTION : à déduire du préfixe du code module (ex: AA-03 → aa)"}
 ${reference_video_url ? `VIDÉO DE RÉFÉRENCE (URL embed à intégrer via callout video) : ${reference_video_url}` : "(pas de vidéo détectée — omettre la callout video)"}
 
 HTML BRUT (extrait du Word via mammoth.js, images déjà uploadées sur Supabase Storage avec URLs publiques préservées) :
@@ -330,7 +359,7 @@ ${html_content}
 
 ---
 
-Génère le JSON {content_html, quiz_data} en respectant strictement les conventions du system prompt. Le quiz doit contenir exactement 10 questions extraites de la PARTIE 3 du Word.`;
+Génère le JSON {content_html, quiz_data, metadata} en respectant strictement les conventions du system prompt. Le quiz doit contenir exactement 10 questions extraites de la PARTIE 3 du Word. La metadata doit être complète (code, title, section, niveau, duree_minutes, metiers, dda_certifiant, description).`;
 
   let anthropicResponse: Response;
   try {
@@ -382,7 +411,7 @@ Génère le JSON {content_html, quiz_data} en respectant strictement les convent
     return jsonError(500, "No text content in Anthropic response");
   }
 
-  let parsed: { content_html?: string; quiz_data?: unknown[] };
+  let parsed: { content_html?: string; quiz_data?: unknown[]; metadata?: Record<string, unknown> };
   try {
     parsed = JSON.parse(textBlock.text);
   } catch (err) {
@@ -390,8 +419,8 @@ Génère le JSON {content_html, quiz_data} en respectant strictement les convent
     return jsonError(500, "Failed to parse JSON from model output", { detail: String(err) });
   }
 
-  if (!parsed.content_html || !Array.isArray(parsed.quiz_data)) {
-    return jsonError(500, "Model output missing required fields");
+  if (!parsed.content_html || !Array.isArray(parsed.quiz_data) || !parsed.metadata) {
+    return jsonError(500, "Model output missing required fields (content_html, quiz_data, metadata)");
   }
 
   console.log("Usage:", {
@@ -405,6 +434,7 @@ Génère le JSON {content_html, quiz_data} en respectant strictement les convent
     JSON.stringify({
       content_html:        parsed.content_html,
       quiz_data:           parsed.quiz_data,
+      metadata:            parsed.metadata,
       reference_video_url,
       usage: {
         input_tokens:  data.usage?.input_tokens         ?? 0,
