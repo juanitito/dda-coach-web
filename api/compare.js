@@ -5,14 +5,18 @@ const SUPABASE_URL = 'https://vrufldjydjrgcqwhmpnt.supabase.co';
 // pour l'endpoint /auth/v1/user. La sécurité repose sur la validation du JWT.
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZydWZsZGp5ZGpyZ2Nxd2htcG50Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5NTA3ODksImV4cCI6MjA5MjUyNjc4OX0.jW1CQ5yzJr4Ccac9-OI2RgVLXqFn-X0MjAxCkc9Xbfc';
 
-const ALLOWED_ORIGIN     = 'https://dda-coach.vercel.app';
+const ALLOWED_ORIGINS    = new Set([
+  'https://www.bingedda.fr',
+  'https://bingedda.fr',
+  'https://dda-coach-web.vercel.app',
+]);
 const ALLOWED_MODEL_RE   = /^claude-haiku-/;
 const MAX_TOKENS_CAP     = 4000;
 
 function corsHeaders(origin) {
-  // Autorise uniquement notre prod ; toute autre origine ne reçoit pas le
-  // header (le navigateur bloquera le response côté client).
-  const allow = origin === ALLOWED_ORIGIN ? ALLOWED_ORIGIN : '';
+  // Autorise uniquement nos origines connues ; toute autre origine ne reçoit
+  // pas le header (le navigateur bloquera la response côté client).
+  const allow = ALLOWED_ORIGINS.has(origin) ? origin : '';
   return {
     'Access-Control-Allow-Origin': allow,
     'Vary': 'Origin',
