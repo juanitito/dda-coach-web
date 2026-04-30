@@ -1928,9 +1928,12 @@ async function registerStep3() {
     const nom     = document.getElementById('f-nom').value.trim();
     const email   = document.getElementById('f-email').value.trim();
     const rs      = document.getElementById('f-rs').value.trim();
+    const siret   = document.getElementById('f-siret').value.replace(/\s/g,'');
+    const orias   = document.getElementById('f-orias').value.replace(/\s/g,'');
     const adresse = document.getElementById('f-adresse').value.trim();
     const cp      = document.getElementById('f-cp').value.trim();
     const ville   = document.getElementById('f-ville').value.trim();
+    const tel     = document.getElementById('f-tel').value.trim();
 
     const res = await fetch(SUPABASE_URL + '/functions/v1/create-subscription', {
       method:  'POST',
@@ -1938,7 +1941,14 @@ async function registerStep3() {
         'Authorization': 'Bearer ' + session.access_token,
         'Content-Type':  'application/json'
       },
-      body: JSON.stringify({ prenom, nom, email, raison_sociale: rs, adresse, cp, ville })
+      body: JSON.stringify({
+        prenom, nom, email,
+        raison_sociale: rs,
+        siret:          siret || null,
+        orias:          orias || null,
+        adresse, cp, ville,
+        tel:            tel   || null
+      })
     });
 
     const result = await res.json();

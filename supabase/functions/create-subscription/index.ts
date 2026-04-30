@@ -6,7 +6,6 @@ const supabase = createClient(
   Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
 );
 
-
 const corsHeaders = {
   "Access-Control-Allow-Origin":  "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
@@ -15,6 +14,7 @@ const corsHeaders = {
 const GC_API_KEY      = Deno.env.get("GOCARDLESS_ACCESS_TOKEN")!;
 const GC_API_URL      = "https://api-sandbox.gocardless.com";
 const GC_REDIRECT_URL = Deno.env.get("GOCARDLESS_REDIRECT_URL")!;
+const GC_EXIT_URL     = Deno.env.get("GOCARDLESS_EXIT_URL") ?? "https://www.bingedda.fr";
 
 async function gcRequest(method: string, path: string, body?: any) {
   const res = await fetch(`${GC_API_URL}${path}`, {
@@ -26,15 +26,27 @@ async function gcRequest(method: string, path: string, body?: any) {
     },
     body: body ? JSON.stringify(body) : undefined
   });
-  if (!res.ok) throw new Error(`GoCardless error ${res.status}: ${await res.text()}`);
+  if (!res.ok) throw new Error(`GoCardless ${method} ${path} → ${res.status}: ${await res.text()}`);
   return res.json();
+}
+
+// Normalise un téléphone FR : "06 12 34 56 78" → "+33612345678"
+function normalizePhone(raw?: string | null): string | undefined {
+  if (!raw) return undefined;
+  const digits = raw.replace(/\D/g, "");
+  if (!digits) return undefined;
+  if (digits.startsWith("33")) return "+" + digits;
+  if (digits.startsWith("0"))  return "+33" + digits.slice(1);
+  return raw.startsWith("+") ? raw : "+" + digits;
 }
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }
-  if (req.method !== "POST") return new Response("Method Not Allowed", { status: 405, headers: corsHeaders });
+  if (req.method !== "POST") {
+    return new Response("Method Not Allowed", { status: 405, headers: corsHeaders });
+  }
 
   const authHeader = req.headers.get("Authorization");
   if (!authHeader) return new Response("Unauthorized", { status: 401, headers: corsHeaders });
@@ -44,23 +56,71 @@ serve(async (req) => {
   );
   if (authError || !user) return new Response("Unauthorized", { status: 401, headers: corsHeaders });
 
-  const { prenom, nom, email, raison_sociale, adresse, cp, ville } = await req.json();
+  const {
+    prenom, nom, email,
+    raison_sociale,
+    adresse, address_line2, cp, ville,
+    tel, siret, orias
+  } = await req.json();
+
+  const phone = normalizePhone(tel);
+
+  // Métadonnées GC : 3 clés max, 50 chars max par valeur
+  const gcMetadata: Record<string, string> = { supabase_user_id: user.id };
+  if (siret) gcMetadata.siret = String(siret).slice(0, 50);
+  if (orias) gcMetadata.orias = String(orias).slice(0, 50);
+
+  const customerPayload = {
+    email,
+    given_name:    prenom,
+    family_name:   nom,
+    company_name:  raison_sociale ?? undefined,
+    address_line1: adresse        || undefined,
+    address_line2: address_line2  || undefined,
+    postal_code:   cp             || undefined,
+    city:          ville          || undefined,
+    country_code:  "FR",
+    language:      "fr",
+    phone_number:  phone,
+    metadata:      gcMetadata
+  };
+
+  console.log("create-subscription", {
+    user_id: user.id,
+    company_name: raison_sociale,
+    siret,
+    has_phone: !!phone
+  });
 
   try {
-    const { customers: customer } = await gcRequest("POST", "/customers", {
-      customers: {
-        email,
-        given_name:    prenom,
-        family_name:   nom,
-        company_name:  raison_sociale ?? undefined,
-        address_line1: adresse      || undefined,
-        postal_code:   cp           || undefined,
-        city:          ville        || undefined,
-        country_code:  "FR",
-        language:      "fr",
-        metadata:      { supabase_user_id: user.id }
-      }
-    });
+    // Idempotence : si l'utilisateur a déjà un subscription pending avec un GC customer,
+    // on UPDATE le customer existant au lieu d'en créer un nouveau (résout le bug
+    // "raison sociale qui reste figée à la valeur de la 1re tentative").
+    const { data: existing } = await supabase
+      .from("subscriptions")
+      .select("id, gc_customer_id, status")
+      .eq("user_id", user.id)
+      .eq("status", "pending")
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    let customerId: string;
+    if (existing?.gc_customer_id) {
+      const { customers: customer } = await gcRequest(
+        "PUT",
+        `/customers/${existing.gc_customer_id}`,
+        { customers: customerPayload }
+      );
+      customerId = customer.id;
+      console.log("create-subscription: updated existing GC customer", customerId);
+    } else {
+      const { customers: customer } = await gcRequest("POST", "/customers", {
+        customers: customerPayload
+      });
+      customerId = customer.id;
+      console.log("create-subscription: created new GC customer", customerId);
+    }
 
     const { billing_requests: billingRequest } = await gcRequest("POST", "/billing_requests", {
       billing_requests: {
@@ -69,37 +129,45 @@ serve(async (req) => {
           scheme:   "sepa_core",
           metadata: { supabase_user_id: user.id }
         },
-        links: { customer: customer.id }
+        links: { customer: customerId }
       }
     });
 
     const { billing_request_flows: flow } = await gcRequest("POST", "/billing_request_flows", {
       billing_request_flows: {
         redirect_uri:       GC_REDIRECT_URL,
-        exit_uri:           "https://dda-coach.vercel.app",
+        exit_uri:           GC_EXIT_URL,
         language:           "fr",
         prefilled_customer: {
           email,
           given_name:    prenom,
           family_name:   nom,
           address_line1: adresse        || undefined,
+          address_line2: address_line2  || undefined,
           postal_code:   cp             || undefined,
           city:          ville          || undefined,
           country_code:  "FR",
           company_name:  raison_sociale || undefined,
-          language:      "fr"
+          language:      "fr",
+          phone_number:  phone
         },
         links:              { billing_request: billingRequest.id }
       }
     });
 
-    await supabase.from("subscriptions").insert({
-      user_id:        user.id,
-      gc_customer_id: customer.id,
-      status:         "pending",
-      amount_ht:      24.99,
-      tva_rate:       20.00
-    });
+    if (existing) {
+      await supabase.from("subscriptions")
+        .update({ gc_customer_id: customerId })
+        .eq("id", existing.id);
+    } else {
+      await supabase.from("subscriptions").insert({
+        user_id:        user.id,
+        gc_customer_id: customerId,
+        status:         "pending",
+        amount_ht:      24.99,
+        tva_rate:       20.00
+      });
+    }
 
     await supabase.from("profiles").update({
       prenom,
@@ -107,17 +175,21 @@ serve(async (req) => {
       raison_sociale: raison_sociale ?? null
     }).eq("id", user.id);
 
-    await supabase.functions.invoke("send-email", {
-      body: {
-        userId:     user.id,
-        templateId: "onboarding_j0",
-        metadata:   {}
-      }
-    });
+    // Onboarding J0 envoyé seulement à la 1re tentative (pas à chaque ré-essai du funnel)
+    if (!existing) {
+      await supabase.functions.invoke("send-email", {
+        body: {
+          userId:     user.id,
+          templateId: "onboarding_j0",
+          metadata:   {}
+        }
+      });
+    }
 
     return new Response(JSON.stringify({
       checkout_url:       flow.authorisation_url,
-      billing_request_id: billingRequest.id
+      billing_request_id: billingRequest.id,
+      gc_customer_id:     customerId
     }), {
       status:  200,
       headers: { ...corsHeaders, "Content-Type": "application/json" }
@@ -125,6 +197,9 @@ serve(async (req) => {
 
   } catch (err) {
     console.error("create-subscription error:", err);
-    return new Response(JSON.stringify({ error: String(err) }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    return new Response(JSON.stringify({ error: String(err) }), {
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" }
+    });
   }
 });
