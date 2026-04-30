@@ -391,14 +391,15 @@ Génère le JSON {content_html, quiz_data, metadata} en respectant strictement l
         "content-type":       "application/json",
       },
       body: JSON.stringify({
-        model: "claude-sonnet-4-6",
+        // Haiku 4.5 : ~3× plus rapide que Sonnet 4.6 et 1/3 du coût
+        // (~$0.05/module). Task très prescriptif (JSON schema strict + system
+        // prompt directif), donc Haiku devrait suffire en qualité.
+        // À noter : `effort` n'est pas supporté sur Haiku 4.5 (renvoie 400),
+        // d'où sa suppression.
+        model: "claude-haiku-4-5",
         max_tokens: 12000,
-        // Adaptive thinking désactivé : task prescriptif (extraction structurée),
-        // l'output JSON suit un schéma strict — pas de raisonnement complexe nécessaire.
-        // Réduit la latence de ~50%, évite les timeouts wall-clock Edge Functions.
         thinking: { type: "disabled" },
         output_config: {
-          effort: "low",
           format: {
             type: "json_schema",
             schema: OUTPUT_SCHEMA,
