@@ -2631,7 +2631,8 @@ async function importFromDocx(file) {
           const idx = ++imgUploadAttempts;
           setImportStatus(`⌛ Upload image ${idx} sur Storage…`, 'var(--accent2)');
           try {
-            const buffer = await image.read('arraybuffer');
+            // image.read() sans argument → ArrayBuffer (browser) ; "arraybuffer" n'est PAS valide.
+            const buffer = await image.read();
             const url = await uploadDocxImageToStorage(_sb, draftId, idx, buffer, image.contentType || 'image/png');
             imgUploadCount += 1;
             return { src: url };
