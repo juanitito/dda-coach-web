@@ -1983,7 +1983,7 @@ async function handleLogin() {
       closeOverlay();
       openFunnel('register');
     } else {
-      showError('login-error', 'Votre abonnement est ' + sub.status + '. Contactez-nous à hello@dda.coach.');
+      showError('login-error', 'Votre abonnement est ' + sub.status + '. Contactez-nous à hello@bingedda.fr.');
     }
   } catch (err) {
     showError('login-error', err.message === 'Invalid login credentials'
