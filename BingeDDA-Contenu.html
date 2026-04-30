@@ -1979,15 +1979,37 @@ function wrapCorrections(rootEl) {
     }
   });
 
-  // === Pattern A : cellule unique avec "Réponses :" / "Correction :" en suffixe ===
+  // === Pattern A : cellule de table thématique (⚡📋✏✅) qui contient la correction ===
+  // 3 sous-cas :
+  //   A1. cellule entière qui DÉMARRE par <strong>Correction... ou <strong>✅ Correction...
+  //       (typique quand l'IA met la correction dans une <tr> séparée)
+  //   A2. cellule entière qui DÉMARRE par <strong>Réponses... (idem, plus rare)
+  //   A3. cellule qui CONTIENT en suffixe "Réponses :" ou "Correction :" (situation
+  //       + correction concaténées dans la même cellule, ancien format)
   rootEl.querySelectorAll('table').forEach(table => {
     const th = table.querySelector('th');
     if (!th) return;
     if (!/^[⚡📋✏✅]/u.test((th.textContent || '').trim())) return;
+
     table.querySelectorAll('td').forEach(td => {
       // Skip si la cellule contient une sous-table (déjà traitée par pattern B)
       if (td.querySelector('table')) return;
+      // Skip si déjà wrappée
+      if (td.querySelector(':scope > details.correction-toggle')) return;
+
       const html = td.innerHTML;
+
+      // A1/A2 : la cellule EST une cellule de correction (commence par <strong>...Correction|Réponses)
+      if (/^\s*(?:<p>\s*)?<strong>\s*(?:[✅📖🔍]\s*)*(Correction|R[ée]ponses?)/i.test(html)) {
+        td.innerHTML =
+          '<details class="correction-toggle">' +
+            '<summary>📖 Voir la correction</summary>' +
+            '<div class="correction-content">' + html + '</div>' +
+          '</details>';
+        return;
+      }
+
+      // A3 : suffixe "Réponses : ..." ou "Correction : ..." dans la même cellule
       const m = html.match(/((?:<br\s*\/?>\s*){0,3})(R[ée]ponses?\s*(?:au cas pratique|à l['’]exercice|aux exercices)?\s*:[\s\S]*?|Correction\s*:[\s\S]*?)$/i);
       if (!m) return;
       const before = html.slice(0, m.index);
