@@ -30,6 +30,8 @@ window._sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
   --gold:    #c8a84b;
   --gold2:   #e0c472;
   --teal:    #2dd4bf;
+  --green:   #22c55e;
+  --red:     #ef4444;
   --text:    #dde3f0;
   --muted:   #6b7a99;
   --white:   #fff;
@@ -1757,7 +1759,7 @@ async function loadAccountData() {
   const subEl = document.getElementById('ac-sub-content');
   if (sub) {
     const statusLabel = { active:'Actif', pending:'En attente de validation', cancelled:'Résilié', past_due:'Prélèvement échoué' };
-    const statusColor = { active:'var(--green)', pending:'#fbbf24', cancelled:'var(--muted)', past_due:'var(--red)' };
+    const statusColor = { active:'var(--green)', pending:'#fbbf24', cancelled:'var(--red)', past_due:'var(--red)' };
     const nextDate = sub.current_period_end ? new Date(sub.current_period_end).toLocaleDateString('fr-FR') : '—';
     subEl.innerHTML = `
       <div style="display:flex;flex-direction:column;gap:10px;">
