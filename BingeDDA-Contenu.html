@@ -2264,6 +2264,12 @@ window.addEventListener('DOMContentLoaded', async () => {
       .eq('user_id', session.user.id)
       .maybeSingle();
 
+    // ── FEATURE FLAG : Mode exploration ──
+    // Quand false : les mandats `pending` ont accès complet immédiat (parité avec `active`).
+    // Quand true  : restaure l'ancien comportement — accès 48h (7j marge), bannière, quiz désactivés.
+    // Le code en aval reste fonctionnel dans les deux cas — toggle ce flag pour réactiver.
+    const EXPLORATION_MODE_ENABLED = false;
+
     // Mode exploration : accès 48h pour les mandats en attente de validation
     const urlParams      = new URLSearchParams(window.location.search);
     const isExploration  = urlParams.get('mode') === 'exploration' || sub?.status === 'pending';
@@ -2277,13 +2283,16 @@ window.addEventListener('DOMContentLoaded', async () => {
       return;
     }
 
-    if (!['active'].includes(sub.status) && !explorationOk) {
+    // Quand le flag est OFF : pending = accès comme active.
+    // Quand ON : ancien comportement (pending refusé sauf dans la fenêtre 7j).
+    const pendingAllowed = sub.status === 'pending' && (EXPLORATION_MODE_ENABLED ? explorationOk : true);
+    if (!['active'].includes(sub.status) && !pendingAllowed) {
       window.location.href = '/?subscription=inactive';
       return;
     }
 
-    // Stocker le mode pour la plateforme
-    window._explorationMode = isExploration && explorationOk;
+    // Stocker le mode pour la plateforme — false en permanence quand flag OFF.
+    window._explorationMode = EXPLORATION_MODE_ENABLED && isExploration && explorationOk;
 
     // Nettoyer l'URL
     if (urlParams.get('mode')) window.history.replaceState({}, '', '/formation');
