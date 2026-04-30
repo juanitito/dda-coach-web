@@ -2117,10 +2117,28 @@ function openModal(type) {
   if (type === 'new-module') {
     title.textContent = 'Nouveau module';
     body.innerHTML = `
-      <!-- Type toggle -->
+      <!-- Type toggle (Vidéo retirée : les modules vidéo sont créés via l'onglet Import YouTube) -->
       <div class="type-toggle" id="type-toggle">
         <button class="type-toggle-btn active-el" id="toggle-el" onclick="switchModuleType('elearning')">📄 E-learning</button>
-        <button class="type-toggle-btn" id="toggle-vid" onclick="switchModuleType('video')">▶ Vidéo</button>
+      </div>
+
+      <!-- IMPORT DEPUIS WORD (en tête : pré-remplit tous les champs en dessous) -->
+      <div class="form-group" style="background:rgba(61,127,255,.08);border:1px solid rgba(61,127,255,.25);border-radius:var(--r);padding:14px;">
+        <label class="form-label" style="color:var(--accent2);">📄 Importer depuis un fichier Word (.docx)</label>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:10px;line-height:1.5;">
+          Sélectionnez un .docx structuré (PARTIE 1 contenu / PARTIE 2 vidéo / PARTIE 3 quiz). Les images sont uploadées sur Supabase Storage, le texte est restructuré par IA, le quiz est extrait. Tous les champs ci-dessous seront pré-remplis.
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <input type="file" id="docx-import-file" accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            style="display:none;" onchange="importFromDocx(this.files[0])">
+          <button type="button" id="docx-import-btn" onclick="document.getElementById('docx-import-file').click()" style="
+            background:var(--accent);color:#fff;border:none;border-radius:var(--r);
+            padding:10px 18px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;
+            cursor:pointer;transition:all .2s;white-space:nowrap;
+          ">Choisir un fichier .docx</button>
+          <div id="docx-import-filename" style="font-size:12px;color:var(--text);"></div>
+        </div>
+        <div id="docx-import-status" style="margin-top:10px;font-size:12px;line-height:1.6;"></div>
       </div>
 
       <!-- Code + Durée -->
@@ -2223,25 +2241,6 @@ function openModal(type) {
 
       <!-- Champs E-learning -->
       <div id="fields-elearning">
-        <!-- IMPORT DEPUIS WORD -->
-        <div class="form-group" style="background:rgba(61,127,255,.08);border:1px solid rgba(61,127,255,.25);border-radius:var(--r);padding:14px;">
-          <label class="form-label" style="color:var(--accent2);">📄 Importer depuis un fichier Word (.docx)</label>
-          <div style="font-size:11px;color:var(--muted);margin-bottom:10px;line-height:1.5;">
-            Sélectionnez un .docx structuré (PARTIE 1 contenu / PARTIE 2 vidéo / PARTIE 3 quiz). Les images sont uploadées sur Supabase Storage, le texte est restructuré par IA, le quiz est extrait. Vous pourrez réviser avant de sauvegarder.
-          </div>
-          <div style="display:flex;gap:8px;align-items:center;">
-            <input type="file" id="docx-import-file" accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-              style="display:none;" onchange="importFromDocx(this.files[0])">
-            <button type="button" id="docx-import-btn" onclick="document.getElementById('docx-import-file').click()" style="
-              background:var(--accent);color:#fff;border:none;border-radius:var(--r);
-              padding:10px 18px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;
-              cursor:pointer;transition:all .2s;white-space:nowrap;
-            ">Choisir un fichier .docx</button>
-            <div id="docx-import-filename" style="font-size:12px;color:var(--text);"></div>
-          </div>
-          <div id="docx-import-status" style="margin-top:10px;font-size:12px;line-height:1.6;"></div>
-        </div>
-
         <div class="form-group">
           <label class="form-label">Thumbnail — Recherche Unsplash</label>
           <div style="display:flex;gap:8px;margin-bottom:8px;">
