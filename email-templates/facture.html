@@ -1,0 +1,50 @@
+<!--
+  Brevo template ID: 5
+  Suggested subject: Votre facture BingeDDA — {{ params.PERIODE }}
+  Vars: PRENOM, NOM, RAISON_SOCIALE, NUMERO_FACTURE, MONTANT_TTC, MONTANT_HT, TVA, PERIODE, FACTURE_URL
+-->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Votre facture BingeDDA</title>
+</head>
+<body style="margin:0;padding:0;background:#0b0f1a;font-family:'DM Sans',Arial,Helvetica,sans-serif;color:#dde3f0;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#0b0f1a;">
+  <tr><td align="center" style="padding:32px 12px;">
+    <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;background:#1a2030;border-radius:12px;overflow:hidden;">
+      <tr><td style="padding:28px 32px 20px;border-bottom:1px solid #202840;">
+        <span style="font-family:'Bebas Neue',Arial,sans-serif;font-size:26px;letter-spacing:3px;color:#dde3f0;font-weight:700;">Binge</span><span style="font-family:'Bebas Neue',Arial,sans-serif;font-size:26px;letter-spacing:3px;color:#3d7fff;font-weight:700;">DDA</span>
+      </td></tr>
+      <tr><td style="padding:36px 32px 12px;">
+        <h1 style="margin:0 0 8px;font-family:'DM Serif Display',Georgia,serif;font-size:26px;color:#e0c472;font-weight:400;">Facture {{ params.NUMERO_FACTURE }}</h1>
+        <p style="margin:0 0 22px;font-size:15px;line-height:1.7;">
+          Bonjour {{ params.PRENOM }}, voici votre facture pour la période <strong style="color:#fff;">{{ params.PERIODE }}</strong>.
+        </p>
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#0e1420;border-radius:8px;margin:0 0 24px;">
+          <tr><td style="padding:18px 22px;font-size:14px;color:#dde3f0;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+              <tr><td style="padding:6px 0;color:#6b7a99;">Montant HT</td><td align="right" style="padding:6px 0;">{{ params.MONTANT_HT }} €</td></tr>
+              <tr><td style="padding:6px 0;color:#6b7a99;">TVA (20&nbsp;%)</td><td align="right" style="padding:6px 0;">{{ params.TVA }} €</td></tr>
+              <tr><td style="padding:10px 0 0;border-top:1px solid #202840;color:#fff;font-weight:700;">Total TTC</td><td align="right" style="padding:10px 0 0;border-top:1px solid #202840;color:#e0c472;font-weight:700;font-size:16px;">{{ params.MONTANT_TTC }} €</td></tr>
+            </table>
+          </td></tr>
+        </table>
+        <p style="margin:0 0 22px;font-size:14px;line-height:1.7;color:#6b7a99;">
+          Le prélèvement SEPA correspondant a été initié sur votre compte enregistré chez GoCardless.
+        </p>
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td style="border-radius:8px;background:#3d7fff;">
+          <a href="{{ params.FACTURE_URL }}" style="display:inline-block;padding:14px 32px;font-size:15px;font-weight:700;color:#ffffff;text-decoration:none;">Télécharger la facture (PDF)</a>
+        </td></tr></table>
+      </td></tr>
+      <tr><td style="padding:24px 32px;border-top:1px solid #202840;font-size:12px;color:#6b7a99;line-height:1.6;">
+        BingeDDA — formation continue DDA assurance<br>
+        Conservez cette facture pour votre comptabilité. La TVA est récupérable.<br>
+        <a href="{{ unsubscribe }}" style="color:#6b7a99;text-decoration:underline;">Se désabonner</a>
+      </td></tr>
+    </table>
+  </td></tr>
+</table>
+</body>
+</html>

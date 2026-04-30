@@ -1,0 +1,40 @@
+<!--
+  Brevo template ID: 12
+  Suggested subject: Votre abonnement BingeDDA est reconduit
+  Vars: PRENOM, DATE_RENOUVELLEMENT, MONTANT_TTC, APP_URL
+-->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Renouvellement BingeDDA</title>
+</head>
+<body style="margin:0;padding:0;background:#0b0f1a;font-family:'DM Sans',Arial,Helvetica,sans-serif;color:#dde3f0;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#0b0f1a;">
+  <tr><td align="center" style="padding:32px 12px;">
+    <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;background:#1a2030;border-radius:12px;overflow:hidden;">
+      <tr><td style="padding:28px 32px 20px;border-bottom:1px solid #202840;">
+        <span style="font-family:'Bebas Neue',Arial,sans-serif;font-size:26px;letter-spacing:3px;color:#dde3f0;font-weight:700;">Binge</span><span style="font-family:'Bebas Neue',Arial,sans-serif;font-size:26px;letter-spacing:3px;color:#3d7fff;font-weight:700;">DDA</span>
+      </td></tr>
+      <tr><td style="padding:36px 32px 12px;">
+        <h1 style="margin:0 0 8px;font-family:'DM Serif Display',Georgia,serif;font-size:26px;color:#e0c472;font-weight:400;">Votre abonnement continue</h1>
+        <p style="margin:0 0 18px;font-size:15px;line-height:1.7;">
+          Bonjour {{ params.PRENOM }}, votre abonnement BingeDDA a été reconduit le <strong style="color:#fff;">{{ params.DATE_RENOUVELLEMENT }}</strong> pour <strong style="color:#fff;">{{ params.MONTANT_TTC }} €</strong>.
+        </p>
+        <p style="margin:0 0 22px;font-size:15px;line-height:1.7;">
+          Vous gardez l'accès à l'intégralité du catalogue, ainsi qu'à votre historique d'heures et d'attestations. La facture sera disponible dans votre espace sous 48h.
+        </p>
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td style="border-radius:8px;background:#3d7fff;">
+          <a href="{{ params.APP_URL }}" style="display:inline-block;padding:14px 32px;font-size:15px;font-weight:700;color:#ffffff;text-decoration:none;">Accéder à mon espace</a>
+        </td></tr></table>
+      </td></tr>
+      <tr><td style="padding:24px 32px;border-top:1px solid #202840;font-size:12px;color:#6b7a99;line-height:1.6;">
+        BingeDDA — formation continue DDA assurance<br>
+        <a href="{{ unsubscribe }}" style="color:#6b7a99;text-decoration:underline;">Se désabonner</a>
+      </td></tr>
+    </table>
+  </td></tr>
+</table>
+</body>
+</html>

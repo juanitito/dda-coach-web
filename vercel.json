@@ -2,38 +2,38 @@
   "rewrites": [
     {
       "source": "/",
-      "destination": "/DDAFLIX-Landing_Funnel.html"
+      "destination": "/BingeDDA-Landing_Funnel.html"
     },
     {
       "source": "/formation",
-      "destination": "/DDAFLIX-Contenu.html"
+      "destination": "/BingeDDA-Contenu.html"
     },
     {
       "source": "/admin",
-      "destination": "/DDAFLIX-Admin.html"
+      "destination": "/BingeDDA-Admin.html"
     },
     {
       "source": "/outils/comparateur",
-      "destination": "/DDAFLIX-Comparateur.html"
+      "destination": "/BingeDDA-Comparateur.html"
     },
     {
       "source": "/outils/emprunt",
-      "destination": "/DDAFLIX-Emprunt.html"
+      "destination": "/BingeDDA-Emprunt.html"
     }
   ],
   "redirects": [
     {
-      "source": "/DDAFLIX-Admin.html",
+      "source": "/BingeDDA-Admin.html",
       "destination": "/admin",
       "permanent": false
     },
     {
-      "source": "/DDAFLIX-Contenu.html",
+      "source": "/BingeDDA-Contenu.html",
       "destination": "/formation",
       "permanent": false
     },
     {
-      "source": "/DDAFLIX-Landing_Funnel.html",
+      "source": "/BingeDDA-Landing_Funnel.html",
       "destination": "/",
       "permanent": false
     }
