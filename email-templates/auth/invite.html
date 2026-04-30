@@ -1,0 +1,44 @@
+<!--
+  Supabase Auth — Invite user
+  Sujet suggéré : Vous êtes invité·e à rejoindre BingeDDA
+  Variables : {{ .ConfirmationURL }}, {{ .Email }}, {{ .SiteURL }}
+-->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Invitation BingeDDA</title>
+</head>
+<body style="margin:0;padding:0;background:#0b0f1a;font-family:'DM Sans',Arial,Helvetica,sans-serif;color:#dde3f0;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#0b0f1a;">
+  <tr><td align="center" style="padding:32px 12px;">
+    <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;background:#1a2030;border-radius:12px;overflow:hidden;">
+      <tr><td style="padding:28px 32px 20px;border-bottom:1px solid #202840;">
+        <span style="font-family:'Bebas Neue',Arial,sans-serif;font-size:26px;letter-spacing:3px;color:#dde3f0;font-weight:700;">Binge</span><span style="font-family:'Bebas Neue',Arial,sans-serif;font-size:26px;letter-spacing:3px;color:#3d7fff;font-weight:700;">DDA</span>
+      </td></tr>
+      <tr><td style="padding:36px 32px 12px;">
+        <h1 style="margin:0 0 8px;font-family:'DM Serif Display',Georgia,serif;font-size:26px;color:#e0c472;font-weight:400;">Vous êtes invité·e sur BingeDDA</h1>
+        <p style="margin:0 0 18px;font-size:15px;line-height:1.7;">
+          Un compte BingeDDA a été créé pour vous à l'adresse <strong style="color:#fff;">{{ .Email }}</strong>. Cliquez sur le bouton ci-dessous pour activer votre accès et définir votre mot de passe.
+        </p>
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:24px 0;"><tr><td style="border-radius:8px;background:#3d7fff;">
+          <a href="{{ .ConfirmationURL }}" style="display:inline-block;padding:14px 32px;font-size:15px;font-weight:700;color:#ffffff;text-decoration:none;letter-spacing:.3px;">Accepter l'invitation</a>
+        </td></tr></table>
+        <p style="margin:0 0 12px;font-size:13px;line-height:1.6;color:#6b7a99;">
+          BingeDDA est la plateforme de formation continue DDA pour les professionnels de l'assurance. Le lien d'invitation expire dans 7 jours.
+        </p>
+        <p style="margin:0;font-size:12px;line-height:1.6;color:#6b7a99;word-break:break-all;">
+          Si le bouton ne fonctionne pas, copiez ce lien dans votre navigateur :<br>
+          <a href="{{ .ConfirmationURL }}" style="color:#6b9fff;text-decoration:underline;">{{ .ConfirmationURL }}</a>
+        </p>
+      </td></tr>
+      <tr><td style="padding:24px 32px;border-top:1px solid #202840;font-size:12px;color:#6b7a99;line-height:1.6;">
+        BingeDDA — formation continue DDA assurance<br>
+        Une question&nbsp;? Répondez à cet email, nous lisons tout.
+      </td></tr>
+    </table>
+  </td></tr>
+</table>
+</body>
+</html>
