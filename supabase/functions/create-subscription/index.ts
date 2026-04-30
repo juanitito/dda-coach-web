@@ -78,7 +78,17 @@ serve(async (req) => {
         redirect_uri:       GC_REDIRECT_URL,
         exit_uri:           "https://dda-coach.vercel.app",
         language:           "fr",
-        prefilled_customer: { email, given_name: prenom, family_name: nom },
+        prefilled_customer: {
+          email,
+          given_name:    prenom,
+          family_name:   nom,
+          address_line1: adresse        || undefined,
+          postal_code:   cp             || undefined,
+          city:          ville          || undefined,
+          country_code:  "FR",
+          company_name:  raison_sociale || undefined,
+          language:      "fr"
+        },
         links:              { billing_request: billingRequest.id }
       }
     });

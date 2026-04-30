@@ -2,7 +2,7 @@
   "name": "dda-coach-web",
   "version": "0.1.0",
   "private": true,
-  "description": "BingeDDA / DDAFLIX — formation DDA assurance",
+  "description": "BingeDDA — formation DDA assurance",
   "scripts": {
     "test": "playwright test",
     "test:ui": "playwright test --ui",

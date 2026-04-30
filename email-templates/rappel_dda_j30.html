@@ -1,0 +1,43 @@
+<!--
+  Brevo template ID: 9
+  Suggested subject: 30 jours — il reste {{ params.HEURES_RESTANTES }}h à valider
+  Vars: PRENOM, HEURES_FAITES, HEURES_RESTANTES, DATE_ECHEANCE, APP_URL
+-->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>J−30 avant l'échéance DDA</title>
+</head>
+<body style="margin:0;padding:0;background:#0b0f1a;font-family:'DM Sans',Arial,Helvetica,sans-serif;color:#dde3f0;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#0b0f1a;">
+  <tr><td align="center" style="padding:32px 12px;">
+    <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;background:#1a2030;border-radius:12px;overflow:hidden;">
+      <tr><td style="padding:28px 32px 20px;border-bottom:1px solid #202840;">
+        <span style="font-family:'Bebas Neue',Arial,sans-serif;font-size:26px;letter-spacing:3px;color:#dde3f0;font-weight:700;">Binge</span><span style="font-family:'Bebas Neue',Arial,sans-serif;font-size:26px;letter-spacing:3px;color:#3d7fff;font-weight:700;">DDA</span>
+      </td></tr>
+      <tr><td style="padding:36px 32px 12px;">
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="background:#3a2c1a;border-left:4px solid #e0c472;border-radius:6px;margin:0 0 22px;"><tr><td style="padding:14px 18px;font-size:13px;color:#ffe7b8;">
+          Plus qu'un mois pour valider votre obligation DDA.
+        </td></tr></table>
+        <h1 style="margin:0 0 8px;font-family:'DM Serif Display',Georgia,serif;font-size:26px;color:#e0c472;font-weight:400;">J−30, {{ params.PRENOM }}.</h1>
+        <p style="margin:0 0 18px;font-size:15px;line-height:1.7;">
+          Échéance le <strong style="color:#fff;">{{ params.DATE_ECHEANCE }}</strong>. Il vous reste <strong style="color:#fff;">{{ params.HEURES_RESTANTES }}h</strong> sur les 15h annuelles.
+        </p>
+        <p style="margin:0 0 22px;font-size:15px;line-height:1.7;">
+          C'est faisable&nbsp;: 30 min/jour, c'est plié sur le mois. La plateforme reprend toujours votre lecture là où vous l'aviez laissée — y compris en mobilité.
+        </p>
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td style="border-radius:8px;background:#3d7fff;">
+          <a href="{{ params.APP_URL }}" style="display:inline-block;padding:14px 32px;font-size:15px;font-weight:700;color:#ffffff;text-decoration:none;">Reprendre maintenant</a>
+        </td></tr></table>
+      </td></tr>
+      <tr><td style="padding:24px 32px;border-top:1px solid #202840;font-size:12px;color:#6b7a99;line-height:1.6;">
+        BingeDDA — formation continue DDA assurance<br>
+        <a href="{{ unsubscribe }}" style="color:#6b7a99;text-decoration:underline;">Se désabonner</a>
+      </td></tr>
+    </table>
+  </td></tr>
+</table>
+</body>
+</html>

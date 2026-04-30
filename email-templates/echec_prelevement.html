@@ -1,0 +1,44 @@
+<!--
+  Brevo template ID: 6
+  Suggested subject: Échec du prélèvement SEPA — action requise
+  Vars: PRENOM, MONTANT_TTC, DATE_NOUVELLE_TENTATIVE, APP_URL
+-->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Échec du prélèvement</title>
+</head>
+<body style="margin:0;padding:0;background:#0b0f1a;font-family:'DM Sans',Arial,Helvetica,sans-serif;color:#dde3f0;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#0b0f1a;">
+  <tr><td align="center" style="padding:32px 12px;">
+    <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;background:#1a2030;border-radius:12px;overflow:hidden;">
+      <tr><td style="padding:28px 32px 20px;border-bottom:1px solid #202840;">
+        <span style="font-family:'Bebas Neue',Arial,sans-serif;font-size:26px;letter-spacing:3px;color:#dde3f0;font-weight:700;">Binge</span><span style="font-family:'Bebas Neue',Arial,sans-serif;font-size:26px;letter-spacing:3px;color:#3d7fff;font-weight:700;">DDA</span>
+      </td></tr>
+      <tr><td style="padding:36px 32px 12px;">
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="background:#3a1a1a;border-left:4px solid #e74c3c;border-radius:6px;margin:0 0 22px;"><tr><td style="padding:14px 18px;font-size:13px;color:#ffd2d0;">
+          Le prélèvement de votre abonnement BingeDDA n'a pas abouti.
+        </td></tr></table>
+        <h1 style="margin:0 0 8px;font-family:'DM Serif Display',Georgia,serif;font-size:26px;color:#e0c472;font-weight:400;">Bonjour {{ params.PRENOM }},</h1>
+        <p style="margin:0 0 18px;font-size:15px;line-height:1.7;">
+          Votre banque a refusé le prélèvement de <strong style="color:#fff;">{{ params.MONTANT_TTC }} €</strong>. Causes les plus fréquentes&nbsp;: provision insuffisante, opposition, ou changement de RIB.
+        </p>
+        <p style="margin:0 0 22px;font-size:15px;line-height:1.7;">
+          Une nouvelle tentative aura lieu automatiquement le <strong style="color:#fff;">{{ params.DATE_NOUVELLE_TENTATIVE }}</strong>. Si vous avez changé de compte, mettez à jour votre mandat depuis votre espace.
+        </p>
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td style="border-radius:8px;background:#3d7fff;">
+          <a href="{{ params.APP_URL }}" style="display:inline-block;padding:14px 32px;font-size:15px;font-weight:700;color:#ffffff;text-decoration:none;">Mettre à jour mon mandat</a>
+        </td></tr></table>
+      </td></tr>
+      <tr><td style="padding:24px 32px;border-top:1px solid #202840;font-size:12px;color:#6b7a99;line-height:1.6;">
+        BingeDDA — formation continue DDA assurance<br>
+        Si vous pensez qu'il s'agit d'une erreur, répondez à cet email, on regardera ensemble.<br>
+        <a href="{{ unsubscribe }}" style="color:#6b7a99;text-decoration:underline;">Se désabonner</a>
+      </td></tr>
+    </table>
+  </td></tr>
+</table>
+</body>
+</html>
