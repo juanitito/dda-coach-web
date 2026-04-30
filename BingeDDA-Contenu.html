@@ -1993,10 +1993,11 @@ function wrapCorrections(rootEl) {
     if (!/[⚡📋✏✅🗣📚🔍]/u.test((firstCell.textContent || '').trim().slice(0, 40))) return;
 
     table.querySelectorAll('td').forEach(td => {
+      // Pattern A ne traite que les cellules de 1er niveau de la table thématique.
+      // Si td.closest('table') n'est pas notre table, c'est un TD de sous-table.
+      if (td.closest('table') !== table) return;
       // Skip la 1ère cellule (titre de la table)
       if (td === firstCell) return;
-      // Skip si la cellule contient une sous-table (déjà traitée par pattern B)
-      if (td.querySelector('table')) return;
       // Skip si déjà wrappée
       if (td.querySelector(':scope > details.correction-toggle')) return;
 
