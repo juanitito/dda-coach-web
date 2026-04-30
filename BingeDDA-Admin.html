@@ -3386,9 +3386,10 @@ async function openVeilleGenerateModal() {
     <div class="form-group">
       <label class="form-label">Thumbnail Unsplash</label>
       <div style="display:flex;gap:8px;align-items:flex-end;">
-        <input class="form-input" id="vgen-thumb-query" placeholder="ex: insurance regulation law" style="flex:1;" value="insurance regulation">
+        <input class="form-input" id="vgen-thumb-query" placeholder="ex: insurance regulation law" style="flex:1;">
         <button class="tbl-btn primary" onclick="vFetchUnsplash()" style="padding:9px 14px;white-space:nowrap;">Chercher</button>
       </div>
+      <div id="vgen-thumb-results" style="display:none;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:10px;"></div>
       <div id="vgen-thumb-preview" class="veille-thumb-preview" style="margin-top:10px;"><span>Entrez un mot-clé et cliquez Chercher</span></div>
     </div>
     <div class="form-group">
@@ -3411,19 +3412,51 @@ async function openVeilleGenerateModal() {
 
 async function vFetchUnsplash() {
   const query   = document.getElementById('vgen-thumb-query').value.trim();
+  const results = document.getElementById('vgen-thumb-results');
   const preview = document.getElementById('vgen-thumb-preview');
   if (!query) return;
   preview.innerHTML = '<span>Recherche…</span>';
+  results.style.display = 'none';
+  // Reset toute sélection précédente
+  _vGenerateData.thumbnailUrl   = null;
+  _vGenerateData.thumbnailQuery = query;
   try {
-    const res  = await fetch(`https://api.unsplash.com/photos/random?query=${encodeURIComponent(query)}&orientation=landscape&client_id=${UNSPLASH_KEY}`);
+    const res = await fetch(
+      `https://api.unsplash.com/search/photos?query=${encodeURIComponent(query)}&per_page=6&orientation=landscape`,
+      { headers: { Authorization: `Client-ID ${UNSPLASH_KEY}` } }
+    );
     if (!res.ok) throw new Error('Unsplash ' + res.status);
     const data = await res.json();
-    _vGenerateData.thumbnailUrl   = data.urls.regular;
-    _vGenerateData.thumbnailQuery = query;
-    preview.innerHTML = `<img src="${data.urls.regular}" alt="${vEsc(query)}">`;
+    if (!data.results?.length) {
+      preview.innerHTML = `<span style="color:var(--muted)">Aucun résultat pour "${vEsc(query)}"</span>`;
+      return;
+    }
+    results.style.display = 'grid';
+    results.innerHTML = data.results.map(photo => `
+      <div onclick="vSelectUnsplashPhoto('${photo.urls.regular}', '${photo.urls.thumb}')"
+        style="cursor:pointer;border-radius:5px;overflow:hidden;position:relative;aspect-ratio:16/9;border:2px solid transparent;transition:border-color .15s;"
+        onmouseover="if(this.dataset.selected!=='1') this.style.borderColor='var(--accent)'"
+        onmouseout="if(this.dataset.selected!=='1') this.style.borderColor='transparent'">
+        <img src="${photo.urls.thumb}" alt="${vEsc(photo.alt_description || '')}"
+          style="width:100%;height:100%;object-fit:cover;">
+        <div style="position:absolute;bottom:0;left:0;right:0;padding:3px 5px;background:rgba(0,0,0,.5);font-size:9px;color:rgba(255,255,255,.7);">
+          ${vEsc(photo.user.name)}
+        </div>
+      </div>`).join('');
+    preview.innerHTML = '<span style="color:var(--muted)">Cliquez sur une image pour la sélectionner</span>';
   } catch(e) {
     preview.innerHTML = `<span style="color:var(--red)">Erreur Unsplash : ${e.message}</span>`;
   }
+}
+
+function vSelectUnsplashPhoto(regularUrl, thumbUrl) {
+  _vGenerateData.thumbnailUrl = regularUrl;
+  document.getElementById('vgen-thumb-preview').innerHTML = `<img src="${regularUrl}" alt="">`;
+  document.querySelectorAll('#vgen-thumb-results > div').forEach(d => {
+    const selected = d.querySelector('img')?.src === thumbUrl;
+    d.style.borderColor = selected ? 'var(--accent)' : 'transparent';
+    d.dataset.selected = selected ? '1' : '0';
+  });
 }
 
 async function vPublishModule() {
