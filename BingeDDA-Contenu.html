@@ -1940,8 +1940,11 @@ function wrapCorrections(rootEl) {
     if (ths.length < 2) return;
 
     const headerTexts = ths.map(h => (h.textContent || '').trim().toLowerCase());
+    // À supprimer : la colonne où l'apprenant est censé écrire sa réponse
+    // ("Votre réponse", "Votre correction"). NE JAMAIS matcher "Formulation
+    // incorrecte" qui est la colonne SOURCE/PROMPT à conserver.
     const idxVotreReponse = headerTexts.findIndex(t =>
-      /votre\s+r[ée]ponse|votre\s+correction|formulation\s+incorrecte/i.test(t)
+      /^votre\s+(r[ée]ponse|correction)$/i.test(t.trim())
     );
     const idxCorrection = headerTexts.findIndex(t =>
       /^correction(\s+propos[ée]e?)?$/i.test(t.trim())

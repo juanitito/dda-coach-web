@@ -2686,6 +2686,10 @@ async function importFromDocx(file) {
     setVal('mod-dur',     m.duree_minutes);
     setVal('mod-desc',    m.description);
     setChk('mod-dda',     m.dda_certifiant);
+    // Pré-remplit la query Unsplash avec le titre extrait, pour faciliter la recherche d'image
+    if (m.title && document.getElementById('unsplash-query') && !document.getElementById('unsplash-query').value) {
+      document.getElementById('unsplash-query').value = m.title;
+    }
     // Métiers : cocher uniquement ceux qui sont dans la liste retournée
     if (Array.isArray(m.metiers)) {
       const wanted = new Set(m.metiers);
