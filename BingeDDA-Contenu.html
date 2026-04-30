@@ -1987,11 +1987,14 @@ function wrapCorrections(rootEl) {
   //   A3. cellule qui CONTIENT en suffixe "Réponses :" ou "Correction :" (situation
   //       + correction concaténées dans la même cellule, ancien format)
   rootEl.querySelectorAll('table').forEach(table => {
-    const th = table.querySelector('th');
-    if (!th) return;
-    if (!/^[⚡📋✏✅]/u.test((th.textContent || '').trim())) return;
+    // Récupère le marker (1ère cellule TH ou TD) pour détecter les tables thématiques
+    const firstCell = table.querySelector('th, td');
+    if (!firstCell) return;
+    if (!/[⚡📋✏✅🗣📚🔍]/u.test((firstCell.textContent || '').trim().slice(0, 40))) return;
 
     table.querySelectorAll('td').forEach(td => {
+      // Skip la 1ère cellule (titre de la table)
+      if (td === firstCell) return;
       // Skip si la cellule contient une sous-table (déjà traitée par pattern B)
       if (td.querySelector('table')) return;
       // Skip si déjà wrappée
