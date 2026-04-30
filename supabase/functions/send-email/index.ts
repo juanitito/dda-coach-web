@@ -8,8 +8,8 @@ const supabase = createClient(
 
 const BREVO_API_KEY  = Deno.env.get("BREVO_API_KEY")!;
 const BREVO_API_URL  = "https://api.brevo.com/v3/smtp/email";
-const SENDER_EMAIL   = "hello@dda.coach";
-const SENDER_NAME    = "DDA.coach";
+const SENDER_EMAIL   = "hello@bingedda.fr";
+const SENDER_NAME    = "BingeDDA";
 
 const TEMPLATES: Record<string, number> = {
   onboarding_j0:        1,
