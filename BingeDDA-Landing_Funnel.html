@@ -1210,11 +1210,7 @@ convention que vous avez passée avec elle.
           <div class="form-group">
             <label class="form-label">IBAN <span>*</span></label>
             <input class="form-input" id="f-iban" type="text" placeholder="FR76 1234 5678 9012 3456 7890 123" maxlength="34" oninput="formatIban(this)">
-            <div class="form-hint">Compte bancaire domicilié dans la zone SEPA (UE + EEE).</div>
-          </div>
-          <div class="form-group">
-            <label class="form-label">BIC / SWIFT <span>*</span></label>
-            <input class="form-input" id="f-bic" type="text" placeholder="BNPAFRPPXXX" maxlength="11" style="text-transform:uppercase;" oninput="this.value=this.value.toUpperCase()">
+            <div class="form-hint">Compte bancaire domicilié dans la zone SEPA (UE + EEE). Le BIC est calculé automatiquement.</div>
           </div>
 
           <div class="form-divider"></div>
@@ -1730,9 +1726,8 @@ function validateStep(n) {
   if (n === 3) {
     const tit = document.getElementById('f-titulaire').value.trim();
     const iban = document.getElementById('f-iban').value.replace(/\s/g,'');
-    const bic = document.getElementById('f-bic').value.trim();
     const cgv = document.getElementById('f-cgv').checked;
-    if (!tit || !iban || !bic) { alert('Veuillez renseigner toutes les coordonnées bancaires.'); return false; }
+    if (!tit || !iban) { alert('Veuillez renseigner le titulaire et l\'IBAN.'); return false; }
     if (!validateIban(iban)) { alert('L\'IBAN saisi semble invalide. Vérifiez le format (ex: FR76…).'); return false; }
     if (!cgv) { alert('Veuillez accepter les Conditions Générales de Vente pour continuer.'); return false; }
   }
@@ -1913,8 +1908,7 @@ async function registerStep3() {
 
   const tit  = document.getElementById('f-titulaire').value.trim();
   const iban = document.getElementById('f-iban').value.replace(/\s/g,'');
-  const bic  = document.getElementById('f-bic').value.trim();
-  if (!tit || !iban || !bic) { showError('sepa-error', 'Veuillez renseigner toutes les coordonnées bancaires.'); return; }
+  if (!tit || !iban) { showError('sepa-error', 'Veuillez renseigner le titulaire et l\'IBAN.'); return; }
   if (!validateIban(iban)) { showError('sepa-error', 'IBAN invalide.'); return; }
 
   setLoading('btn-sepa', true, '🏦 Signer le mandat et activer mon accès');
@@ -1947,7 +1941,9 @@ async function registerStep3() {
         siret:          siret || null,
         orias:          orias || null,
         adresse, cp, ville,
-        tel:            tel   || null
+        tel:            tel   || null,
+        iban,
+        titulaire:      tit
       })
     });
 

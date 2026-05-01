@@ -60,10 +60,20 @@ serve(async (req) => {
     prenom, nom, email,
     raison_sociale,
     adresse, address_line2, cp, ville,
-    tel, siret, orias
+    tel, siret, orias,
+    iban, titulaire
   } = await req.json();
 
-  const phone = normalizePhone(tel);
+  const phone   = normalizePhone(tel);
+  const ibanRaw = (iban || "").replace(/\s/g, "").toUpperCase();
+  const holder  = (titulaire || "").trim();
+
+  if (!ibanRaw || !holder) {
+    return new Response(JSON.stringify({ error: "IBAN et titulaire du compte requis" }), {
+      status: 400,
+      headers: { ...corsHeaders, "Content-Type": "application/json" }
+    });
+  }
 
   // Métadonnées GC : 3 clés max, 50 chars max par valeur
   const gcMetadata: Record<string, string> = { supabase_user_id: user.id };
@@ -132,6 +142,18 @@ serve(async (req) => {
       });
     }
 
+    // Création du customer_bank_account avec l'IBAN saisi dans le funnel
+    // → user n'aura pas à le re-saisir sur GC (combiné avec lock_bank_account: true)
+    const { customer_bank_accounts: bankAccount } = await gcRequest("POST", "/customer_bank_accounts", {
+      customer_bank_accounts: {
+        iban:                ibanRaw,
+        account_holder_name: holder,
+        country_code:        "FR",
+        links:               { customer: customerId }
+      }
+    });
+    console.log("create-subscription: created GC bank account", bankAccount.id);
+
     const { billing_requests: billingRequest } = await gcRequest("POST", "/billing_requests", {
       billing_requests: {
         mandate_request: {
@@ -139,15 +161,20 @@ serve(async (req) => {
           scheme:   "sepa_core",
           metadata: { supabase_user_id: user.id }
         },
-        links: { customer: customerId }
+        links: {
+          customer:              customerId,
+          customer_bank_account: bankAccount.id
+        }
       }
     });
 
     const { billing_request_flows: flow } = await gcRequest("POST", "/billing_request_flows", {
       billing_request_flows: {
-        redirect_uri:       GC_REDIRECT_URL,
-        exit_uri:           GC_EXIT_URL,
-        language:           "fr",
+        redirect_uri:           GC_REDIRECT_URL,
+        exit_uri:               GC_EXIT_URL,
+        language:               "fr",
+        lock_customer_details:  true,
+        lock_bank_account:      true,
         prefilled_customer: {
           email,
           given_name:    prenom,
@@ -160,7 +187,7 @@ serve(async (req) => {
           company_name:  raison_sociale || undefined,
           phone_number:  phone
         },
-        links:              { billing_request: billingRequest.id }
+        links:                  { billing_request: billingRequest.id }
       }
     });
 
