@@ -1,10 +1,24 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-const supabase = createClient(
-  Deno.env.get("SUPABASE_URL")!,
-  Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
-);
+const SUPABASE_URL  = Deno.env.get("SUPABASE_URL")!;
+const SERVICE_ROLE  = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+const supabase = createClient(SUPABASE_URL, SERVICE_ROLE);
+
+// Appel direct via fetch + service role : supabase.functions.invoke() ne pose
+// pas l'Authorization header attendu par send-email (verify_jwt: true).
+async function sendEmail(userId: string, templateId: string, metadata: Record<string, unknown> = {}) {
+  const r = await fetch(`${SUPABASE_URL}/functions/v1/send-email`, {
+    method:  "POST",
+    headers: {
+      "Authorization": `Bearer ${SERVICE_ROLE}`,
+      "Content-Type":  "application/json"
+    },
+    body: JSON.stringify({ userId, templateId, metadata })
+  });
+  if (!r.ok) console.error(`send-email ${templateId} failed:`, r.status, await r.text());
+  return r.ok;
+}
 
 serve(async () => {
   const { error } = await supabase.rpc("flag_dda_reminders");
@@ -40,9 +54,7 @@ serve(async () => {
         .single();
 
       if (!already) {
-        await supabase.functions.invoke("send-email", {
-          body: { userId: user_id, templateId: seq.template, metadata: {} }
-        });
+        await sendEmail(user_id, seq.template);
       }
     }
   }

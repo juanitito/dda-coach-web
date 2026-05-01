@@ -2,12 +2,26 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { crypto } from "https://deno.land/std@0.168.0/crypto/mod.ts";
 
-const supabase = createClient(
-  Deno.env.get("SUPABASE_URL")!,
-  Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
-);
+const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
+const SERVICE_ROLE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+const supabase = createClient(SUPABASE_URL, SERVICE_ROLE);
 
 const GC_WEBHOOK_SECRET = Deno.env.get("GOCARDLESS_WEBHOOK_SECRET")!;
+
+// Appel direct via fetch + service role : supabase.functions.invoke() ne pose
+// pas l'Authorization header attendu par send-email (verify_jwt: true).
+async function sendEmail(userId: string, templateId: string, metadata: Record<string, unknown> = {}) {
+  const r = await fetch(`${SUPABASE_URL}/functions/v1/send-email`, {
+    method:  "POST",
+    headers: {
+      "Authorization": `Bearer ${SERVICE_ROLE}`,
+      "Content-Type":  "application/json"
+    },
+    body: JSON.stringify({ userId, templateId, metadata })
+  });
+  if (!r.ok) console.error(`send-email ${templateId} failed:`, r.status, await r.text());
+  return r.ok;
+}
 
 async function verifySignature(body: string, signature: string): Promise<boolean> {
   const key = await crypto.subtle.importKey(
@@ -86,13 +100,7 @@ async function processEvent(event: any) {
           .eq("id", payment.subscription_id)
           .eq("status", "pending");
 
-        await supabase.functions.invoke("send-email", {
-          body: {
-            userId:     payment.subscriptions.user_id,
-            templateId: "facture",
-            metadata:   { amount_ttc: payment.amount_ttc }
-          }
-        });
+        await sendEmail(payment.subscriptions.user_id, "facture", { amount_ttc: payment.amount_ttc });
       }
     }
 
@@ -113,13 +121,7 @@ async function processEvent(event: any) {
           .update({ status: "past_due" })
           .eq("id", payment.subscription_id);
 
-        await supabase.functions.invoke("send-email", {
-          body: {
-            userId:     payment.subscriptions.user_id,
-            templateId: "echec_prelevement",
-            metadata:   { failure_reason: event.details?.description }
-          }
-        });
+        await sendEmail(payment.subscriptions.user_id, "echec_prelevement", { failure_reason: event.details?.description });
       }
     }
   }
@@ -143,9 +145,7 @@ async function processEvent(event: any) {
         .single();
 
       if (sub) {
-        await supabase.functions.invoke("send-email", {
-          body: { userId: sub.user_id, templateId: "mandat_annule", metadata: {} }
-        });
+        await sendEmail(sub.user_id, "mandat_annule");
       }
     }
   }
