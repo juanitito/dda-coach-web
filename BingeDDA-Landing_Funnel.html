@@ -643,6 +643,29 @@ footer{
   </div>
 </section>
 
+<!-- ═══ BLOC EQUIPE ═══ -->
+<section class="section" style="background:var(--bg2);border-top:1px solid var(--border);padding-top:56px;padding-bottom:56px;">
+  <div class="section-inner" style="max-width:560px;">
+    <div class="section-eyebrow">Formation en équipe</div>
+    <h2 class="section-title" style="font-size:clamp(24px,4vw,36px);margin-bottom:12px;">Vous avez une équipe à former ?</h2>
+    <p style="color:var(--muted);font-size:15px;margin-bottom:32px;line-height:1.6;">Nos contenus, tarifs et modalités s'adaptent à votre structure.<br>Laissez-nous votre numéro — Jean vous rappelle.</p>
+    <form id="form-equipe" onsubmit="submitLeadEquipe(event)" style="display:flex;gap:12px;flex-wrap:wrap;">
+      <input
+        id="input-tel-equipe"
+        type="tel"
+        placeholder="Votre numéro de téléphone"
+        required
+        style="flex:1;min-width:200px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r1);padding:12px 16px;font-size:15px;color:var(--white);outline:none;"
+        onfocus="this.style.borderColor='var(--accent)'"
+        onblur="this.style.borderColor='var(--border2)'"
+      />
+      <button type="submit" class="btn-primary" style="white-space:nowrap;">Jean vous rappelle</button>
+    </form>
+    <div id="equipe-confirm" style="display:none;margin-top:16px;color:var(--accent2);font-size:14px;font-weight:500;">C'est noté. Jean vous rappelle très vite.</div>
+    <div id="equipe-error" style="display:none;margin-top:16px;color:#e05c8a;font-size:14px;">Une erreur est survenue. Réessayez ou écrivez à hello@bingedda.fr.</div>
+  </div>
+</section>
+
 <!-- ═══ LOGOS BAR ═══ -->
 <div class="logos-bar">
   <div class="logos-inner">
@@ -665,9 +688,9 @@ footer{
     <p class="section-sub">La formation DDA a longtemps été perçue comme une contrainte coûteuse et peu engageante. BingeDDA change la donne : un abonnement, un catalogue vivant, une liberté totale.</p>
     <div class="args-grid">
       <div class="arg-card ac-blue">
-        <div class="arg-num blue">250€</div>
+        <div class="arg-num blue">800€</div>
         <div class="arg-label">Le prix que vous payiez avant</div>
-        <div class="arg-desc">Entre 250€ et 800€ HT par an, à l'acte, pour des contenus statiques et ennuyeux imposés par un organisme. Chez BingeDDA : <strong style="color:var(--accent2)">24,99€ HT/mois</strong>, renouvellement glissant sur 12 mois.</div>
+        <div class="arg-desc">Jusqu'à 800€ HT par an chez vos prestataires habituels.<br>BingeDDA : 299,88€ HT sur 12 mois.<br><strong>Soit jusqu'à 500€ économisés. Par personne. Chaque année.</strong></div>
       </div>
       <div class="arg-card ac-teal">
         <div class="arg-num teal">200+</div>
@@ -1813,6 +1836,28 @@ function populateConfirmation() {
 }
 
 // ── SUPABASE ──
+async function submitLeadEquipe(e) {
+  e.preventDefault();
+  const tel = document.getElementById('input-tel-equipe').value.trim();
+  const btn = e.target.querySelector('button[type="submit"]');
+  btn.disabled = true;
+  btn.textContent = '...';
+  try {
+    const res = await fetch('https://vrufldjydjrgcqwhmpnt.supabase.co/functions/v1/lead-equipe', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ telephone: tel })
+    });
+    if (!res.ok) throw new Error();
+    document.getElementById('form-equipe').style.display = 'none';
+    document.getElementById('equipe-confirm').style.display = 'block';
+  } catch {
+    document.getElementById('equipe-error').style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = 'Jean vous rappelle';
+  }
+}
+
 const SUPABASE_URL  = 'https://vrufldjydjrgcqwhmpnt.supabase.co';
 const SUPABASE_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZydWZsZGp5ZGpyZ2Nxd2htcG50Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5NTA3ODksImV4cCI6MjA5MjUyNjc4OX0.jW1CQ5yzJr4Ccac9-OI2RgVLXqFn-X0MjAxCkc9Xbfc';
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
