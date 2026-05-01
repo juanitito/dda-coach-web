@@ -977,6 +977,19 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text)
       <div id="ac-pref-msg" style="display:none;margin-top:8px;font-size:12px;"></div>
     </div>
 
+    <!-- Section Résiliation -->
+    <div class="account-section" id="ac-cancel-section" style="display:none;">
+      <div class="account-section-title" style="color:#ff6b6b;">⚠ Résilier mon abonnement</div>
+      <div style="font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.5;">
+        Cette action annule définitivement votre mandat de prélèvement et met fin à votre abonnement BingeDDA.
+        Vous perdrez l'accès à la formation immédiatement et ne pourrez plus télécharger d'attestation.
+      </div>
+      <button class="account-btn" id="btn-cancel-sub" onclick="confirmCancelSubscription()" style="background:rgba(255,107,107,.1);border:1px solid rgba(255,107,107,.3);color:#ff6b6b;">
+        Résilier mon abonnement
+      </button>
+      <div id="ac-cancel-msg" style="display:none;margin-top:8px;font-size:12px;"></div>
+    </div>
+
   </div>
 </div>
 
@@ -1783,6 +1796,56 @@ async function loadAccountData() {
       </div>`;
   } else {
     subEl.textContent = 'Aucun abonnement actif.';
+  }
+
+  // Section résiliation : visible seulement si abonnement résiliable.
+  const cancelSection = document.getElementById('ac-cancel-section');
+  if (cancelSection) {
+    const canCancel = sub && ['active', 'pending', 'past_due'].includes(sub.status);
+    cancelSection.style.display = canCancel ? 'block' : 'none';
+  }
+}
+
+async function confirmCancelSubscription() {
+  if (!confirm("Êtes-vous sûr de vouloir résilier votre abonnement BingeDDA ? Cette action est irréversible et coupera immédiatement votre accès à la formation.")) return;
+
+  const sb = window._sb;
+  if (!sb) return;
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) return;
+
+  const btn   = document.getElementById('btn-cancel-sub');
+  const msgEl = document.getElementById('ac-cancel-msg');
+  btn.disabled = true;
+  btn.textContent = 'Résiliation en cours…';
+  msgEl.style.display = 'block';
+  msgEl.style.color = 'var(--muted)';
+  msgEl.textContent = '';
+
+  try {
+    const r = await fetch(`${SUPABASE_URL}/functions/v1/cancel-subscription`, {
+      method:  'POST',
+      headers: {
+        'Authorization': `Bearer ${session.access_token}`,
+        'Content-Type':  'application/json'
+      }
+    });
+    const data = await r.json().catch(() => ({}));
+    if (r.ok && data.ok) {
+      msgEl.style.color = 'var(--teal)';
+      msgEl.textContent = '✓ Abonnement résilié. Un email de confirmation vous a été envoyé.';
+      setTimeout(() => { window.location.href = '/'; }, 2500);
+    } else {
+      btn.disabled = false;
+      btn.textContent = 'Résilier mon abonnement';
+      msgEl.style.color = '#f87171';
+      msgEl.textContent = '⚠ ' + (data.error || `Erreur ${r.status}`);
+    }
+  } catch (e) {
+    btn.disabled = false;
+    btn.textContent = 'Résilier mon abonnement';
+    msgEl.style.color = '#f87171';
+    msgEl.textContent = '⚠ Erreur réseau';
   }
 }
 

@@ -190,10 +190,12 @@ async function processEvent(event: any) {
         .from("subscriptions")
         .update({ status: "cancelled", cancelled_at: new Date().toISOString() })
         .eq("gc_mandate_id", gcMandateId)
-        .select("user_id")
+        .select("user_id, cancelled_by_user")
         .single();
 
-      if (sub) {
+      // Si l'user a déclenché la résiliation depuis "Mon compte", cancel-subscription
+      // a déjà envoyé le mail "resiliation" → on évite le double envoi mandat_annule.
+      if (sub && !sub.cancelled_by_user) {
         await sendEmail(sub.user_id, "mandat_annule");
       }
     }
