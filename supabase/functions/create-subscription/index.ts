@@ -113,13 +113,23 @@ serve(async (req) => {
         { customers: customerPayload }
       );
       customerId = customer.id;
-      console.log("create-subscription: updated existing GC customer", customerId);
+      console.log("create-subscription: updated GC customer", {
+        id: customerId,
+        sent_company_name: raison_sociale,
+        gc_returned_company_name: customer.company_name,
+        gc_returned_given_name: customer.given_name,
+        gc_returned_family_name: customer.family_name
+      });
     } else {
       const { customers: customer } = await gcRequest("POST", "/customers", {
         customers: customerPayload
       });
       customerId = customer.id;
-      console.log("create-subscription: created new GC customer", customerId);
+      console.log("create-subscription: created GC customer", {
+        id: customerId,
+        sent_company_name: raison_sociale,
+        gc_returned_company_name: customer.company_name
+      });
     }
 
     const { billing_requests: billingRequest } = await gcRequest("POST", "/billing_requests", {
