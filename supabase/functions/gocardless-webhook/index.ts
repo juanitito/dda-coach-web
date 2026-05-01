@@ -6,7 +6,10 @@ const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_ROLE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const supabase = createClient(SUPABASE_URL, SERVICE_ROLE);
 
-const GC_WEBHOOK_SECRET = Deno.env.get("GOCARDLESS_WEBHOOK_SECRET")!;
+const GC_WEBHOOK_SECRET = Deno.env.get("GOCARDLESS_WEBHOOK_SECRET") ?? "";
+// Mode diagnostic / sandbox : si à "false" on bypass la vérif HMAC (à NE JAMAIS faire en prod).
+// Par défaut on vérifie. Pour bypass, poser GC_WEBHOOK_VERIFY_SIGNATURE=false dans Supabase.
+const VERIFY_SIGNATURE = (Deno.env.get("GC_WEBHOOK_VERIFY_SIGNATURE") ?? "true").toLowerCase() !== "false";
 
 // Appel direct via fetch + service role : supabase.functions.invoke() ne pose
 // pas l'Authorization header attendu par send-email (verify_jwt: true).
@@ -41,8 +44,23 @@ serve(async (req) => {
   const body = await req.text();
   const signature = req.headers.get("Webhook-Signature") ?? "";
 
-  if (!await verifySignature(body, signature)) {
-    return new Response("Unauthorized", { status: 401 });
+  // Diagnostic : trace ce que GC nous envoie (utile tant qu'on cale le secret partagé)
+  const headerDump: Record<string, string> = {};
+  req.headers.forEach((v, k) => { headerDump[k] = v; });
+  console.log("gocardless-webhook received", {
+    has_signature:  !!signature,
+    signature_len:  signature.length,
+    body_len:       body.length,
+    headers:        headerDump
+  });
+
+  if (VERIFY_SIGNATURE) {
+    if (!signature || !await verifySignature(body, signature)) {
+      console.error("gocardless-webhook: signature check failed");
+      return new Response("Unauthorized", { status: 401 });
+    }
+  } else {
+    console.warn("gocardless-webhook: SIGNATURE VERIFICATION BYPASSED (sandbox mode)");
   }
 
   const payload = JSON.parse(body);
