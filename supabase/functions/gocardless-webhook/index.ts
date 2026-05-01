@@ -146,10 +146,23 @@ async function processEvent(event: any) {
 
   if (resource_type === "mandates") {
     const gcMandateId = links.mandate;
+    const gcCustomerId = links.customer;
+
+    // À la création du mandate (l'user vient de signer sur GC), on remonte
+    // le mandate_id sur le sub via le customer_id stocké à l'inscription.
+    // Sans ce link, les events suivants (active/cancelled/failed) ne matcheraient
+    // aucun sub car gc_mandate_id resterait NULL.
+    if (action === "created" && gcCustomerId) {
+      await supabase.from("subscriptions")
+        .update({ gc_mandate_id: gcMandateId })
+        .eq("gc_customer_id", gcCustomerId)
+        .eq("status", "pending")
+        .is("gc_mandate_id", null);
+    }
 
     if (action === "active") {
       await supabase.from("subscriptions")
-        .update({ status: "active" })
+        .update({ status: "active", started_at: new Date().toISOString() })
         .eq("gc_mandate_id", gcMandateId)
         .eq("status", "pending");
     }
