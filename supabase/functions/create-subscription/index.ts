@@ -148,7 +148,6 @@ serve(async (req) => {
           city:          ville          || undefined,
           country_code:  "FR",
           company_name:  raison_sociale || undefined,
-          language:      "fr",
           phone_number:  phone
         },
         links:              { billing_request: billingRequest.id }
