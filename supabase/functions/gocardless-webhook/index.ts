@@ -7,6 +7,8 @@ const SERVICE_ROLE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const supabase = createClient(SUPABASE_URL, SERVICE_ROLE);
 
 const GC_WEBHOOK_SECRET = Deno.env.get("GOCARDLESS_WEBHOOK_SECRET") ?? "";
+const GC_API_KEY        = Deno.env.get("GOCARDLESS_ACCESS_TOKEN") ?? "";
+const GC_API_URL        = Deno.env.get("GOCARDLESS_API_URL") ?? "https://api-sandbox.gocardless.com";
 // Mode diagnostic / sandbox : si à "false" on bypass la vérif HMAC (à NE JAMAIS faire en prod).
 // Par défaut on vérifie. Pour bypass, poser GC_WEBHOOK_VERIFY_SIGNATURE=false dans Supabase.
 const VERIFY_SIGNATURE = (Deno.env.get("GC_WEBHOOK_VERIFY_SIGNATURE") ?? "true").toLowerCase() !== "false";
@@ -146,18 +148,34 @@ async function processEvent(event: any) {
 
   if (resource_type === "mandates") {
     const gcMandateId = links.mandate;
-    const gcCustomerId = links.customer;
 
     // À la création du mandate (l'user vient de signer sur GC), on remonte
-    // le mandate_id sur le sub via le customer_id stocké à l'inscription.
-    // Sans ce link, les events suivants (active/cancelled/failed) ne matcheraient
-    // aucun sub car gc_mandate_id resterait NULL.
-    if (action === "created" && gcCustomerId) {
-      await supabase.from("subscriptions")
-        .update({ gc_mandate_id: gcMandateId })
-        .eq("gc_customer_id", gcCustomerId)
-        .eq("status", "pending")
-        .is("gc_mandate_id", null);
+    // le mandate_id sur le sub. Le payload mandates.created ne contient pas
+    // links.customer ; on le récupère via le billing_request.
+    if (action === "created" && links.billing_request) {
+      try {
+        const r = await fetch(`${GC_API_URL}/billing_requests/${links.billing_request}`, {
+          headers: {
+            "Authorization":      `Bearer ${GC_API_KEY}`,
+            "GoCardless-Version": "2015-07-06"
+          }
+        });
+        if (r.ok) {
+          const data = await r.json();
+          const gcCustomerId = data.billing_requests?.links?.customer;
+          if (gcCustomerId) {
+            await supabase.from("subscriptions")
+              .update({ gc_mandate_id: gcMandateId })
+              .eq("gc_customer_id", gcCustomerId)
+              .eq("status", "pending")
+              .is("gc_mandate_id", null);
+          }
+        } else {
+          console.error("GET /billing_requests failed:", r.status, await r.text());
+        }
+      } catch (e) {
+        console.error("mandates.created link error:", e);
+      }
     }
 
     if (action === "active") {
