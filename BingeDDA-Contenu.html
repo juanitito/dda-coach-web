@@ -564,6 +564,16 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text)
 }
 .form-select:focus{border-color:var(--accent);}
 .form-hint{font-size:11px;color:var(--muted);margin-top:5px;}
+.form-pwd{position:relative;}
+.form-pwd .form-input{padding-right:42px;}
+.pwd-toggle{
+  position:absolute;right:10px;top:50%;transform:translateY(-50%);
+  background:none;border:none;padding:6px;cursor:pointer;color:var(--muted);
+  display:flex;align-items:center;justify-content:center;border-radius:6px;
+  transition:color .2s,background .2s;
+}
+.pwd-toggle:hover{color:var(--white);background:rgba(255,255,255,.05);}
+.pwd-toggle svg{width:18px;height:18px;display:block;}
 
 .dda-timer {
   position:fixed; bottom:24px; left:24px; z-index:200;
@@ -862,11 +872,21 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text)
       </div>
       <div class="form-group">
         <label class="account-label">Nouveau mot de passe</label>
-        <input class="form-input" id="ac-mdp" type="password" placeholder="Laisser vide pour ne pas modifier">
+        <div class="form-pwd">
+          <input class="form-input" id="ac-mdp" type="password" placeholder="Laisser vide pour ne pas modifier" autocomplete="new-password">
+          <button type="button" class="pwd-toggle" aria-label="Afficher/masquer le mot de passe" onclick="togglePassword('ac-mdp', this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
       </div>
       <div class="form-group">
         <label class="account-label">Confirmer le mot de passe</label>
-        <input class="form-input" id="ac-mdp2" type="password" placeholder="Confirmer le nouveau mot de passe">
+        <div class="form-pwd">
+          <input class="form-input" id="ac-mdp2" type="password" placeholder="Confirmer le nouveau mot de passe" autocomplete="new-password">
+          <button type="button" class="pwd-toggle" aria-label="Afficher/masquer le mot de passe" onclick="togglePassword('ac-mdp2', this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
       </div>
       <button class="account-btn" onclick="savePersonalInfo()">Enregistrer les modifications</button>
       <div id="ac-personal-msg" style="display:none;margin-top:8px;font-size:12px;"></div>
@@ -1677,6 +1697,17 @@ function buildCard(grid, mod, sec) {
 
   card.addEventListener('click', () => openModal(code));
   grid.appendChild(card);
+}
+
+// ===== PASSWORD VISIBILITY TOGGLE =====
+const EYE_OPEN  = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
+const EYE_OFF   = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>';
+function togglePassword(id, btn) {
+  const input = document.getElementById(id);
+  if (!input) return;
+  const showing = input.type === 'text';
+  input.type = showing ? 'password' : 'text';
+  if (btn) btn.innerHTML = showing ? EYE_OPEN : EYE_OFF;
 }
 
 // ===== MON COMPTE =====
