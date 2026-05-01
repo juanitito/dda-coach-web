@@ -1,9 +1,10 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
+const SERVICE_ROLE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const supabase = createClient(
   Deno.env.get("SUPABASE_URL")!,
-  Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+  SERVICE_ROLE
 );
 
 const BREVO_API_KEY  = Deno.env.get("BREVO_API_KEY")!;
@@ -27,8 +28,15 @@ const TEMPLATES: Record<string, number> = {
   resiliation:         13,
 };
 
+// Auth interne : send-email est déployée avec verify_jwt=false (les appels viennent
+// d'autres Edge Functions, pas du browser). On exige un header partagé avec le
+// SERVICE_ROLE pour empêcher l'usage public.
 serve(async (req) => {
   if (req.method !== "POST") return new Response("Method Not Allowed", { status: 405 });
+
+  if (req.headers.get("x-internal-secret") !== SERVICE_ROLE) {
+    return new Response("Unauthorized", { status: 401 });
+  }
 
   const { userId, templateId, metadata } = await req.json();
 

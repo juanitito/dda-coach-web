@@ -211,8 +211,8 @@ serve(async (req) => {
     }).eq("id", user.id);
 
     // Onboarding J0 envoyé seulement à la 1re tentative (pas à chaque ré-essai du funnel).
-    // Appel direct via fetch + service role : supabase.functions.invoke() ne pose pas
-    // l'Authorization header attendu par les Edge Functions avec verify_jwt: true.
+    // send-email est déployée avec verify_jwt=false + check du header partagé
+    // x-internal-secret = SERVICE_ROLE (auth interne entre Edge Functions).
     if (!existing) {
       try {
         const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
@@ -220,9 +220,8 @@ serve(async (req) => {
         const r = await fetch(`${SUPABASE_URL}/functions/v1/send-email`, {
           method:  "POST",
           headers: {
-            "Authorization": `Bearer ${SERVICE_ROLE}`,
-            "apikey":        SERVICE_ROLE,
-            "Content-Type":  "application/json"
+            "x-internal-secret": SERVICE_ROLE,
+            "Content-Type":      "application/json"
           },
           body: JSON.stringify({
             userId:     user.id,

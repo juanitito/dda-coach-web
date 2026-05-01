@@ -5,15 +5,14 @@ const SUPABASE_URL  = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_ROLE  = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const supabase = createClient(SUPABASE_URL, SERVICE_ROLE);
 
-// Appel direct via fetch + service role : supabase.functions.invoke() ne pose
-// pas l'Authorization header attendu par send-email (verify_jwt: true).
+// send-email est déployée avec verify_jwt=false et exige le header partagé
+// x-internal-secret = SERVICE_ROLE (auth interne entre Edge Functions).
 async function sendEmail(userId: string, templateId: string, metadata: Record<string, unknown> = {}) {
   const r = await fetch(`${SUPABASE_URL}/functions/v1/send-email`, {
     method:  "POST",
     headers: {
-      "Authorization": `Bearer ${SERVICE_ROLE}`,
-      "apikey":        SERVICE_ROLE,
-      "Content-Type":  "application/json"
+      "x-internal-secret": SERVICE_ROLE,
+      "Content-Type":      "application/json"
     },
     body: JSON.stringify({ userId, templateId, metadata })
   });
