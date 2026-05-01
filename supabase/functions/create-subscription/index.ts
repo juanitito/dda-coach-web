@@ -210,15 +210,29 @@ serve(async (req) => {
       raison_sociale: raison_sociale ?? null
     }).eq("id", user.id);
 
-    // Onboarding J0 envoyé seulement à la 1re tentative (pas à chaque ré-essai du funnel)
+    // Onboarding J0 envoyé seulement à la 1re tentative (pas à chaque ré-essai du funnel).
+    // Appel direct via fetch + service role : supabase.functions.invoke() ne pose pas
+    // l'Authorization header attendu par les Edge Functions avec verify_jwt: true.
     if (!existing) {
-      await supabase.functions.invoke("send-email", {
-        body: {
-          userId:     user.id,
-          templateId: "onboarding_j0",
-          metadata:   {}
-        }
-      });
+      try {
+        const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
+        const SERVICE_ROLE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+        const r = await fetch(`${SUPABASE_URL}/functions/v1/send-email`, {
+          method:  "POST",
+          headers: {
+            "Authorization": `Bearer ${SERVICE_ROLE}`,
+            "Content-Type":  "application/json"
+          },
+          body: JSON.stringify({
+            userId:     user.id,
+            templateId: "onboarding_j0",
+            metadata:   {}
+          })
+        });
+        if (!r.ok) console.error("send-email onboarding_j0 failed:", r.status, await r.text());
+      } catch (e) {
+        console.error("send-email onboarding_j0 invoke error:", e);
+      }
     }
 
     return new Response(JSON.stringify({
