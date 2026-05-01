@@ -20,6 +20,7 @@ async function sendEmail(userId: string, templateId: string, metadata: Record<st
     method:  "POST",
     headers: {
       "Authorization": `Bearer ${SERVICE_ROLE}`,
+      "apikey":        SERVICE_ROLE,
       "Content-Type":  "application/json"
     },
     body: JSON.stringify({ userId, templateId, metadata })
