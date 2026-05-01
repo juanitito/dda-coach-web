@@ -170,11 +170,10 @@ serve(async (req) => {
 
     const { billing_request_flows: flow } = await gcRequest("POST", "/billing_request_flows", {
       billing_request_flows: {
-        redirect_uri:           GC_REDIRECT_URL,
-        exit_uri:               GC_EXIT_URL,
-        language:               "fr",
-        lock_customer_details:  true,
-        lock_bank_account:      true,
+        redirect_uri:       GC_REDIRECT_URL,
+        exit_uri:           GC_EXIT_URL,
+        language:           "fr",
+        lock_bank_account:  true,
         prefilled_customer: {
           email,
           given_name:    prenom,
