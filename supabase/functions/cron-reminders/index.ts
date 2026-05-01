@@ -20,7 +20,7 @@ async function sendEmail(userId: string, templateId: string, metadata: Record<st
 }
 
 // J-N depuis started_at : envoie une fois si pas déjà loggé pour ce user+template.
-async function processOnboarding() {
+async function processOnboarding(now = new Date()) {
   const sequences = [
     { days: 3,  template: "onboarding_j3"  },
     { days: 7,  template: "onboarding_j7"  },
@@ -28,7 +28,7 @@ async function processOnboarding() {
   ];
 
   for (const seq of sequences) {
-    const target = new Date();
+    const target = new Date(now);
     target.setDate(target.getDate() - seq.days);
     const dateStr = target.toISOString().split("T")[0];
 
@@ -57,8 +57,7 @@ async function processOnboarding() {
 // Idempotence via flags renewal_reminded_60/30/7 (sémantiquement détournés
 // pour les rappels DDA — historiquement nommés "renewal" mais c'est la même
 // colonne, on évite une migration de schéma).
-async function processDdaReminders() {
-  const now = new Date();
+async function processDdaReminders(now = new Date()) {
   const year = now.getUTCFullYear();
   const endOfYear = Date.UTC(year, 11, 31);   // 31 déc 00:00 UTC
   const j60 = Date.UTC(year, 10, 2);          //  2 nov
@@ -106,8 +105,8 @@ async function processDdaReminders() {
 
 // Renouvellement annuel : le jour J où current_period_end tombe (= anniversaire
 // d'inscription). Idempotence via email_log (clé : user + template + period_end).
-async function processRenewal() {
-  const todayStr = new Date().toISOString().split("T")[0];
+async function processRenewal(now = new Date()) {
+  const todayStr = now.toISOString().split("T")[0];
 
   const { data: subs } = await supabase
     .from("subscriptions")
@@ -136,9 +135,15 @@ serve(async (req) => {
     return new Response("Unauthorized", { status: 401 });
   }
 
-  await processOnboarding();
-  await processDdaReminders();
-  await processRenewal();
+  let overrideDate: Date | undefined;
+  try {
+    const body = await req.json();
+    if (body?.testDate) overrideDate = new Date(body.testDate);
+  } catch { /* body vide ou absent */ }
 
-  return new Response(JSON.stringify({ ok: true, ts: new Date().toISOString() }));
+  await processOnboarding(overrideDate);
+  await processDdaReminders(overrideDate);
+  await processRenewal(overrideDate);
+
+  return new Response(JSON.stringify({ ok: true, ts: (overrideDate ?? new Date()).toISOString() }));
 });
